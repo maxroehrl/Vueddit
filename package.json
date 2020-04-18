@@ -1,0 +1,61 @@
+{
+  "name": "vueddit",
+  "version": "1.0.0",
+  "description": "A Reddit client built with NativeScript-Vue",
+  "author": "Max Röhrl <max.roehrl11@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxroehrl/Vueddit.git"
+  },
+  "nativescript": {
+    "id": "de.max.roehrl.vueddit",
+    "templateVersion": "v2",
+    "tns-ios": {
+      "version": "6.5.0"
+    },
+    "tns-android": {
+      "version": "6.5.0"
+    }
+  },
+  "dependencies": {
+    "@nativescript/theme": "^2.3.3",
+    "@nstudio/nativescript-loading-indicator": "^3.0.4",
+    "@vue/devtools": "^5.3.3",
+    "base-64": "^0.1.0",
+    "events": "^3.1.0",
+    "fs": "0.0.1-security",
+    "nativescript-markdown-view": "^2.0.0",
+    "nativescript-ripple2": "^2.3.0",
+    "nativescript-socketio": "^3.3.1",
+    "nativescript-toasty": "^2.0.1",
+    "nativescript-ui-listview": "^8.1.2",
+    "nativescript-ui-sidedrawer": "^8.0.1",
+    "nativescript-vue": "^2.6.1",
+    "nativescript-vue-devtools": "^1.4.0",
+    "path": "^0.12.7",
+    "stream": "0.0.2",
+    "tns-core-modules": "^6.5.1",
+    "url": "^0.11.0",
+    "util": "^0.12.3",
+    "vuex": "^3.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.9.6",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-i-am-meticulous": "^12.0.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-babel": "^5.3.0",
+    "eslint-plugin-vue": "^6.2.2",
+    "nativescript-dev-webpack": "^1.5.1",
+    "nativescript-vue-template-compiler": "^2.6.1",
+    "nativescript-worker-loader": "~0.11.0",
+    "node-sass": "^4.14.0",
+    "vue-loader": "^15.9.2"
+  }
+}

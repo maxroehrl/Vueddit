@@ -1,0 +1,42 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": [
+      "google",
+      "plugin:vue/recommended"
+    ],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "parser": "babel-eslint",
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "vue",
+        "babel"
+    ],
+    "rules": {
+      "no-invalid-this": 0,
+      "vue/html-closing-bracket-newline": ["error", {
+        "singleline": "never",
+        "multiline": "never"
+      }],
+      "vue/max-attributes-per-line": ["error", {
+        "singleline": 2,
+        "multiline": {
+          "max": 1,
+          "allowFirstLine": true
+        }
+      }],
+      "vue/no-v-html": 0,
+      "max-len": 0,
+      "linebreak-style": 0,
+      "vue/attribute-hyphenation": 0,
+      "require-jsdoc": "off"
+    }
+}
