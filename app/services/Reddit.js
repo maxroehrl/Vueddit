@@ -33,48 +33,64 @@ export default class Reddit {
   }
 
   static authorize(page) {
-    const url = `${this.api}/api/v1/authorize.compact?client_id=${this.clientId}&response_type=token&state=${this.randomState}&redirect_uri=${this.redirectUri}&scope=${this.scope}`;
+    const url = `${this.api}/api/v1/authorize.compact?client_id=${this.clientId}&response_type=code&state=${this.randomState}&redirect_uri=${this.redirectUri}&scope=${this.scope}&duration=permanent`;
     page.$navigateTo(Login, {
       transition: 'slide',
       props: {
-        post: {url},
-        onAuthorizationSuccessful: this.updateToken.bind(this, page),
+        url,
+        onAuthorizationSuccessful: this.getRefreshToken.bind(this, page),
       },
     });
   }
 
-  static refreshToken() {
-    // TODO How to refresh the token?
-    const form = new FormData();
-    form.set('grant_type', 'https://oauth.reddit.com/grants/installed_client');
-    form.set('device_id', 'DO_NOT_TRACK_THIS_DEVICE');
-    request({
-      url: `${this.api}/api/v1/access_token`,
-      method: 'POST',
-      content: `grant_type=refresh_token&refresh_token=${store.state.reddit.authToken}`,
-      headers: {
-        'Authorization': `Basic ${btoa(this.clientId + ':')}`,
-        'User-Agent': 'android:maxreddit:1.0 (by /u/VersaceManfred)',
-      },
-    }).then((data) => {
-      this.updateToken(null, data.content.toString());
-    });
-  }
-
-  static updateToken(page, responseUrl) {
-    const state = responseUrl.match(/state=([^&]+)&/)[1];
+  static getRefreshToken(page, responseUrl) {
+    const state = responseUrl.match(/state=([^&]+)/)[1];
     if (state === this.randomState) {
-      const authToken = responseUrl.match(/#access_token=([^&]+)&/)[1];
-      const validUntil = responseUrl.match(/expires_in=([^&]+)&/)[1];
-
-      store.dispatch('login', {authToken, validUntil}).then(() => {
-        if (page) {
-          page.$navigateBack({
-            transition: 'slide',
-          });
+      if (responseUrl.includes('code=')) {
+        const code = responseUrl.match(/code=([^&]+)/)[1];
+        return request({
+          url: `${this.api}/api/v1/access_token`,
+          method: 'POST',
+          content: `grant_type=authorization_code&code=${code}&redirect_uri=${this.redirectUri}`,
+          headers: {'Authorization': `Basic ${btoa(this.clientId + ':')}`},
+        }).then(this.handleResponse).then(this.updateToken.bind(this)).then(() => {
+          if (page) {
+            page.$navigateBack({
+              transition: 'slide',
+            });
+          }
+        });
+      } else {
+        const error = responseUrl.match(/error=([^&]+)/)[1];
+        if (error === 'access_denied') {
+          android.foregroundActivity.finish();
+        } else {
+          console.log('Login error: ', error);
         }
-      });
+      }
     }
+  }
+
+  static refreshAuthToken() {
+    if (store.state.reddit.refreshToken) {
+      return request({
+        url: `${this.api}/api/v1/access_token`,
+        method: 'POST',
+        content: `grant_type=refresh_token&refresh_token=${store.state.reddit.refreshToken}`,
+        headers: {'Authorization': `Basic ${btoa(this.clientId + ':')}`},
+      }).then(this.handleResponse).then(this.updateToken.bind(this));
+    } else {
+      return Promise.reject(new Error('No refresh token'));
+    }
+  }
+
+  static updateToken(response) {
+    const payload = {
+      authToken: response.access_token,
+      validUntil: response.expires_in + this.getUnixTime(),
+      refreshToken: response.refresh_token || store.state.reddit.refreshToken,
+    };
+    return store.dispatch('login', payload);
   }
 
   static getUser() {
@@ -133,27 +149,31 @@ export default class Reddit {
   }
 
   static get(url) {
-    return request({
+    return this.refreshTokenIfNecessary().then(() => request({
       url: `${this.oauthApi}${url}`,
       method: 'GET',
       headers: this.getHeaders(),
-    }).then(this.handleResponse);
+    })).then(this.handleResponse);
   }
 
   static post(url, content) {
-    return request({
+    return this.refreshTokenIfNecessary().then(() => request({
       url: `${this.oauthApi}${url}`,
       method: 'POST',
       headers: this.getHeaders(),
       content,
-    }).then(this.handleResponse);
+    })).then(this.handleResponse);
+  }
+
+  static refreshTokenIfNecessary() {
+    return store.state.reddit.validUntil <= this.getUnixTime() ? this.refreshAuthToken() : Promise.resolve();
   }
 
   static handleResponse(response) {
     if (response.statusCode === 200) {
       return response.content.toJSON();
-    } else if (response.statusCode === 401) {
-      throw new Error('Error 401');
+    } else {
+      throw new Error('Error: ' + response.statusCode);
     }
   }
 
@@ -174,5 +194,9 @@ export default class Reddit {
     } else {
       return 'res://ic_comment_text_multiple_outline_white_48dp';
     }
+  }
+
+  static getUnixTime() {
+    return Math.round(new Date().getTime() / 1000);
   }
 }

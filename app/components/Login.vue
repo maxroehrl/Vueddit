@@ -1,8 +1,9 @@
 <template>
-  <Page>
-    <ActionBar title="Login" />
+  <Page actionBarHidden="true"
+        @loaded="loaded($event)"
+        @unloaded="unloaded($event)">
     <StackLayout>
-      <WebView :src="post.url"
+      <WebView :src="url"
                @loadFinished="onLoadFinished"
                @loadStarted="onLoadStarted" />
     </StackLayout>
@@ -10,11 +11,14 @@
 </template>
 
 <script>
+import * as application from 'tns-core-modules/application';
+import {AndroidApplication} from 'tns-core-modules/application';
+
 export default {
   name: 'Login',
   props: {
-    post: {
-      type: Object,
+    url: {
+      type: String,
       required: true,
     },
     onAuthorizationSuccessful: {
@@ -23,6 +27,16 @@ export default {
     },
   },
   methods: {
+    loaded() {
+      application.android.on(AndroidApplication.activityBackPressedEvent, (data) => {
+        data.cancel = true;
+      });
+    },
+
+    unloaded() {
+      application.android.off(AndroidApplication.activityBackPressedEvent);
+    },
+
     onLoadStarted(args) {
       const androidWebView = args.object.android;
       if (androidWebView) {
@@ -33,22 +47,10 @@ export default {
     },
 
     onLoadFinished(args) {
-      if (!args.error && args.url && args.url.includes('#access_token=')) {
+      if (!args.error && args.url && (args.url.includes('code=') || args.url.includes('error='))) {
         this.onAuthorizationSuccessful(args.url);
       }
     },
   },
 };
 </script>
-
-<style scoped>
-  ActionBar {
-    background-color: #53ba82;
-    color: #ffffff;
-  }
-
-  WebView {
-    height: 100%;
-    width: 100%;
-  }
-</style>

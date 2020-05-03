@@ -10,6 +10,7 @@ export default new Vuex.Store({
       user: null,
       authToken: null,
       validUntil: null,
+      refreshToken: null,
     },
     lastVisitedSubreddits: [],
     starredSubreddits: [],
@@ -20,9 +21,10 @@ export default new Vuex.Store({
     },
   },
   mutations: {
-    setReddit(state, {authToken = null, validUntil = null}) {
+    setReddit(state, {authToken = null, validUntil = null, refreshToken = null}) {
       state.reddit.authToken = authToken;
       state.reddit.validUntil = validUntil;
+      state.reddit.refreshToken = refreshToken;
     },
     setRedditUser(state, {user = null}) {
       state.reddit.user = user;
@@ -55,14 +57,15 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    login({commit}, {authToken, validUntil}) {
-      commit('setReddit', {authToken, validUntil});
+    login({commit}, {authToken, validUntil, refreshToken}) {
+      commit('setReddit', {authToken, validUntil, refreshToken});
     },
     setRedditUser({commit}, {user}) {
       commit('setRedditUser', {user});
     },
     logout({commit}) {
-      commit('setReddit', {user: null, authToken: null, validUntil: null});
+      commit('setReddit', {authToken: null, validUntil: null, refreshToken: null});
+      commit('setRedditUser', {user: null});
     },
     visitSubreddit({commit}, {subreddit}) {
       commit('visitSubreddit', {subreddit: subreddit.display_name});
