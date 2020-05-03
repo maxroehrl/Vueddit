@@ -1,9 +1,10 @@
 // Add your native dependencies here:
 
 // Uncomment to add recyclerview-v7 dependency
-//dependencies {
+dependencies {
 //	implementation 'com.android.support:recyclerview-v7:+'
-//}
+  implementation 'saschpe.android:customtabs:3.0.2'
+}
 
 // If you want to add something to be applied before applying plugins' include.gradle files
 // e.g. project.ext.googlePlayServicesVersion = "15.0.1"

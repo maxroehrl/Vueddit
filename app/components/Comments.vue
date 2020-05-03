@@ -79,8 +79,9 @@
 <script>
 import {GestureTypes} from 'tns-core-modules/ui/gestures';
 import {ObservableArray} from 'tns-core-modules/data/observable-array';
+import {ad} from 'tns-core-modules/utils/utils';
+import * as app from 'tns-core-modules/application';
 import Reddit from '../services/Reddit';
-import ImageViewer from './ImageViewer';
 import Votes from './Votes';
 
 export default {
@@ -188,13 +189,27 @@ export default {
     },
 
     openUrl(post) {
-      if (!post.domain.endsWith(post.subreddit)) {
-        this.$navigateTo(ImageViewer, {
-          transition: 'slide',
-          props: {
-            post,
-          },
-        });
+      if (post.url) {
+        const activity = app.android.startActivity || app.android.foregroundActivity;
+        const backArrowId = ad.resources.getDrawableId('ic_arrow_left_white_48dp');
+        const slideInRight = ad.resources.getId(':anim/slide_in_right');
+        const slideOutLeft = ad.resources.getId(':anim/slide_out_left');
+        const slideInLeft = ad.resources.getId(':anim/slide_in_left');
+        const slideOutRight = ad.resources.getId(':anim/slide_out_right');
+        const backArrow = androidx.core.content.ContextCompat.getDrawable(activity, backArrowId).getBitmap();
+        const customTabsIntent = new androidx.browser.customtabs.CustomTabsIntent.Builder()
+            .addDefaultShareMenuItem()
+            .setShowTitle(true)
+            .setStartAnimations(activity, slideInRight, slideOutLeft)
+            .setExitAnimations(activity, slideInLeft, slideOutRight)
+            .setCloseButtonIcon(backArrow)
+            .enableUrlBarHiding()
+            .build();
+        const customTabsHelper = saschpe.android.customtabs.CustomTabsHelper.Companion;
+        const uri = android.net.Uri.parse(post.url);
+        const fallback = new saschpe.android.customtabs.WebViewFallback();
+        customTabsHelper.addKeepAliveExtra(activity, customTabsIntent.intent);
+        customTabsHelper.openCustomTab(activity, customTabsIntent, uri, fallback);
       }
     },
   },
