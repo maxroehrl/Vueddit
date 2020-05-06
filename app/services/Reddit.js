@@ -144,6 +144,18 @@ export default class Reddit {
     return this.post(`/api/unsave?id=${id}`);
   }
 
+  static getSaved(user) {
+    return this.get(`/user/${user}/saved`);
+  }
+
+  static getUpvoted(user) {
+    return this.get(`/user/${user}/upvoted`);
+  }
+
+  static getDownvoted(user) {
+    return this.get(`/user/${user}/downvoted`);
+  }
+
   static getEmojis(subreddit) {
     return this.get(`/api/v1/${subreddit}/emojis/all`);
   }
