@@ -18,34 +18,41 @@
                     @selectedIndexChange="onSortingChange" />
     </v-template>
     <v-template>
-      <Ripple rippleColor="#53ba82" @tap="openComments($event, post)">
-        <FlexboxLayout flexDirection="row"
-                       alignSelf="flex-start"
-                       justifyContent="flex-start">
-          <Votes :post="post" />
-          <Label textWrap="true"
-                 style="width: 65%">
-            <FormattedString>
-              <Span :style="{'background-color': post.link_flair_background_color || defaultFlairColor}"
-                    :text="post.link_flair_text"
-                    class="post-flair" />
-              <Span :text="post.link_flair_text ? ' ' + post.title : post.title"
-                    class="post-title"
-                    :style="{color: post.stickied && subreddit.created ? '#53ba82' : 'white'}" />
-              <Span :text="' (' + post.domain + ') \n'" class="post-domain" />
-              <Span :text="post.over_18 ? 'nsfw ' : ''" class="post-nsfw" />
-              <Span :text="post.spoiler ? 'spoiler ' : ''" class="post-spoiler" />
-              <Span :text="post.num_comments + ' comments '" class="post-num-comments" />
-              <Span :text="post.subreddit" class="post-subreddit" />
-            </FormattedString>
-          </Label>
-          <Image :src="getPreview(post)"
-                 stretch="aspectFit"
-                 width="20%"
-                 height="300px"
-                 loadMode="async" />
-        </FlexboxLayout>
-      </Ripple>
+      <FlexboxLayout flexDirection="row"
+                     alignSelf="flex-start"
+                     justifyContent="flex-start">
+        <Votes :post="post" />
+        <Ripple rippleColor="#53ba82"
+                width="80%"
+                @longPress="onLongPress(post)"
+                @tap="openComments(post)">
+          <FlexboxLayout flexDirection="row"
+                         alignSelf="flex-start"
+                         justifyContent="flex-start">
+            <Label textWrap="true"
+                   style="width: 80%">
+              <FormattedString>
+                <Span :style="{'background-color': post.link_flair_background_color || defaultFlairColor}"
+                      :text="post.link_flair_text"
+                      class="post-flair" />
+                <Span :text="post.link_flair_text ? ' ' + post.title : post.title"
+                      class="post-title"
+                      :style="{color: post.stickied && subreddit.created ? '#53ba82' : 'white'}" />
+                <Span :text="' (' + post.domain + ') \n'" class="post-domain" />
+                <Span :text="post.over_18 ? 'nsfw ' : ''" class="post-nsfw" />
+                <Span :text="post.spoiler ? 'spoiler ' : ''" class="post-spoiler" />
+                <Span :text="post.num_comments + ' comments '" class="post-num-comments" />
+                <Span :text="post.subreddit" class="post-subreddit" />
+              </FormattedString>
+            </Label>
+            <Image :src="getPreview(post)"
+                   stretch="aspectFit"
+                   width="20%"
+                   height="300px"
+                   loadMode="async" />
+          </FlexboxLayout>
+        </Ripple>
+      </FlexboxLayout>
     </v-template>
   </RadListView>
 </template>
@@ -53,6 +60,7 @@
 <script>
 import Reddit from '../services/Reddit';
 import {ObservableArray} from 'tns-core-modules/data/observable-array';
+import {action} from 'tns-core-modules/ui/dialogs';
 import Votes from './Votes';
 import Comments from './Comments';
 import {SegmentedBarItem} from 'tns-core-modules/ui/segmented-bar';
@@ -133,7 +141,7 @@ export default {
       return Reddit.getPreview(post);
     },
 
-    openComments(event, post) {
+    openComments(post) {
       // explode (Android Lollipop(21) and up only), fade,
       // flip (same as flipRight), flipRight, flipLeft,
       // slide (same as slideLeft), slideLeft, slideRight, slideTop, slideBottom
@@ -143,6 +151,10 @@ export default {
           post,
         },
       });
+    },
+
+    onLongPress(post) {
+      action({actions: ['Save', 'Goto /r/' + post.subreddit, 'Goto /u/' + post.author, 'Copy', 'Share']});
     },
   },
 };

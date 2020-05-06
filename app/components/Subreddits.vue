@@ -28,6 +28,7 @@
           </Ripple>
           <Ripple rippleColor="#53ba82"
                   width="80%"
+                  @longPress="onLongPress(subreddit)"
                   @tap="setSubreddit(subreddit)">
             <Label :text="subreddit.display_name"
                    class="subreddit-label" />
@@ -44,6 +45,7 @@ import {ObservableArray} from 'tns-core-modules/data/observable-array';
 import SidebarDialog from './SidebarDialog';
 import store from '../store';
 import {ad} from 'tns-core-modules/utils/utils';
+import {action} from 'tns-core-modules/ui/dialogs';
 
 export default {
   name: 'Subreddits',
@@ -204,8 +206,20 @@ export default {
       return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase());
     },
 
+    onLongPress(subreddit) {
+      action({actions: ['Sidebar']}).then((result) => {
+        if (result === 'Sidebar') {
+          this.showSidebar(subreddit);
+        }
+      });
+    },
+
     showSidebar(subreddit) {
-      this.$showModal(SidebarDialog, {props: {subreddit}});
+      Reddit.getSidebar(subreddit.display_name).then((response) => {
+        if (response && response.data && response.data.description) {
+          this.$showModal(SidebarDialog, {props: {sidebar: response.data.description}});
+        }
+      });
     },
   },
 };

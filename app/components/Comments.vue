@@ -17,28 +17,35 @@
                          justifyContent="flex-start"
                          class="post-header">
             <Votes :post="post" />
-            <Label textWrap="true" class="post-info">
-              <FormattedString>
-                <Span v-if="post.link_flair_text"
-                      :style="{'background-color': post.link_flair_background_color}"
-                      :text="post.link_flair_text"
-                      class="post-flair" />
-                <Span v-if="post.link_flair_text" text=" " />
-                <Span :text="post.title" />
-                <Span :text="' (' + post.domain + ')\n'" class="post" />
-                <Span :text="post.num_comments + ' comments '" class="post" />
-                <Span :text="post.subreddit + '\n'" class="post" />
-                <Span :text="getHours(post.created) + ' hours ago by '" class="post" />
-                <Span :text="post.author + ' '" class="post-author" />
-                <Span :text="post.author_flair_text"
-                      class="author-flair"
-                      :style="{'background-color': post.author_flair_background_color || defaultFlairColor}" />
-              </FormattedString>
-            </Label>
-            <Image id="postPreview"
-                   :src="getPreview(post)"
-                   stretch="aspectFit"
-                   class="post-preview" />
+            <Ripple rippleColor="#53ba82"
+                    class="post-info"
+                    @tap="showMoreOptions(post)">
+              <Label textWrap="true">
+                <FormattedString>
+                  <Span v-if="post.link_flair_text"
+                        :style="{'background-color': post.link_flair_background_color}"
+                        :text="post.link_flair_text"
+                        class="post-flair" />
+                  <Span v-if="post.link_flair_text" text=" " />
+                  <Span :text="post.title" />
+                  <Span :text="' (' + post.domain + ')\n'" class="post" />
+                  <Span :text="post.num_comments + ' comments '" class="post" />
+                  <Span :text="post.subreddit + '\n'" class="post" />
+                  <Span :text="getHours(post.created) + ' hours ago by '" class="post" />
+                  <Span :text="post.author + ' '" class="post-author" />
+                  <Span :text="post.author_flair_text"
+                        class="author-flair"
+                        :style="{'background-color': post.author_flair_background_color || defaultFlairColor}" />
+                </FormattedString>
+              </Label>
+            </Ripple>
+            <Ripple rippleColor="#53ba82"
+                    class="post-preview"
+                    @tap="openUrl(post)">
+              <Image id="postPreview"
+                     :src="getPreview(post)"
+                     stretch="aspectFit" />
+            </Ripple>
           </FlexboxLayout>
           <WebView v-if="Object.keys(post.secure_media_embed).length"
                    height="2000px"
@@ -77,9 +84,9 @@
 </template>
 
 <script>
-import {GestureTypes} from 'tns-core-modules/ui/gestures';
 import {ObservableArray} from 'tns-core-modules/data/observable-array';
 import {ad} from 'tns-core-modules/utils/utils';
+import {action} from 'tns-core-modules/ui/dialogs';
 import * as app from 'tns-core-modules/application';
 import Reddit from '../services/Reddit';
 import Votes from './Votes';
@@ -154,8 +161,6 @@ export default {
     },
 
     loaded(event) {
-      const page = event.object;
-      page.getViewById('postPreview').on(GestureTypes.tap, () => this.openUrl(this.post));
       if (!this.commentList.length) {
         this.getComments();
       }
@@ -211,6 +216,10 @@ export default {
         customTabsHelper.addKeepAliveExtra(activity, customTabsIntent.intent);
         customTabsHelper.openCustomTab(activity, customTabsIntent, uri, fallback);
       }
+    },
+
+    showMoreOptions(post) {
+      action({actions: ['Reply', 'Save', 'Goto ' + post.subreddit, 'Goto /u/' + post.author, 'Copy', 'Share']});
     },
   },
 };

@@ -1,46 +1,39 @@
 <template>
-  <Frame>
-    <Page>
-      <ActionBar title="Sidebar" />
-      <StackLayout>
-        <MarkdownView :markdown="sidebar"
-                      textWrap="true"
-                      class="sidebar-text" />
-        <Button text="Close" @tap="$modal.close" />
-      </StackLayout>
-    </Page>
-  </Frame>
+  <Page @loaded="loaded" @unloaded="unloaded">
+    <ScrollView class="sidebar">
+      <MarkdownView :markdown="sidebar" textWrap="true" />
+    </ScrollView>
+  </Page>
 </template>
 
 <script>
-import Reddit from '../services/Reddit';
+import * as application from 'tns-core-modules/application';
+import {AndroidApplication} from 'tns-core-modules/application';
 
 export default {
   name: 'Sidebar',
   props: {
-    subreddit: {
+    sidebar: {
       type: String,
       required: true,
     },
   },
-  data() {
-    return {
-      sidebar: '',
-    };
-  },
   methods: {
     loaded() {
-      Reddit.getSidebar(this.subreddit).then((response) => {
-        if (response && response.data) {
-          this.sidebar = response.data;
-        }
+      application.android.on(AndroidApplication.activityBackPressedEvent, (data) => {
+        this.$modal.close();
       });
+    },
+
+    unloaded() {
+      application.android.off(AndroidApplication.activityBackPressedEvent);
     },
   },
 };
 </script>
 
 <style scoped>
-  .sidebar-text {
+  .sidebar {
+    margin: 20px;
   }
 </style>

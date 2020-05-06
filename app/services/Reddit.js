@@ -129,7 +129,7 @@ export default class Reddit {
   }
 
   static getSidebar(subreddit) {
-    return this.get(`/r/${subreddit}/sidebar`);
+    return this.get(`/r/${subreddit}/about.json`);
   }
 
   static vote(id, dir) {
