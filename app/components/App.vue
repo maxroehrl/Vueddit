@@ -22,7 +22,7 @@
       </StackLayout>
 
       <StackLayout ~mainContent>
-        <Posts ref="postList" :subreddit.sync="subreddit" />
+        <Posts ref="postList" :subreddit="subreddit" />
       </StackLayout>
     </RadSideDrawer>
   </Page>
