@@ -7,9 +7,9 @@
       <v-template name="header">
         <StackLayout @loaded="searchLayoutLoaded">
           <SearchBar ref="searchbar"
+                     v-model="searchText"
                      hint="Search for subreddit"
                      class="searchbar"
-                     text=""
                      @loaded="searchbarLoaded"
                      @textChange="onSearchTextChanged"
                      @submit="onSubmit"
@@ -128,12 +128,11 @@ export default {
 
     onSearchTextChanged(event) {
       if (event.value) {
-        this.searchText = event.value;
-        Reddit.searchForSubreddit(event.value).then((result) => {
+        Reddit.searchForSubreddit(this.searchText).then((result) => {
           if (result && result.names) {
             this.subredditList = new ObservableArray(result.names.map((s) => ({display_name: s})));
             this.refreshList();
-            // setTimeout(this.$refs.searchbar.nativeView.focus, 1000);
+            setTimeout(() => this.$refs.searchbar.nativeView.focus(), 500);
           }
         });
       }
@@ -145,7 +144,7 @@ export default {
 
     onClear() {
       this.displaySubscriptions();
-      ad.dismissSoftInput();
+      setTimeout(() => ad.dismissSoftInput(), 50);
     },
 
     searchbarLoaded(event) {
