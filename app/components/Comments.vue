@@ -48,7 +48,7 @@
             </Ripple>
           </FlexboxLayout>
           <WebView v-if="Object.keys(post.secure_media_embed).length"
-                   height="2000px"
+                   :height="(post.secure_media_embed.height*2.5).toFixed(0) + 'px'"
                    :src="getSrc(post)"
                    @loadStarted="onLoadStarted" />
           <Image v-if="post.preview && post.preview.enabled && !Object.keys(post.secure_media_embed).length"
@@ -117,9 +117,10 @@ export default {
       if (androidWebView) {
         androidWebView.getSettings().setDomStorageEnabled(true);
         androidWebView.getSettings().setLoadWithOverviewMode(true);
-        androidWebView.getSettings().setUseWideViewPort(true);
+        androidWebView.getSettings().setUseWideViewPort(false);
         androidWebView.getSettings().setDisplayZoomControls(false);
         androidWebView.getSettings().setBuiltInZoomControls(true);
+        androidWebView.setInitialScale(1);
       }
     },
 
