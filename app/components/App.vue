@@ -70,9 +70,14 @@ export default {
         this.login();
       }
       // eslint-disable-next-line new-cap
-      // application.android.nativeApp.registerActivityLifecycleCallbacks(saschpe.android.customtabs.CustomTabsActivityLifecycleCallbacks());
+      // application.android.startActivity.registerActivityLifecycleCallbacks(saschpe.android.customtabs.CustomTabsActivityLifecycleCallbacks());
       application.android.on(AndroidApplication.activityBackPressedEvent, (data) => {
-        data.cancel = true;
+        if (this.lastSubreddits.length) {
+          this.loadingIndicator.show(this.loadingIndicatorOptions);
+          this.subreddit = this.lastSubreddits.pop();
+          setTimeout(() => this.$refs.postList.refresh().finally(() => this.loadingIndicator.hide()));
+          data.cancel = true;
+        }
       });
     },
 
