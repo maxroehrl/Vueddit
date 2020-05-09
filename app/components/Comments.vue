@@ -65,7 +65,7 @@
       </v-template>
       <v-template>
         <StackLayout :style="{marginLeft: ((comment.depth * 70) + 'px')}" class="comment">
-          <Label>
+          <Label textWrap="true">
             <FormattedString>
               <Span :text="comment.author_flair_text"
                     class="author-flair"
