@@ -284,7 +284,6 @@ export default {
   .comment {
     border-color: #767676;
     border-width: 5px;
-    border-radius: 30px;
   }
 
   .post-author {
