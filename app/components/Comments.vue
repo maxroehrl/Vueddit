@@ -47,11 +47,12 @@
                      stretch="aspectFit" />
             </Ripple>
           </FlexboxLayout>
-          <WebView v-if="Object.keys(post.secure_media_embed).length"
-                   :height="(post.secure_media_embed.height*2.5).toFixed(0) + 'px'"
-                   :src="getSrc(post)"
-                   @loadStarted="onLoadStarted" />
-          <Image v-if="post.preview && post.preview.enabled && !Object.keys(post.secure_media_embed).length"
+          <WebView v-if="getVideoSrc(post)"
+                   :height="(getVideoSrc(post).height*2.5).toFixed(0) + 'px'"
+                   :src="getVideoSrc(post).src"
+                   @loadFinished="onVideoPreviewLoadFinished"
+                   @loaded="onVideoPreviewLoaded" />
+          <Image v-else-if="post.preview && post.preview.enabled"
                  :src="getImage(post)"
                  stretch="aspectFit"
                  class="post-image"
@@ -112,7 +113,7 @@ export default {
       this.getComments().finally(() => args.object.notifyPullToRefreshFinished(true));
     },
 
-    onLoadStarted(args) {
+    onVideoPreviewLoaded(args) {
       const androidWebView = args.object.android;
       if (androidWebView) {
         androidWebView.getSettings().setDomStorageEnabled(true);
@@ -120,8 +121,11 @@ export default {
         androidWebView.getSettings().setUseWideViewPort(false);
         androidWebView.getSettings().setDisplayZoomControls(false);
         androidWebView.getSettings().setBuiltInZoomControls(true);
-        androidWebView.setInitialScale(1);
       }
+    },
+
+    onVideoPreviewLoadFinished(args) {
+      args.object.android.zoomOut();
     },
 
     getPreview(post) {
@@ -137,11 +141,19 @@ export default {
       }
     },
 
-    getSrc(post) {
-      if (post.secure_media_embed && post.secure_media_embed.content) {
-        return post.secure_media_embed.content;
+    getVideoSrc(post) {
+      if (post.secure_media_embed && post.secure_media_embed.media_domain_url) {
+        post.secure_media_embed.src = post.secure_media_embed.media_domain_url;
+        return post.secure_media_embed;
+      } else if (post.preview && post.preview.reddit_video_preview) {
+        post.preview.reddit_video_preview.src = post.preview.reddit_video_preview.fallback_url;
+        return post.preview.reddit_video_preview;
+      } else if (post.preview && post.preview.images && post.preview.images.length &&
+        post.preview.images[0].variants && post.preview.images[0].variants.mp4) {
+        post.preview.images[0].variants.mp4.source.src = post.preview.images[0].variants.mp4.source.url;
+        return post.preview.images[0].variants.mp4.source;
       } else {
-        return '';
+        return null;
       }
     },
 
