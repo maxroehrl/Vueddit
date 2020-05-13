@@ -1,4 +1,4 @@
-import {android} from 'tns-core-modules/application';
+import * as app from 'tns-core-modules/application';
 import {request} from 'tns-core-modules/http';
 import Login from '../components/Login';
 import store from '../store';
@@ -24,7 +24,7 @@ export default class Reddit {
 
   static getHeaders() {
     if (!this.userAgent) {
-      this.userAgent = `${android.context.getPackageName()}:${android.context.getPackageManager().getPackageInfo(android.context.getPackageName(), 0).versionName} (by /u/MaxRoehrl)`;
+      this.userAgent = `${app.android.context.getPackageName()}:${app.android.context.getPackageManager().getPackageInfo(app.android.context.getPackageName(), 0).versionName} (by /u/MaxRoehrl)`;
     }
     return {
       'User-Agent': this.userAgent,
@@ -63,7 +63,7 @@ export default class Reddit {
       } else {
         const error = responseUrl.match(/error=([^&]+)/)[1];
         if (error === 'access_denied') {
-          android.foregroundActivity.finish();
+          app.android.foregroundActivity.finish();
         } else {
           console.log('Login error: ', error);
         }
