@@ -7,7 +7,6 @@ import VueDevtools from 'nativescript-vue-devtools';
 import RadSideDrawer from 'nativescript-ui-sidedrawer/vue';
 import RadListView from 'nativescript-ui-listview/vue';
 import {Ripple} from 'nativescript-ripple2';
-import {MarkdownView} from 'nativescript-markdown-view';
 
 import {decode, encode} from 'base-64';
 
@@ -31,7 +30,6 @@ if (TNS_ENV !== 'production') {
 Vue.use(RadSideDrawer);
 Vue.use(RadListView);
 Vue.registerElement('Ripple', () => Ripple);
-Vue.registerElement('MarkdownView', () => MarkdownView);
 
 new Vue({
   store,

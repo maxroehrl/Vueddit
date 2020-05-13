@@ -57,10 +57,10 @@
                  stretch="aspectFit"
                  class="post-image"
                  loadMode="async" />
-          <MarkdownView v-if="post.selftext !== ''"
-                        :markdown="post.selftext"
-                        textWrap="true"
-                        class="post-text" />
+          <Label v-if="post.selftext !== ''"
+                 :text="markdown(post.selftext)"
+                 textWrap="true"
+                 class="post-text" />
           <Label class="comment-label" :text="post.num_comments <= 1 ? '1 comment' : post.num_comments + ' comments'" />
         </StackLayout>
       </v-template>
@@ -77,7 +77,9 @@
               <Span :text="getHours(comment.created) + ' hours ago'" class="comment-created" />
             </FormattedString>
           </Label>
-          <MarkdownView :markdown="comment.body" class="comment-body" />
+          <Label :text="markdown(comment.body)"
+                 class="comment-body"
+                 textWrap="true" />
         </StackLayout>
       </v-template>
     </RadListView>
@@ -87,6 +89,7 @@
 <script>
 import {ObservableArray} from 'tns-core-modules/data/observable-array';
 import {action} from 'tns-core-modules/ui/dialogs';
+import Markdown from '../services/Markdown';
 import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
 import Votes from './Votes';
@@ -176,6 +179,10 @@ export default {
       if (!this.commentList.length) {
         this.getComments();
       }
+    },
+
+    markdown(text) {
+      return Markdown.toMarkdown(text);
     },
 
     getComments() {

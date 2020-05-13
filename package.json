@@ -25,7 +25,6 @@
     "base-64": "^0.1.0",
     "events": "^3.1.0",
     "fs": "0.0.1-security",
-    "nativescript-markdown-view": "^2.0.0",
     "nativescript-ripple2": "^2.3.0",
     "nativescript-socketio": "^3.3.1",
     "nativescript-toasty": "^2.0.1",
@@ -38,7 +37,7 @@
     "tns-core-modules": "^6.5.1",
     "url": "^0.11.0",
     "util": "^0.12.3",
-    "vuex": "^3.3.0"
+    "vuex": "^3.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
