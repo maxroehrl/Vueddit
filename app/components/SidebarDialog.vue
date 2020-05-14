@@ -1,7 +1,7 @@
 <template>
   <Page @loaded="loaded" @unloaded="unloaded">
     <ScrollView class="sidebar">
-      <Label :text="markdown(sidebar)" textWrap="true" />
+      <MarkdownView :text="sidebar" />
     </ScrollView>
   </Page>
 </template>
@@ -9,10 +9,11 @@
 <script>
 import * as application from 'tns-core-modules/application';
 import {AndroidApplication} from 'tns-core-modules/application';
-import Markdown from '../services/Markdown';
+import MarkdownView from './MarkdownView';
 
 export default {
   name: 'Sidebar',
+  components: {MarkdownView},
   props: {
     sidebar: {
       type: String,
@@ -28,10 +29,6 @@ export default {
 
     unloaded() {
       application.android.off(AndroidApplication.activityBackPressedEvent);
-    },
-
-    markdown(text) {
-      return Markdown.toMarkdown(text);
     },
   },
 };

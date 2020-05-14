@@ -10,77 +10,10 @@
                  pullToRefresh="true"
                  @pullToRefreshInitiated="onPullDown">
       <v-template name="header">
-        <StackLayout>
-          <FlexboxLayout flexDirection="row"
-                         flexWrap="nowrap"
-                         alignSelf="flex-start"
-                         justifyContent="flex-start"
-                         class="post-header">
-            <Votes :post="post" />
-            <Ripple rippleColor="#53ba82"
-                    class="post-info"
-                    @tap="showMoreOptions(post)">
-              <Label textWrap="true">
-                <FormattedString>
-                  <Span v-if="post.link_flair_text"
-                        :style="{'background-color': post.link_flair_background_color}"
-                        :text="post.link_flair_text"
-                        class="post-flair" />
-                  <Span v-if="post.link_flair_text" text=" " />
-                  <Span :text="post.title" />
-                  <Span :text="' (' + post.domain + ')\n'" class="post" />
-                  <Span :text="post.num_comments + ' comments '" class="post" />
-                  <Span :text="post.subreddit + '\n'" class="post" />
-                  <Span :text="getHours(post.created) + ' hours ago by '" class="post" />
-                  <Span :text="post.author + ' '" class="post-author" />
-                  <Span :text="post.author_flair_text"
-                        class="author-flair"
-                        :style="{'background-color': post.author_flair_background_color || defaultFlairColor}" />
-                </FormattedString>
-              </Label>
-            </Ripple>
-            <Ripple rippleColor="#53ba82"
-                    class="post-preview"
-                    @tap="openUrl(post)">
-              <Image id="postPreview"
-                     :src="getPreview(post)"
-                     stretch="aspectFit" />
-            </Ripple>
-          </FlexboxLayout>
-          <WebView v-if="getVideoSrc(post)"
-                   :height="(getVideoSrc(post).height*2.5).toFixed(0) + 'px'"
-                   :src="getVideoSrc(post).src"
-                   @loadFinished="onVideoPreviewLoadFinished"
-                   @loaded="onVideoPreviewLoaded" />
-          <Image v-else-if="post.preview && post.preview.enabled"
-                 :src="getImage(post)"
-                 stretch="aspectFit"
-                 class="post-image"
-                 loadMode="async" />
-          <Label v-if="post.selftext !== ''"
-                 :text="markdown(post.selftext)"
-                 textWrap="true"
-                 class="post-text" />
-          <Label class="comment-label" :text="post.num_comments <= 1 ? '1 comment' : post.num_comments + ' comments'" />
-        </StackLayout>
+        <Post :post="post" />
       </v-template>
       <v-template>
-        <StackLayout :style="{marginLeft: ((comment.depth * 70) + 'px')}" class="comment">
-          <Label textWrap="true">
-            <FormattedString>
-              <Span :text="comment.author_flair_text"
-                    class="author-flair"
-                    :style="{'background-color': comment.author_flair_background_color || defaultFlairColor}" />
-              <Span :text="(comment.author_flair_text ? ' ' : '') + comment.author + ' '"
-                    :style="{color: getUserColor(comment, post)}" />
-              <Span :text="comment.ups + ' points '" class="comment-votes" />
-              <Span :text="getHours(comment.created) + ' hours ago'" class="comment-created" />
-            </FormattedString>
-          </Label>
-          <Label :text="markdown(comment.body)"
-                 class="comment-body"
-                 textWrap="true" />
-        </StackLayout>
+        <Comment :comment="comment" :post="post" />
       </v-template>
     </RadListView>
   </Page>
@@ -88,15 +21,13 @@
 
 <script>
 import {ObservableArray} from 'tns-core-modules/data/observable-array';
-import {action} from 'tns-core-modules/ui/dialogs';
-import Markdown from '../services/Markdown';
-import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
-import Votes from './Votes';
+import Comment from './Comment';
+import Post from './Post';
 
 export default {
   name: 'Comments',
-  components: {Votes},
+  components: {Post, Comment},
   props: {
     post: {
       type: Object,
@@ -106,83 +37,17 @@ export default {
   data() {
     return {
       commentList: new ObservableArray([]),
-      defaultFlairColor: '#767676',
     };
   },
-  computed: {},
   methods: {
     onPullDown(args) {
       this.getComments().finally(() => args.object.notifyPullToRefreshFinished(true));
     },
 
-    onVideoPreviewLoaded(args) {
-      const androidWebView = args.object.android;
-      if (androidWebView) {
-        androidWebView.getSettings().setDomStorageEnabled(true);
-        androidWebView.getSettings().setLoadWithOverviewMode(true);
-        androidWebView.getSettings().setUseWideViewPort(false);
-        androidWebView.getSettings().setDisplayZoomControls(false);
-        androidWebView.getSettings().setBuiltInZoomControls(true);
-      }
-    },
-
-    onVideoPreviewLoadFinished(args) {
-      args.object.android.zoomOut();
-    },
-
-    getPreview(post) {
-      return Reddit.getPreview(post);
-    },
-
-    getImage(post) {
-      if (post.preview.images && post.preview.images[0]) {
-        const resolutions = post.preview.images[0].resolutions;
-        return resolutions[resolutions.length - 1].url;
-      } else {
-        return '';
-      }
-    },
-
-    getVideoSrc(post) {
-      if (post.secure_media_embed && post.secure_media_embed.media_domain_url) {
-        post.secure_media_embed.src = post.secure_media_embed.media_domain_url;
-        return post.secure_media_embed;
-      } else if (post.preview && post.preview.reddit_video_preview) {
-        post.preview.reddit_video_preview.src = post.preview.reddit_video_preview.fallback_url;
-        return post.preview.reddit_video_preview;
-      } else if (post.preview && post.preview.images && post.preview.images.length &&
-        post.preview.images[0].variants && post.preview.images[0].variants.mp4) {
-        post.preview.images[0].variants.mp4.source.src = post.preview.images[0].variants.mp4.source.url;
-        return post.preview.images[0].variants.mp4.source;
-      } else {
-        return null;
-      }
-    },
-
-    getHours(unixTime) {
-      return new Date(unixTime * 1000).getHours();
-    },
-
-    getUserColor(comment, post) {
-      if (comment.author === post.author) {
-        return '#53ba82';
-      } else if (comment.distinguished === 'moderator') {
-        return '#4afff5';
-      } else if (comment.distinguished === 'admin') {
-        return '#c40013';
-      } else {
-        return '#c4c4c4';
-      }
-    },
-
-    loaded(event) {
+    loaded() {
       if (!this.commentList.length) {
         this.getComments();
       }
-    },
-
-    markdown(text) {
-      return Markdown.toMarkdown(text);
     },
 
     getComments() {
@@ -211,14 +76,6 @@ export default {
       items.forEach(addAllChildren);
       return new ObservableArray(commentList);
     },
-
-    openUrl(post) {
-      CustomTabs.openUrl(post.url);
-    },
-
-    showMoreOptions(post) {
-      action({actions: ['Reply', 'Save', 'Goto ' + post.subreddit, 'Goto /u/' + post.author, 'Copy', 'Share']});
-    },
   },
 };
 </script>
@@ -229,80 +86,7 @@ export default {
     color: #ffffff;
   }
 
-  .post {
-    color: #767676;
-  }
-
-  .post-header {
-    background-color: #080808;
-  }
-
-  .post-info {
-    width: 65%;
-  }
-
-  .post-preview {
-    width: 20%;
-  }
-
-  .post-image {
-    width: 100%;
-  }
-
-  .post-flair {
-    font-size: 12px;
-    color: #f3f3f3;
-  }
-
-  .post-text {
-    border-width: 6px;
-    border-color: #767676;
-    margin: 10px;
-    padding: 30px;
-    border-radius: 30px;
-  }
-
   #comment-list {
     background-color: #080808;
-  }
-
-  .comment {
-    border-color: #767676;
-    border-width: 5px;
-  }
-
-  .post-author {
-    color: #53ba82;
-  }
-
-  .author-flair {
-    color: #c2c2c2;
-  }
-
-  .comment-votes {
-    color: #767676;
-  }
-
-  .comment-votes {
-    color: #767676;
-  }
-
-  .comment-created {
-    color: #767676;
-  }
-
-  .comment-body {
-    color: white;
-    padding-left: 20px;
-  }
-
-  .comment-label {
-    background-color: #3e3e3e;
-    color: white;
-    font-size: 14px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    width: 100%;
-    text-align: center;
   }
 </style>
