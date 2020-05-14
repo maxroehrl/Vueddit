@@ -59,7 +59,8 @@ export default {
 <style scoped>
   .comment {
     border-color: #767676;
-    border-width: 5px;
+    border-width: 6px;
+    border-radius: 30px;
   }
 
   .comment-author-flair {
