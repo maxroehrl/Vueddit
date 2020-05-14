@@ -29,3 +29,4 @@ tns resources generate splash splash.png
 ## Libraries used
 
 * [android-customtabs](https://github.com/saschpe/android-customtabs)
+* [Markwon](https://github.com/noties/Markwon)
