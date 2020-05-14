@@ -94,7 +94,7 @@ export default class Reddit {
   }
 
   static getUser() {
-    return this.get(`/api/v1/me`);
+    return this.get(`/api/v1/me?raw_json=1`);
   }
 
   static getPosts(subreddit, after=null, sorting=this.sortings.best, limit=20) {
@@ -121,7 +121,7 @@ export default class Reddit {
   }
 
   static getMultisSubreddits(multipath) {
-    return this.get(`/api/multi/${multipath}`);
+    return this.get(`/api/multi/${multipath}?raw_json=1`);
   }
 
   static searchForSubreddit(query) {
@@ -129,7 +129,7 @@ export default class Reddit {
   }
 
   static getSidebar(subreddit) {
-    return this.get(`/r/${subreddit}/about.json`);
+    return this.get(`/r/${subreddit}/about.json?raw_json=1`);
   }
 
   static vote(id, dir) {
@@ -145,19 +145,19 @@ export default class Reddit {
   }
 
   static getSaved(user) {
-    return this.get(`/user/${user}/saved`);
+    return this.get(`/user/${user}/saved?raw_json=1`);
   }
 
   static getUpvoted(user) {
-    return this.get(`/user/${user}/upvoted`);
+    return this.get(`/user/${user}/upvoted?raw_json=1`);
   }
 
   static getDownvoted(user) {
-    return this.get(`/user/${user}/downvoted`);
+    return this.get(`/user/${user}/downvoted?raw_json=1`);
   }
 
   static getEmojis(subreddit) {
-    return this.get(`/api/v1/${subreddit}/emojis/all`);
+    return this.get(`/api/v1/${subreddit}/emojis/all?raw_json=1`);
   }
 
   static get(url) {
