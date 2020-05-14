@@ -18,11 +18,12 @@ export default {
   watch: {
     $props: {
       handler(props) {
-        setTimeout(() => {
+        if (this.$refs.label && props.text) {
           this.$refs.label.nativeView.android.setText(Markdown.toMarkdown(props.text));
-        });
+        }
       },
       immediate: true,
+      deep: true,
     },
   },
   methods: {
