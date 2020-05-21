@@ -75,6 +75,10 @@ export default {
       type: Object,
       required: true,
     },
+    app: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -154,7 +158,11 @@ export default {
     },
 
     onLongPress(post) {
-      action({actions: ['Save', 'Goto /r/' + post.subreddit, 'Goto /u/' + post.author, 'Copy', 'Share']});
+      action({actions: ['Save', 'Goto /r/' + post.subreddit, 'Goto /u/' + post.author, 'Copy', 'Share']}).then((action) => {
+        if (action.startsWith('Goto /r/')) {
+          this.app.setSubreddit({display_name: action.split('/r/')[1]});
+        }
+      });
     },
   },
 };
