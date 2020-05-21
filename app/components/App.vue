@@ -38,6 +38,7 @@ import Subreddits from './Subreddits';
 import Reddit from '../services/Reddit';
 import store from '../store';
 import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
+import {SnackBar} from '@nstudio/nativescript-snackbar';
 
 export default {
   name: 'App',
@@ -125,10 +126,30 @@ export default {
 
     setSubreddit(subreddit) {
       this.loadingIndicator.show(this.loadingIndicatorOptions);
+      if (this.lastSubreddits.length) {
+        this.showGoBackSnackbar(this.subreddit, subreddit);
+      }
       this.lastSubreddits.push(this.subreddit);
       this.subreddit = subreddit;
       this.$refs.drawer.nativeView.closeDrawer();
       setTimeout(() => this.$refs.postList.refresh().finally(() => this.loadingIndicator.hide()));
+    },
+
+    showGoBackSnackbar(oldSubreddit, newSubreddit) {
+      const snackbar = new SnackBar();
+      snackbar.action({
+        actionText: 'Go back',
+        actionTextColor: '#53ba82',
+        snackText: 'Showing ' + newSubreddit.display_name,
+        hideDelay: 8000,
+        backgroundColor: '#3e3e3e',
+      }).then((args) => {
+        if (args.command === 'Action') {
+          this.setSubreddit(oldSubreddit);
+          this.lastSubreddits.pop();
+          this.lastSubreddits.pop();
+        }
+      });
     },
 
     logout() {
