@@ -206,6 +206,7 @@ export default {
     },
 
     onLongPress(subreddit) {
+      return;
       action({actions: ['Sidebar']}).then((result) => {
         if (result === 'Sidebar') {
           this.showSidebar(subreddit);
