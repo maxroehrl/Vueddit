@@ -104,6 +104,12 @@ export default class Reddit {
     return this.get(url);
   }
 
+  getUserPosts(user, after=null, sorting=this.sortings.new, limit=20) {
+    let url = `/user/${user}.json?limit=${limit}&raw_json=1`;
+    url = after ? `${url}&after=${after}` : url;
+    return Reddit.get(url);
+  }
+
   static getComments(post) {
     return this.get(`${post.permalink}.json?raw_json=1`);
   }
