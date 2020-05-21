@@ -4,7 +4,7 @@
 dependencies {
 //	implementation 'com.android.support:recyclerview-v7:+'
   implementation 'saschpe.android:customtabs:3.0.2'
-  implementation "io.noties.markwon:core:4.3.1"
+  implementation "io.noties.markwon:core:4.4.0"
 }
 
 // If you want to add something to be applied before applying plugins' include.gradle files
