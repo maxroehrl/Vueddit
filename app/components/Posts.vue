@@ -2,8 +2,6 @@
   <RadListView id="post-list"
                ref="postList"
                for="post in postList"
-               selectionBehavior="Press"
-               itemSelectedBackgroundColor="#222222"
                loadOnDemandMode="Auto"
                loadOnDemandBufferSize="5"
                pullToRefresh="true"
@@ -11,8 +9,7 @@
                @loadMoreDataRequested="onLoadMorePostsRequested"
                @pullToRefreshInitiated="onPullDown">
     <v-template name="header">
-      <SegmentedBar class="sorting"
-                    :items="sortings"
+      <SegmentedBar :items="sortings"
                     selectedIndex="0"
                     selectedBackgroundColor="#53ba82"
                     @selectedIndexChange="onSortingChange" />
@@ -58,12 +55,14 @@
 </template>
 
 <script>
-import Reddit from '../services/Reddit';
 import {ObservableArray} from 'tns-core-modules/data/observable-array';
+import {SegmentedBarItem} from 'tns-core-modules/ui/segmented-bar';
+import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
 import {action} from 'tns-core-modules/ui/dialogs';
+import Reddit from '../services/Reddit';
 import Votes from './Votes';
 import Comments from './Comments';
-import {SegmentedBarItem} from 'tns-core-modules/ui/segmented-bar';
+import User from './User';
 
 export default {
   name: 'Subreddits',
@@ -85,8 +84,18 @@ export default {
       defaultFlairColor: '#767676',
       postList: new ObservableArray([]),
       lastPostId: null,
-      sortings: this.getSortings(),
+      sortings: Object.values(Reddit.sortings).slice(0, 4).map((sorting) => {
+        const item = new SegmentedBarItem();
+        item.title = sorting;
+        return item;
+      }),
       sorting: 'best',
+      loadingIndicator: new LoadingIndicator(),
+      loadingIndicatorOptions: {
+        hideBezel: true,
+        color: '#53ba82',
+        mode: Mode.Indeterminate,
+      },
     };
   },
   methods: {
@@ -102,23 +111,16 @@ export default {
           .then(() => args.object.notifyAppendItemsOnDemandFinished(this.postList.length, false));
     },
 
-    getSortings() {
-      return Object.values(Reddit.sortings).slice(0, 4).map((sorting) => {
-        const item = new SegmentedBarItem();
-        item.title = sorting;
-        return item;
-      });
-    },
-
     onSortingChange(args) {
-      this.sorting = this.getSortings()[args.value].title;
-      this.refresh();
+      this.loadingIndicator.show(this.loadingIndicatorOptions);
+      this.sorting = this.sortings[args.value].title;
+      this.refresh().finally(() => this.loadingIndicator.hide());
     },
 
     refresh() {
       this.postList = new ObservableArray([]);
       this.lastPostId = null;
-      return this.getPosts();
+      return this.getPosts().then(() => this.$refs.postList.nativeView.refresh());
     },
 
     getPosts(lastPostId) {
@@ -161,6 +163,14 @@ export default {
       action({actions: ['Save', 'Goto /r/' + post.subreddit, 'Goto /u/' + post.author, 'Copy', 'Share']}).then((action) => {
         if (action.startsWith('Goto /r/')) {
           this.app.setSubreddit({display_name: action.split('/r/')[1]});
+        } else if (action.startsWith('Goto /u/')) {
+          this.app.$navigateTo(User, {
+            transition: 'slide',
+            props: {
+              user: action.split('/u/')[1],
+              app: this.app,
+            },
+          });
         }
       });
     },
@@ -204,10 +214,5 @@ export default {
 
   .post-spoiler {
     color: yellow;
-  }
-
-  .sorting {
-    height: 200px;
-    width: 100%;
   }
 </style>

@@ -97,17 +97,21 @@ export default class Reddit {
     return this.get(`/api/v1/me?raw_json=1`);
   }
 
-  static getPosts(subreddit, after=null, sorting=this.sortings.best, limit=20) {
+  static getPosts(subreddit, after=null, sorting=this.sortings.best, limit=25) {
     subreddit = subreddit === this.frontpage ? '' : `/r/${subreddit}`;
     let url = `${subreddit}/${sorting}.json?limit=${limit}&raw_json=1`;
     url = after ? `${url}&after=${after}` : url;
     return this.get(url);
   }
 
-  getUserPosts(user, after=null, sorting=this.sortings.new, limit=20) {
-    let url = `/user/${user}.json?limit=${limit}&raw_json=1`;
+  static getUserPosts(user, after=null, sorting=this.sortings.new, limit=25, type='links') {
+    let url = `/user/${user}/submitted.json?limit=${limit}&raw_json=1&sort=${sorting}&type=${type}`;
     url = after ? `${url}&after=${after}` : url;
-    return Reddit.get(url);
+    return this.refreshTokenIfNecessary().then(() => request({
+      url: `${this.api}${url}`,
+      method: 'GET',
+      headers: {'User-Agent': this.userAgent},
+    })).then(this.handleResponse);
   }
 
   static getComments(post) {
