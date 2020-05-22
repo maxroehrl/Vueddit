@@ -134,8 +134,10 @@ export default {
         return Reddit.getPosts(sub, lastPostId, this.sorting).then((r) => {
           if (r && r.data && r.data.children) {
             const items = r.data.children.map((d) => d.data);
-            this.lastPostId = items[items.length - 1].name;
-            this.postList.push(...items);
+            if (items.length) {
+              this.lastPostId = items[items.length - 1].name;
+              this.postList.push(...items);
+            }
           }
         });
       } else {

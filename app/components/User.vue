@@ -127,9 +127,11 @@ export default {
       return Reddit.getUserPosts(this.user, lastPostId, this.sorting).then((r) => {
         if (r && r.data && r.data.children) {
           const items = r.data.children.map((d) => d.data);
-          this.lastPostId = items[items.length - 1].name;
-          this.postList.push(...items);
-          this.$refs.postList.nativeView.refresh();
+          if (items.length) {
+            this.lastPostId = items[items.length - 1].name;
+            this.postList.push(...items);
+            this.$refs.postList.nativeView.refresh();
+          }
         }
       });
     },
