@@ -4,7 +4,7 @@
       <FormattedString>
         <Span :text="comment.author_flair_text"
               class="comment-author-flair"
-              :style="{'background-color': comment.author_flair_background_color || defaultFlairColor}" />
+              :style="{'background-color': comment.author_flair_background_color || '#767676'}" />
         <Span :text="(comment.author_flair_text ? ' ' : '') + comment.author + ' '"
               :style="{color: getUserColor(comment, post)}" />
         <Span :text="comment.ups + ' points '" class="comment-votes" />
@@ -31,11 +31,6 @@ export default {
       type: Object,
       required: true,
     },
-  },
-  data() {
-    return {
-      defaultFlairColor: '#767676',
-    };
   },
   methods: {
     getTimeFromNow(comment) {

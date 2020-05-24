@@ -24,7 +24,7 @@
             <Span :text="post.author + ' '" class="post-author" />
             <Span :text="post.author_flair_text"
                   class="post-author-flair"
-                  :style="{'background-color': post.author_flair_background_color || defaultFlairColor}" />
+                  :style="{'background-color': post.author_flair_background_color || '#767676'}" />
           </FormattedString>
         </Label>
       </Ripple>
@@ -74,11 +74,6 @@ export default {
       type: Object,
       required: true,
     },
-  },
-  data() {
-    return {
-      defaultFlairColor: '#767676',
-    };
   },
   methods: {
     onVideoPreviewLoaded(args) {
