@@ -1,5 +1,6 @@
 import * as app from 'tns-core-modules/application';
 import {request} from 'tns-core-modules/http';
+import {screen} from 'tns-core-modules/platform';
 import Login from '../components/Login';
 import store from '../store';
 
@@ -199,23 +200,21 @@ export default class Reddit {
     }
   }
 
-  static getPreview(post) {
-    const previews = post.preview && post.preview.images;
-    if (previews &&
-      previews.length &&
-      previews[0].resolutions &&
-      previews[0].resolutions.length >= 3 &&
-      previews[0].resolutions[2].url) {
-      return previews[0].resolutions[2].url;
-    } else if (previews &&
-      previews.length &&
-      previews[0].resolutions &&
-      previews[0].resolutions.length &&
-      previews[0].resolutions[0].url) {
-      return previews[0].resolutions[0].url;
+  static getImage(post) {
+    return this.getPreview(post, screen.mainScreen.widthPixels, '');
+  }
+
+  static getPreview(post, width=300, noPreview='res://ic_comment_text_multiple_outline_white_48dp') {
+    if (post.preview && post.preview.images && post.preview.images[0] && post.preview.images[0].resolutions) {
+      return this.getPreferredPreviewSize(post.preview.images[0].resolutions, width);
     } else {
-      return 'res://ic_comment_text_multiple_outline_white_48dp';
+      return noPreview;
     }
+  }
+
+  static getPreferredPreviewSize(resolutions, preferredWidth) {
+    const distArr = resolutions.map((e) => Math.abs(e.width - preferredWidth));
+    return resolutions[distArr.indexOf(Math.min(...distArr))].url;
   }
 
   static getUnixTime() {

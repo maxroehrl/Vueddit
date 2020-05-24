@@ -96,12 +96,7 @@ export default {
     },
 
     getImage(post) {
-      if (post.preview.images && post.preview.images[0]) {
-        const resolutions = post.preview.images[0].resolutions;
-        return resolutions[resolutions.length - 1].url;
-      } else {
-        return '';
-      }
+      return Reddit.getImage(post);
     },
 
     getVideo(post) {
