@@ -140,7 +140,7 @@ export default {
     templateSelector(item, index, items) {
       const subHasMoreThanHalfPictures = items
           .slice(0, 10)
-          .map((e) => Boolean(e.preview && e.preview.images && e.preview.images.length))
+          .map((post) => Boolean(post && post.preview && post.preview.images && post.preview.images.length))
           .reduce((a, b) => a + b, 0) > 5;
       const itemHasPreview = Boolean(Reddit.getPreview(item, 300, false));
       const isNotFrontPage = this.subreddit.display_name !== Reddit.frontpage;

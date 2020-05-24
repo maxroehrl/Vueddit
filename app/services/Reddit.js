@@ -1,6 +1,7 @@
 import * as app from 'tns-core-modules/application';
 import {request} from 'tns-core-modules/http';
 import {screen} from 'tns-core-modules/platform';
+import moment from 'moment';
 import Login from '../components/Login';
 import store from '../store';
 
@@ -217,6 +218,10 @@ export default class Reddit {
   static getPreferredPreviewSize(resolutions, preferredWidth) {
     const distArr = resolutions.map((e) => Math.abs(e.width - preferredWidth));
     return resolutions[distArr.indexOf(Math.min(...distArr))].url;
+  }
+
+  static getTimeFromNow(thing) {
+    return moment(thing.created * 1000).fromNow();
   }
 
   static getUnixTime() {

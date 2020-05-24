@@ -20,7 +20,7 @@
             <Span :text="' (' + post.domain + ')\n'" class="post" />
             <Span :text="post.num_comments + ' comments '" class="post" />
             <Span :text="post.subreddit + '\n'" class="post" />
-            <Span :text="getHours(post.created) + ' hours ago by '" class="post" />
+            <Span :text="getTimeFromNow(post) + ' by '" class="post" />
             <Span :text="post.author + ' '" class="post-author" />
             <Span :text="post.author_flair_text"
                   class="post-author-flair"
@@ -120,8 +120,8 @@ export default {
       return (video.height * screen.mainScreen.widthPixels / video.width).toFixed(0) + 'px';
     },
 
-    getHours(unixTime) {
-      return new Date(unixTime * 1000).getHours();
+    getTimeFromNow(post) {
+      return Reddit.getTimeFromNow(post);
     },
 
     openUrl(post) {

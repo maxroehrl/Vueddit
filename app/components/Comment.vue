@@ -8,7 +8,7 @@
         <Span :text="(comment.author_flair_text ? ' ' : '') + comment.author + ' '"
               :style="{color: getUserColor(comment, post)}" />
         <Span :text="comment.ups + ' points '" class="comment-votes" />
-        <Span :text="getHours(comment.created) + ' hours ago'" class="comment-created" />
+        <Span :text="getTimeFromNow(comment)" class="comment-created" />
       </FormattedString>
     </Label>
     <MarkdownView class="comment-body" :text="comment.body" />
@@ -17,6 +17,7 @@
 
 <script>
 import MarkdownView from './MarkdownView';
+import Reddit from '../services/Reddit';
 
 export default {
   name: 'Comment',
@@ -37,8 +38,8 @@ export default {
     };
   },
   methods: {
-    getHours(unixTime) {
-      return new Date(unixTime * 1000).getHours();
+    getTimeFromNow(comment) {
+      return Reddit.getTimeFromNow(comment);
     },
 
     getUserColor(comment, post) {
