@@ -204,11 +204,11 @@ export default class Reddit {
   }
 
   static getImage(post) {
-    return this.getPreview(post, screen.mainScreen.widthPixels, '');
+    return this.getPreview(post, screen.mainScreen.widthPixels, {url: ''});
   }
 
-  static getPreview(post, width=300, noPreview='res://ic_comment_text_multiple_outline_white_48dp') {
-    if (post.preview && post.preview.images && post.preview.images[0] && post.preview.images[0].resolutions) {
+  static getPreview(post, width=300, noPreview={url: 'res://ic_comment_text_multiple_outline_white_48dp'}) {
+    if (post && post.preview && post.preview.images && post.preview.images[0] && post.preview.images[0].resolutions) {
       return this.getPreferredPreviewSize(post.preview.images[0].resolutions, width);
     } else {
       return noPreview;
@@ -217,11 +217,15 @@ export default class Reddit {
 
   static getPreferredPreviewSize(resolutions, preferredWidth) {
     const distArr = resolutions.map((e) => Math.abs(e.width - preferredWidth));
-    return resolutions[distArr.indexOf(Math.min(...distArr))].url;
+    return resolutions[distArr.indexOf(Math.min(...distArr))];
   }
 
-  static getTimeFromNow(thing) {
-    return moment(thing.created * 1000).fromNow();
+  static getAspectFixHeight({height, width}) {
+    return (height * screen.mainScreen.widthPixels / width).toFixed(0) + 'px';
+  }
+
+  static getTimeFromNow({created}) {
+    return moment(created * 1000).fromNow();
   }
 
   static getUnixTime() {

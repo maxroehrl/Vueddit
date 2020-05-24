@@ -43,6 +43,7 @@
              @loaded="onVideoPreviewLoaded" />
     <Image v-else-if="post.preview && post.preview.enabled"
            :src="getImage(post)"
+           :style="{height: getImageHeight(post)}"
            stretch="aspectFit"
            class="post-image"
            loadMode="async" />
@@ -55,7 +56,6 @@
 
 <script>
 import {action} from 'tns-core-modules/ui/dialogs';
-import {screen} from 'tns-core-modules/platform';
 import MarkdownView from './MarkdownView';
 import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
@@ -97,11 +97,15 @@ export default {
     },
 
     getPreview(post) {
-      return Reddit.getPreview(post);
+      return Reddit.getPreview(post).url;
     },
 
     getImage(post) {
-      return Reddit.getImage(post);
+      return Reddit.getImage(post).url;
+    },
+
+    getImageHeight(post) {
+      return Reddit.getAspectFixHeight(Reddit.getImage(post));
     },
 
     getVideo(post) {
@@ -121,8 +125,7 @@ export default {
     },
 
     getVideoHeight(post) {
-      const video = this.getVideo(post);
-      return (video.height * screen.mainScreen.widthPixels / video.width).toFixed(0) + 'px';
+      return Reddit.getAspectFixHeight(this.getVideo(post));
     },
 
     getTimeFromNow(post) {
@@ -136,7 +139,7 @@ export default {
     showMoreOptions(post) {
       const actions = [
         post.saved ? 'Unsave' : 'Save',
-        'Goto /u/' + post.author,
+        // 'Goto /u/' + post.author, // Needs double back navigation if post is opened from user page
       ];
       if (post.subreddit !== this.app.subreddit.display_name && post.subreddit_type !== 'user') {
         actions.push('Goto /r/' + post.subreddit);

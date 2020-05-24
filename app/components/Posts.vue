@@ -46,6 +46,7 @@
                 @longPress="onLongPress(post)"
                 @tap="openComments(post)">
           <Image :src="getImage(post)"
+                 :style="{height: getImageHeight(post)}"
                  stretch="aspectFit"
                  class="post-image"
                  loadMode="async" />
@@ -191,11 +192,15 @@ export default {
     },
 
     getPreview(post) {
-      return Reddit.getPreview(post);
+      return Reddit.getPreview(post).url;
     },
 
     getImage(post) {
-      return Reddit.getImage(post);
+      return Reddit.getImage(post).url;
+    },
+
+    getImageHeight(post) {
+      return Reddit.getAspectFixHeight(Reddit.getImage(post));
     },
 
     openComments(post) {
@@ -245,7 +250,6 @@ export default {
     height: 100%;
     width: 100%;
     background-color: #080808;
-    separator-color: #ff0000;
   }
 
   .post-flair {
