@@ -60,12 +60,17 @@ import MarkdownView from './MarkdownView';
 import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
 import Votes from './Votes';
+import User from './User';
 
 export default {
   name: 'Post',
   components: {Votes, MarkdownView},
   props: {
     post: {
+      type: Object,
+      required: true,
+    },
+    app: {
       type: Object,
       required: true,
     },
@@ -129,7 +134,31 @@ export default {
     },
 
     showMoreOptions(post) {
-      action({actions: ['Reply', 'Save', 'Goto ' + post.subreddit, 'Goto /u/' + post.author, 'Copy', 'Share']});
+      const actions = [
+        post.saved ? 'Unsave' : 'Save',
+        'Goto /u/' + post.author,
+      ];
+      if (post.subreddit !== this.app.subreddit.display_name && post.subreddit_type !== 'user') {
+        actions.push('Goto /r/' + post.subreddit);
+      }
+      action({actions}).then((action) => {
+        if (action === 'Save') {
+          const promise = post.saved ? Reddit.unsave(post.name) : Reddit.save(post.name);
+          promise.then(() => post.saved = !post.saved);
+        } else if (action.startsWith('Goto /r/')) {
+          this.app.$navigateBack();
+          this.app.setSubreddit({display_name: post.subreddit});
+        } else if (action.startsWith('Goto /u/')) {
+          this.app.$navigateBack();
+          this.app.$navigateTo(User, {
+            transition: 'slide',
+            props: {
+              user: post.author,
+              app: this.app,
+            },
+          });
+        }
+      });
     },
   },
 };

@@ -205,27 +205,31 @@ export default {
       this.$navigateTo(Comments, {
         transition: 'slide',
         props: {
+          app: this.app,
           post,
         },
       });
     },
 
     onLongPress(post) {
-      action({actions: [
+      const actions = [
         post.saved ? 'Unsave' : 'Save',
-        'Goto /r/' + post.subreddit,
         'Goto /u/' + post.author,
-      ]}).then((action) => {
+      ];
+      if (post.subreddit !== this.subreddit.display_name) {
+        actions.push('Goto /r/' + post.subreddit);
+      }
+      action({actions}).then((action) => {
         if (action === 'Save') {
           const promise = post.saved ? Reddit.unsave(post.name) : Reddit.save(post.name);
           promise.then(() => post.saved = !post.saved);
         } else if (action.startsWith('Goto /r/')) {
-          this.app.setSubreddit({display_name: action.split('/r/')[1]});
+          this.app.setSubreddit({display_name: post.subreddit});
         } else if (action.startsWith('Goto /u/')) {
           this.app.$navigateTo(User, {
             transition: 'slide',
             props: {
-              user: action.split('/u/')[1],
+              user: post.author,
               app: this.app,
             },
           });

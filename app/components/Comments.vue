@@ -10,7 +10,7 @@
                  pullToRefresh="true"
                  @pullToRefreshInitiated="onPullDown">
       <v-template name="header">
-        <Post :post="post" />
+        <Post :post="post" :app="app" />
       </v-template>
       <v-template>
         <Comment :comment="comment" :post="post" />
@@ -30,6 +30,10 @@ export default {
   components: {Post, Comment},
   props: {
     post: {
+      type: Object,
+      required: true,
+    },
+    app: {
       type: Object,
       required: true,
     },
