@@ -148,7 +148,9 @@ export default class Reddit {
   }
 
   static save(id, category) {
-    return this.post(`/api/save?id=${id}&category=${category}`);
+    let url = `/api/save?id=${id}`;
+    url = category ? url + '&category=${category}' : url;
+    return this.post(url);
   }
 
   static unsave(id) {

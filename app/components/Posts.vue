@@ -162,8 +162,15 @@ export default {
     },
 
     onLongPress(post) {
-      action({actions: ['Save', 'Goto /r/' + post.subreddit, 'Goto /u/' + post.author, 'Copy', 'Share']}).then((action) => {
-        if (action.startsWith('Goto /r/')) {
+      action({actions: [
+        post.saved ? 'Unsave' : 'Save',
+        'Goto /r/' + post.subreddit,
+        'Goto /u/' + post.author,
+      ]}).then((action) => {
+        if (action === 'Save') {
+          const promise = post.saved ? Reddit.unsave(post.name) : Reddit.save(post.name);
+          promise.then(() => post.saved = !post.saved);
+        } else if (action.startsWith('Goto /r/')) {
           this.app.setSubreddit({display_name: action.split('/r/')[1]});
         } else if (action.startsWith('Goto /u/')) {
           this.app.$navigateTo(User, {
