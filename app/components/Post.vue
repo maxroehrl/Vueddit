@@ -31,14 +31,14 @@
       <Ripple rippleColor="#53ba82"
               class="post-preview"
               @tap="openUrl(post)">
-        <Image id="postPreview"
-               :src="getPreview(post)"
-               stretch="aspectFit" />
+        <Image :src="getPreview(post)"
+               stretch="aspectFit"
+               loadMode="async" />
       </Ripple>
     </FlexboxLayout>
-    <WebView v-if="getVideoSrc(post)"
-             :height="(getVideoSrc(post).height*2.5).toFixed(0) + 'px'"
-             :src="getVideoSrc(post).src"
+    <WebView v-if="getVideo(post)"
+             :height="getVideoHeight(post)"
+             :src="getVideo(post).src"
              @loadFinished="onVideoPreviewLoadFinished"
              @loaded="onVideoPreviewLoaded" />
     <Image v-else-if="post.preview && post.preview.enabled"
@@ -55,6 +55,7 @@
 
 <script>
 import {action} from 'tns-core-modules/ui/dialogs';
+import {screen} from 'tns-core-modules/platform';
 import MarkdownView from './MarkdownView';
 import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
@@ -103,7 +104,7 @@ export default {
       }
     },
 
-    getVideoSrc(post) {
+    getVideo(post) {
       if (post.secure_media_embed && post.secure_media_embed.media_domain_url) {
         post.secure_media_embed.src = post.secure_media_embed.media_domain_url;
         return post.secure_media_embed;
@@ -117,6 +118,11 @@ export default {
       } else {
         return null;
       }
+    },
+
+    getVideoHeight(post) {
+      const video = this.getVideo(post);
+      return (video.height * screen.mainScreen.widthPixels / video.width).toFixed(0) + 'px';
     },
 
     getHours(unixTime) {
