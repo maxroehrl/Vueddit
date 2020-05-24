@@ -56,6 +56,7 @@
 
 <script>
 import {action} from 'tns-core-modules/ui/dialogs';
+import {screen} from 'tns-core-modules/platform';
 import MarkdownView from './MarkdownView';
 import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
@@ -79,11 +80,15 @@ export default {
     onVideoPreviewLoaded(args) {
       const androidWebView = args.object.android;
       if (androidWebView) {
+        androidWebView.getSettings().setJavaScriptEnabled(true);
         androidWebView.getSettings().setDomStorageEnabled(true);
         androidWebView.getSettings().setLoadWithOverviewMode(true);
         androidWebView.getSettings().setUseWideViewPort(false);
         androidWebView.getSettings().setDisplayZoomControls(false);
         androidWebView.getSettings().setBuiltInZoomControls(true);
+        androidWebView.getSettings().setAllowFileAccessFromFileURLs(true);
+        androidWebView.getSettings().setAllowUniversalAccessFromFileURLs(true);
+        androidWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
       }
     },
 
@@ -107,8 +112,11 @@ export default {
       if (post.secure_media_embed && post.secure_media_embed.media_domain_url) {
         post.secure_media_embed.src = post.secure_media_embed.media_domain_url;
         return post.secure_media_embed;
+      } else if (post.secure_media && post.secure_media.reddit_video) {
+        post.secure_media.reddit_video.src = this.getRedditDashVideoPlayerHtml(post.secure_media.reddit_video);
+        return post.secure_media.reddit_video;
       } else if (post.preview && post.preview.reddit_video_preview) {
-        post.preview.reddit_video_preview.src = post.preview.reddit_video_preview.fallback_url;
+        post.preview.reddit_video_preview.src = this.getRedditDashVideoPlayerHtml(post.preview.reddit_video_preview);
         return post.preview.reddit_video_preview;
       } else if (post.preview && post.preview.images && post.preview.images.length &&
           post.preview.images[0].variants && post.preview.images[0].variants.mp4) {
@@ -117,6 +125,31 @@ export default {
       } else {
         return null;
       }
+    },
+
+    getRedditDashVideoPlayerHtml(video) {
+      return `
+        <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>DashJS Player</title>
+            <style>
+              body {
+                margin: 0;
+                background-color: black;
+              }
+              video {
+                  width: ${screen.mainScreen.widthDIPs}px;
+              }
+            </style>
+          </head>
+          <body>
+            <script src="https://cdn.dashjs.org/latest/dash.all.min.js"><` + `/script>
+            <video data-dashjs-player autoplay controls src="${video.dash_url}"></video>
+          </body>
+        </html>`;
     },
 
     getVideoHeight(post) {
