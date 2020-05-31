@@ -10,6 +10,9 @@
       <ActionItem text="Sidebar"
                   android.position="popup"
                   @tap="showSidebar" />
+      <ActionItem text="Remove from visited"
+                  android.position="popup"
+                  @tap="clearVisited" />
       <ActionItem text="Logout"
                   android.position="popup"
                   @tap="logout" />
@@ -70,11 +73,7 @@ export default {
   methods: {
     loaded(event) {
       if (this.refreshAll) {
-        this.loadingIndicator.show(this.loadingIndicatorOptions);
-        store.commit('load');
-        store.subscribe(((mutation, state) => {
-          ApplicationSettings.setString('store', JSON.stringify(state));
-        }));
+        store.subscribe(((mutation, state) => ApplicationSettings.setString('store', JSON.stringify(state))));
         this.login();
       }
       application.android.on(AndroidApplication.activityBackPressedEvent, this.navigateBack, this);
@@ -85,10 +84,13 @@ export default {
     },
 
     login() {
+      this.loadingIndicator.show(this.loadingIndicatorOptions);
       Reddit.getUser().then((result) => {
         if (result && result.name) {
-          store.dispatch('setRedditUser', {user: result.name})
-              .then(this.refreshChildren);
+          store.dispatch('setRedditUser', {user: result.name}).then(() => {
+            this.$refs.subredditList.refresh();
+            this.refreshPosts();
+          });
           this.refreshAll = false;
         }
       }, () => {
@@ -99,31 +101,35 @@ export default {
 
     navigateBack(data) {
       if (!this.isSidebarDialogOpen && this.lastSubreddits.length) {
-        this.loadingIndicator.show(this.loadingIndicatorOptions);
-        this.subreddit = this.lastSubreddits.pop();
-        setTimeout(() => this.$refs.postList.refresh().finally(() => this.loadingIndicator.hide()));
+        this.setSubreddit(null, true);
         data.cancel = true;
       }
     },
 
-    refreshChildren() {
-      if (this.$refs.postList && this.$refs.subredditList) {
-        this.$refs.postList.refresh().finally(() => this.loadingIndicator.hide());
-        this.$refs.subredditList.refresh();
+    refreshSelectedSubreddit() {
+      if (this.$refs.subredditList) {
+        this.$refs.subredditList.setSubreddit(this.subreddit);
+      }
+    },
+
+    refreshSubredditList() {
+      if (this.$refs.subredditList) {
+        this.$refs.subredditList.displaySubscriptions();
       }
     },
 
     refreshPosts() {
       if (this.$refs.postList) {
         this.loadingIndicator.show(this.loadingIndicatorOptions);
-        this.$refs.postList.refresh().finally(() => this.loadingIndicator.hide());
+        this.$refs.postList.setSubreddit(this.subreddit).finally(() => this.loadingIndicator.hide());
       }
     },
 
     navigatedTo(event) {
       if (this.refreshAll && event.isBackNavigation) {
         this.refreshAll = false;
-        this.refreshChildren();
+        this.refreshSelectedSubreddit();
+        this.refreshPosts();
       }
     },
 
@@ -131,32 +137,39 @@ export default {
       this.$refs.drawer.nativeView.toggleDrawerState();
     },
 
-    setSubreddit(subreddit) {
-      this.loadingIndicator.show(this.loadingIndicatorOptions);
-      if (this.lastSubreddits.length) {
-        this.showGoBackSnackbar(this.subreddit, subreddit);
+    setSubreddit(subreddit, goBack) {
+      if (goBack) {
+        subreddit = this.lastSubreddits.pop();
+        this.showGoBackSnackbar(this.subreddit, subreddit, !goBack);
+        this.subreddit = subreddit;
+      } else {
+        this.lastSubreddits.push(this.subreddit);
+        this.showGoBackSnackbar(this.subreddit, subreddit, !goBack);
+        this.subreddit = subreddit;
+        this.visitSubreddit(subreddit);
       }
-      this.lastSubreddits.push(this.subreddit);
-      this.subreddit = subreddit;
       this.$refs.drawer.nativeView.closeDrawer();
-      setTimeout(() => this.$refs.postList.refresh().finally(() => this.loadingIndicator.hide()));
+      this.refreshSelectedSubreddit();
+      this.refreshPosts();
     },
 
-    showGoBackSnackbar(oldSubreddit, newSubreddit) {
+    showGoBackSnackbar(oldSubreddit, newSubreddit, goBack) {
       const snackbar = new SnackBar();
       snackbar.action({
-        actionText: 'Go back',
+        actionText: 'Go back to ' + this.getPrefixedName(oldSubreddit),
         actionTextColor: '#53ba82',
-        snackText: 'Showing ' + newSubreddit.display_name,
+        snackText: 'Showing ' + this.getPrefixedName(newSubreddit),
         hideDelay: 8000,
         backgroundColor: '#3e3e3e',
       }).then((args) => {
         if (args.command === 'Action') {
-          this.setSubreddit(oldSubreddit);
-          this.lastSubreddits.pop();
-          this.lastSubreddits.pop();
+          this.setSubreddit(oldSubreddit, goBack);
         }
       });
+    },
+
+    getPrefixedName(subreddit) {
+      return (subreddit.subreddits ? '/m/' : '/r/') + subreddit.display_name;
     },
 
     showSidebar() {
@@ -170,6 +183,22 @@ export default {
                 .finally(() => this.isSidebarDialogOpen = false);
           }
         });
+      }
+    },
+
+    visitSubreddit(subreddit) {
+      if (subreddit && !subreddit.subreddits && !store.state.subscribedSubreddits
+          .concat(this.$refs.subredditList.defaultSubreddits.map((s) => s.display_name))
+          .includes(subreddit.display_name)) {
+        store.dispatch('visitSubreddit', {subreddit})
+            .then(() => this.refreshSubredditList());
+      }
+    },
+
+    clearVisited() {
+      if (this.subreddit && !this.subreddit.subreddits) {
+        store.dispatch('unVisitSubreddit', {subreddit: this.subreddit})
+            .then(() => this.refreshSubredditList());
       }
     },
 

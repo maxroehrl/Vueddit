@@ -163,6 +163,11 @@ export default {
       this.refresh().finally(() => this.loadingIndicator.hide());
     },
 
+    setSubreddit(subreddit) {
+      this.subreddit = subreddit;
+      return this.refresh();
+    },
+
     refresh() {
       this.postList = new ObservableArray([]);
       this.lastPostId = null;

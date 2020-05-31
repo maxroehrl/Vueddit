@@ -28,7 +28,7 @@
           </Ripple>
           <Ripple rippleColor="#53ba82"
                   width="80%"
-                  @tap="setSubreddit(subreddit)">
+                  @tap="onSelection(subreddit)">
             <Label :text="subreddit.display_name"
                    class="subreddit-label" />
           </Ripple>
@@ -69,7 +69,8 @@ export default {
   methods: {
     loaded() {
       if (!this.subscriptions) {
-        this.subscriptions = store.state.subscribedSubreddits;
+        store.commit('load');
+        this.subscriptions = store.state.subscribedSubreddits.map((s) => ({display_name: s}));
         this.multis = store.state.multireddits;
         this.displaySubscriptions();
         this.refresh();
@@ -87,7 +88,7 @@ export default {
           items.sort(this.sortSubredditByStarred);
           this.subscriptions = items;
           this.subscribedSubredditNames = items.concat(this.defaultSubreddits).map((s) => s.display_name);
-          store.dispatch('setSubscribedSubreddits', {subscribedSubreddits: this.subscriptions});
+          store.dispatch('setSubscribedSubreddits', {subscribedSubreddits: this.subscriptions.map((s) => s.display_name)});
         }
       });
     },
@@ -95,7 +96,7 @@ export default {
     fetchMultiReddits() {
       return Reddit.getMultis().then((result) => {
         this.multis = result.map((r) => r.data);
-        store.dispatch('setMultireddits', {multireddits: this.multis});
+        store.dispatch('setMultireddits', {multireddits: this.multis.map((s) => ({display_name: s.display_name, subreddits: s.subreddits}))});
       });
     },
 
@@ -111,16 +112,11 @@ export default {
       this.$refs.subredditList.nativeView.refresh();
     },
 
-    setSubreddit(subreddit) {
+    setSubreddit(subreddit, callback) {
       this.selected = subreddit;
-      this.visitSubreddit(subreddit);
       this.refreshList();
-      this.onSelection(subreddit);
-    },
-
-    visitSubreddit(subreddit) {
-      if (!this.isSubscribedTo(subreddit) && !this.isMultireddit(subreddit)) {
-        store.dispatch('visitSubreddit', {subreddit});
+      if (callback) {
+        callback(subreddit);
       }
     },
 
@@ -141,7 +137,7 @@ export default {
     },
 
     onSubmit() {
-      this.setSubreddit({display_name: this.searchText});
+      this.onSelection({display_name: this.searchText});
     },
 
     onClear() {
