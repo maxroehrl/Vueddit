@@ -7,6 +7,9 @@
       <ActionItem text="Refresh"
                   icon="res://ic_menu_refresh"
                   @tap="refreshPosts" />
+      <ActionItem text="Sidebar"
+                  android.position="popup"
+                  @tap="showSidebar" />
       <ActionItem text="Logout"
                   android.position="popup"
                   @tap="logout" />
@@ -32,15 +35,16 @@
 
 <script>
 import {PushTransition} from 'nativescript-ui-sidedrawer';
+import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
+import {SnackBar} from '@nstudio/nativescript-snackbar';
 import * as ApplicationSettings from 'tns-core-modules/application-settings';
 import * as application from 'tns-core-modules/application';
 import {AndroidApplication} from 'tns-core-modules/application';
 import Posts from './Posts';
 import Subreddits from './Subreddits';
+import SidebarDialog from './SidebarDialog';
 import Reddit from '../services/Reddit';
 import store from '../store';
-import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
-import {SnackBar} from '@nstudio/nativescript-snackbar';
 
 export default {
   name: 'App',
@@ -152,6 +156,18 @@ export default {
           this.lastSubreddits.pop();
         }
       });
+    },
+
+    showSidebar() {
+      if (this.subreddit &&
+        ![Reddit.frontpage, 'popular', 'all', 'random'].includes(this.subreddit.display_name) &&
+        !this.subreddit.subreddits) {
+        Reddit.getSidebar(this.subreddit.display_name).then((response) => {
+          if (response && response.data && response.data.description) {
+            this.$showModal(SidebarDialog, {props: {sidebar: response.data.description}});
+          }
+        });
+      }
     },
 
     logout() {
