@@ -58,7 +58,7 @@ export default {
   },
   data() {
     return {
-      subscriptions: [],
+      subscriptions: null,
       multis: [],
       subredditList: new ObservableArray([]),
       defaultSubreddits: [Reddit.frontpage, 'popular', 'all', 'random'].map((s) => ({display_name: s})),
@@ -68,7 +68,10 @@ export default {
   },
   methods: {
     loaded() {
-      if (!this.subscriptions.length) {
+      if (!this.subscriptions) {
+        this.subscriptions = store.state.subscribedSubreddits;
+        this.multis = store.state.multireddits;
+        this.displaySubscriptions();
         this.refresh();
       }
     },
@@ -84,6 +87,7 @@ export default {
           items.sort(this.sortSubredditByStarred);
           this.subscriptions = items;
           this.subscribedSubredditNames = items.concat(this.defaultSubreddits).map((s) => s.display_name);
+          store.dispatch('setSubscribedSubreddits', {subscribedSubreddits: this.subscriptions});
         }
       });
     },
@@ -91,6 +95,7 @@ export default {
     fetchMultiReddits() {
       return Reddit.getMultis().then((result) => {
         this.multis = result.map((r) => r.data);
+        store.dispatch('setMultireddits', {multireddits: this.multis});
       });
     },
 

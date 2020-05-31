@@ -14,6 +14,8 @@ export default new Vuex.Store({
     },
     lastVisitedSubreddits: [],
     starredSubreddits: [],
+    subscribedSubreddits: [],
+    multireddits: [],
   },
   getters: {
     getReddit(state) {
@@ -49,6 +51,12 @@ export default new Vuex.Store({
         state.starredSubreddits = state.starredSubreddits.filter((s) => s !== subreddit);
       }
     },
+    setMultireddits(state, {multireddits = []}) {
+      state.multireddits = multireddits;
+    },
+    setSubscribedSubreddits(state, {subscribedSubreddits = []}) {
+      state.subscribedSubreddits = subscribedSubreddits;
+    },
     load(state) {
       const savedState = ApplicationSettings.getString('store');
       if (savedState) {
@@ -78,6 +86,12 @@ export default new Vuex.Store({
     },
     unStarSubreddit({commit}, {subreddit}) {
       commit('unStarSubreddit', {subreddit: subreddit.display_name});
+    },
+    setMultireddits({commit}, {multireddits}) {
+      commit('setMultireddits', {multireddits});
+    },
+    setSubscribedSubreddits({commit}, {subscribedSubreddits}) {
+      commit('setSubscribedSubreddits', {subscribedSubreddits});
     },
   },
 });
