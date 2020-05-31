@@ -29,7 +29,7 @@ export default {
   methods: {
     loaded(event) {
       if (this.text) {
-        event.object.nativeView.setText(Markdown.toMarkdown(this.text));
+        Markdown.setMarkdown(event.object.nativeView, this.text);
       }
     },
   },

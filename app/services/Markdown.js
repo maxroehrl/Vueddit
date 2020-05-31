@@ -70,11 +70,8 @@ export default class Markdown {
   }
 
   static getLinkResolverPlugin() {
-    const linkResolver = new io.noties.markwon.LinkResolver({
-      resolve(view, link) {
-        this.urlOpenCallback(link, view);
-      },
-    });
+    const resolve = (view, link) => this.urlOpenCallback(link, view);
+    const linkResolver = new io.noties.markwon.LinkResolver({resolve});
     const LinkResolverPlugin = io.noties.markwon.AbstractMarkwonPlugin.extend({
       configureConfiguration(builder) {
         builder.linkResolver(linkResolver);
@@ -87,10 +84,10 @@ export default class Markdown {
     this.urlOpenCallback = urlOpenCallback;
   }
 
-  static toMarkdown(text) {
+  static setMarkdown(tv, text) {
     if (!text) {
       return '';
     }
-    return this.getInstance().toMarkdown(text);
+    this.getInstance().setMarkdown(tv, text);
   }
 }
