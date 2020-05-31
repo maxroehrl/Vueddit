@@ -76,8 +76,6 @@ export default {
         }));
         this.login();
       }
-      // eslint-disable-next-line new-cap
-      // application.android.startActivity.registerActivityLifecycleCallbacks(saschpe.android.customtabs.CustomTabsActivityLifecycleCallbacks());
       application.android.on(AndroidApplication.activityBackPressedEvent, (data) => {
         if (this.lastSubreddits.length) {
           this.loadingIndicator.show(this.loadingIndicatorOptions);
