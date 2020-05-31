@@ -64,6 +64,7 @@ export default {
         color: '#53ba82',
         mode: Mode.Indeterminate,
       },
+      isSidebarDialogOpen: false,
     };
   },
   methods: {
@@ -76,18 +77,11 @@ export default {
         }));
         this.login();
       }
-      application.android.on(AndroidApplication.activityBackPressedEvent, (data) => {
-        if (this.lastSubreddits.length) {
-          this.loadingIndicator.show(this.loadingIndicatorOptions);
-          this.subreddit = this.lastSubreddits.pop();
-          setTimeout(() => this.$refs.postList.refresh().finally(() => this.loadingIndicator.hide()));
-          data.cancel = true;
-        }
-      });
+      application.android.on(AndroidApplication.activityBackPressedEvent, this.navigateBack, this);
     },
 
     unloaded(event) {
-      application.android.off(AndroidApplication.activityBackPressedEvent);
+      application.android.off(AndroidApplication.activityBackPressedEvent, this.navigateBack, this);
     },
 
     login() {
@@ -101,6 +95,15 @@ export default {
         this.loadingIndicator.hide();
         Reddit.authorize(this);
       });
+    },
+
+    navigateBack(data) {
+      if (!this.isSidebarDialogOpen && this.lastSubreddits.length) {
+        this.loadingIndicator.show(this.loadingIndicatorOptions);
+        this.subreddit = this.lastSubreddits.pop();
+        setTimeout(() => this.$refs.postList.refresh().finally(() => this.loadingIndicator.hide()));
+        data.cancel = true;
+      }
     },
 
     refreshChildren() {
@@ -162,7 +165,9 @@ export default {
         !this.subreddit.subreddits) {
         Reddit.getSidebar(this.subreddit.display_name).then((response) => {
           if (response && response.data && response.data.description) {
-            this.$showModal(SidebarDialog, {props: {sidebar: response.data.description}});
+            this.isSidebarDialogOpen = true;
+            this.$showModal(SidebarDialog, {props: {sidebar: response.data.description}})
+                .finally(() => this.isSidebarDialogOpen = false);
           }
         });
       }

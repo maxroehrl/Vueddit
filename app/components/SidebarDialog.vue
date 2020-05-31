@@ -22,13 +22,15 @@ export default {
   },
   methods: {
     loaded() {
-      application.android.on(AndroidApplication.activityBackPressedEvent, (data) => {
-        this.$modal.close();
-      });
+      application.android.on(AndroidApplication.activityBackPressedEvent, this.close, this);
     },
 
     unloaded() {
-      application.android.off(AndroidApplication.activityBackPressedEvent);
+      application.android.off(AndroidApplication.activityBackPressedEvent, this.close, this);
+    },
+
+    close() {
+      this.$modal.close();
     },
   },
 };
