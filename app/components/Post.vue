@@ -50,7 +50,8 @@
     <MarkdownView v-if="post.selftext !== ''"
                   :text="post.selftext"
                   class="post-text" />
-    <Label class="post-comment-num-label" :text="post.num_comments <= 1 ? '1 comment' : post.num_comments + ' comments'" />
+    <Label class="post-comment-num-label"
+           :text="post.num_comments + ' comment' + (post.num_comments === 1 ? '' : 's')" />
   </StackLayout>
 </template>
 

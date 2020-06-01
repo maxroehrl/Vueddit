@@ -32,11 +32,16 @@
                 <Span :text="post.link_flair_text ? ' ' + post.title : post.title"
                       class="post-title"
                       :style="{color: post.stickied && subreddit.created ? '#53ba82' : 'white'}" />
-                <Span :text="' (' + post.domain + ') \n'" class="post-domain" />
-                <Span :text="post.over_18 ? 'nsfw ' : ''" class="post-nsfw" />
-                <Span :text="post.spoiler ? 'spoiler ' : ''" class="post-spoiler" />
-                <Span :text="post.num_comments + ' comments '" class="post-num-comments" />
-                <Span :text="post.subreddit" class="post-subreddit" />
+                <Span :text="' (' + post.domain + ') \n'"
+                      class="post-domain" />
+                <Span :text="post.over_18 ? 'nsfw ' : ''"
+                      class="post-nsfw" />
+                <Span :text="post.spoiler ? 'spoiler ' : ''"
+                      class="post-spoiler" />
+                <Span :text="post.num_comments + ' comment' + (post.num_comments === 1 ? ' ' : 's ')"
+                      class="post-num-comments" />
+                <Span :text="post.subreddit"
+                      class="post-subreddit" />
               </FormattedString>
             </Label>
           </Ripple>
