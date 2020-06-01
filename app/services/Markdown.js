@@ -18,21 +18,17 @@ export default class Markdown {
   static getUrlPlugin() {
     // https://developer.android.com/reference/android/text/util/Linkify
     const Pattern = java.util.regex.Pattern;
-    // eslint-disable-next-line no-unused-vars
-    const mask = Pattern.compile('(?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)' +
+    // Match users (/u/username) and subreddits (/r/subreddit)
+    const mask = Pattern.compile('(\\/(r|u)\\/[^\\s]+)|((?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)' +
       '(([\\w\\-]+\\.){1,}?([\\w\\-.~]+\\/?)*' +
-      '[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};\']*)',
+      '[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};\']*))',
     Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
-    // eslint-disable-next-line no-unused-vars
     const transformFilter = new android.text.util.Linkify.TransformFilter({
       transformUrl(match, url) {
-        console.log(match, url);
-      },
-    });
-    // eslint-disable-next-line no-unused-vars
-    const matchFilter = new android.text.util.Linkify.MatchFilter({
-      acceptMatch(s, start, end) {
-        console.log(s, start, end);
+        if (url.startsWith('/r/') || url.startsWith('/u/')) {
+          return 'https://reddit.com' + url;
+        }
+        return url;
       },
     });
     const LinkifyTextAddedListener = new io.noties.markwon.core.CorePlugin.OnTextAddedListener({
@@ -41,7 +37,7 @@ export default class Markdown {
         this.builder.clear();
         this.builder.clearSpans();
         this.builder.append(text);
-        if (android.text.util.Linkify.addLinks(this.builder, 1)) {
+        if (android.text.util.Linkify.addLinks(this.builder, mask, null, null, transformFilter)) {
           const spans = this.builder.getSpans(0, this.builder.length(), java.lang.Object.class);
           if (spans != null && spans.length > 0) {
             const spannableBuilder = visitor.builder();

@@ -19,7 +19,7 @@ export default {
     $props: {
       handler(props) {
         if (this.$refs.label && props.text) {
-          this.$refs.label.nativeView.android.setText(Markdown.toMarkdown(props.text));
+          this.updateMarkdown(this.$refs.label.nativeView.android, props.text);
         }
       },
       immediate: true,
@@ -29,8 +29,12 @@ export default {
   methods: {
     loaded(event) {
       if (this.text) {
-        Markdown.setMarkdown(event.object.nativeView, this.text);
+        this.updateMarkdown(event.object.nativeView, this.text);
       }
+    },
+
+    updateMarkdown(tv, text) {
+      Markdown.setMarkdown(tv, text);
     },
   },
 };
