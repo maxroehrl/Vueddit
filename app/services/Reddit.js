@@ -112,8 +112,12 @@ export default class Reddit {
     return this.get(url, false);
   }
 
-  static getComments(post) {
-    return this.get(`${post.permalink}.json?raw_json=1`);
+  static getComments(post, comment='') {
+    return this.get(`${post.permalink}${comment}.json?raw_json=1`);
+  }
+
+  static getMoreComments(link, children) {
+    return this.post(`/api/morechildren`, `api_type=json&link_id=${link}&children=${children.join(',')}`);
   }
 
   static getSubscriptions() {

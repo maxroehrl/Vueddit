@@ -1,5 +1,5 @@
 <template>
-  <Page @loaded="loaded($event)">
+  <Page @loaded="loaded" @unloaded="unloaded">
     <ActionBar :title="post.title">
       <NavigationButton text="Back"
                         icon="res://ic_arrow_left"
@@ -9,18 +9,29 @@
                  ref="commentList"
                  for="comment in commentList"
                  pullToRefresh="true"
+                 :itemTemplateSelector="templateSelector"
                  @pullToRefreshInitiated="onPullDown">
       <v-template name="header">
         <Post :post="post" :app="app" />
       </v-template>
-      <v-template>
+      <v-template name="comment">
         <Comment :comment="comment" :post="post" />
+      </v-template>
+      <v-template name="more">
+        <Ripple rippleColor="#53ba82"
+                class="more"
+                :style="{marginLeft: 17 * comment.depth + ''}"
+                @tap="loadMore(comment)">
+          <Label :text="getText(comment)" />
+        </Ripple>
       </v-template>
     </RadListView>
   </Page>
 </template>
 
 <script>
+import * as application from 'tns-core-modules/application';
+import {AndroidApplication} from 'tns-core-modules/application';
 import {ObservableArray} from 'tns-core-modules/data/observable-array';
 import Reddit from '../services/Reddit';
 import Comment from './Comment';
@@ -42,9 +53,14 @@ export default {
   data() {
     return {
       commentList: new ObservableArray([]),
+      isShowingSubtree: false,
     };
   },
   methods: {
+    templateSelector(item, index, items) {
+      return item.body ? 'comment' : 'more';
+    },
+
     onPullDown(args) {
       this.getComments().finally(() => args.object.notifyPullToRefreshFinished(true));
     },
@@ -53,34 +69,74 @@ export default {
       if (!this.commentList.length) {
         this.getComments();
       }
+      application.android.on(AndroidApplication.activityBackPressedEvent, this.navigateBack, this);
+    },
+
+    unloaded() {
+      application.android.off(AndroidApplication.activityBackPressedEvent, this.navigateBack, this);
+    },
+
+    navigateBack(data) {
+      if (this.isShowingSubtree) {
+        this.isShowingSubtree = false;
+        this.getComments();
+        data.cancel = true;
+      }
+    },
+
+    getText(comment) {
+      return comment.count === 0 ? 'continue this thread' : ('load ' + comment.count + ' more comment' + (comment.count === 1 ? '' : 's'));
     },
 
     getComments() {
-      return Reddit.getComments(this.post).then((r) => {
-        if (r && r.length === 2 && r[1].data) {
-          const items = r[1].data.children.map((d) => d.data);
-          this.commentList = this.processComments(items);
-          setTimeout(() => this.$refs.commentList.nativeView.refresh());
-        }
+      return this.fetchComments().then((items) => {
+        this.commentList = this.processComments(items);
+        this.refreshCommentList();
       });
+    },
+
+    fetchComments(comment) {
+      return Reddit.getComments(this.post, comment).then((r) => {
+        if (r && r.length === 2 && r[1].data) {
+          return r[1].data.children.map((d) => d.data);
+        }
+        return [];
+      });
+    },
+
+    refreshCommentList() {
+      setTimeout(() => this.$refs.commentList.nativeView.refresh());
     },
 
     processComments(items) {
       const commentList = [];
       const addAllChildren = (comment) => {
-        let children;
+        commentList.push(comment);
         if (comment.replies && comment.replies !== '') {
-          children = comment.replies.data.children.map((d) => d.data);
-        }
-        if (comment.body) {
-          commentList.push(comment);
-        }
-        if (children) {
-          children.forEach((comment) => addAllChildren(comment));
+          comment.replies.data.children.map((d) => d.data).forEach(addAllChildren);
         }
       };
       items.forEach(addAllChildren);
       return new ObservableArray(commentList);
+    },
+
+    loadMore(comment) {
+      if (comment.count === 0) {
+        return this.fetchComments(comment.parent_id.split('_')[1]).then((items) => {
+          this.isShowingSubtree = true;
+          this.commentList = this.processComments(items);
+          this.refreshCommentList();
+        });
+      } else {
+        return Reddit.getMoreComments(this.post.name, comment.children).then((r) => {
+          if (r && r.json && r.json.data && r.json.data.things) {
+            const items = r.json.data.things.map((r) => r.data);
+            const index = this.commentList.indexOf(comment);
+            this.commentList.splice(index, 1, ...items);
+            this.refreshCommentList();
+          }
+        });
+      }
     },
   },
 };
@@ -94,5 +150,9 @@ export default {
 
   #comment-list {
     background-color: #080808;
+  }
+
+  .more {
+    color: #53ba82;
   }
 </style>
