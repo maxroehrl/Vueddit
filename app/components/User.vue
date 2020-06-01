@@ -169,7 +169,7 @@ export default {
     refresh() {
       this.postList = new ObservableArray([]);
       this.lastPostId = null;
-      return this.getPosts();
+      return this.getPosts().then(() => this.$refs.postList.nativeView.refresh());
     },
 
     getPosts(lastPostId) {
@@ -179,7 +179,6 @@ export default {
           if (items.length) {
             this.lastPostId = items[items.length - 1].name;
             this.postList.push(...items);
-            this.$refs.postList.nativeView.refresh();
           }
         }
       });

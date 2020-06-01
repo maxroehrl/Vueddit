@@ -6,6 +6,7 @@
                         @tap="$navigateBack" />
     </ActionBar>
     <RadListView id="comment-list"
+                 ref="commentList"
                  for="comment in commentList"
                  pullToRefresh="true"
                  @pullToRefreshInitiated="onPullDown">
@@ -59,6 +60,7 @@ export default {
         if (r && r.length === 2 && r[1].data) {
           const items = r[1].data.children.map((d) => d.data);
           this.commentList = this.processComments(items);
+          setTimeout(() => this.$refs.commentList.nativeView.refresh());
         }
       });
     },

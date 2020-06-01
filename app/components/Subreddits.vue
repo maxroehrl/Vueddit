@@ -109,7 +109,7 @@ export default {
     },
 
     refreshList() {
-      this.$refs.subredditList.nativeView.refresh();
+      setTimeout(() => this.$refs.subredditList.nativeView.refresh());
     },
 
     setSubreddit(subreddit, callback) {
