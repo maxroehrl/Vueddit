@@ -1,5 +1,5 @@
 <template>
-  <StackLayout :style="{marginLeft: ((comment.depth * 70) + 'px')}" class="comment">
+  <StackLayout :style="{marginLeft: (17 * comment.depth + '')}" class="comment">
     <Label textWrap="true">
       <FormattedString>
         <Span :text="comment.author_flair_text"
