@@ -109,11 +109,7 @@ export default class Reddit {
   static getUserPosts(user, after=null, sorting=this.sortings.new, limit=25, type='links') {
     let url = `/user/${user}/submitted.json?limit=${limit}&raw_json=1&sort=${sorting}&type=${type}`;
     url = after ? `${url}&after=${after}` : url;
-    return this.refreshTokenIfNecessary().then(() => request({
-      url: `${this.api}${url}`,
-      method: 'GET',
-      headers: {'User-Agent': this.userAgent},
-    })).then(this.handleResponse);
+    return this.get(url, false);
   }
 
   static getComments(post) {
@@ -174,19 +170,19 @@ export default class Reddit {
     return this.get(`/api/v1/${subreddit}/emojis/all?raw_json=1`);
   }
 
-  static get(url) {
+  static get(url, oAuth=true) {
     return this.refreshTokenIfNecessary().then(() => request({
-      url: `${this.oauthApi}${url}`,
+      url: `${oAuth ? this.oauthApi : this.api}${url}`,
       method: 'GET',
-      headers: this.getHeaders(),
+      headers: oAuth ? this.getHeaders() : {'User-Agent': this.userAgent},
     })).then(this.handleResponse);
   }
 
-  static post(url, content) {
+  static post(url, content, oAuth=true) {
     return this.refreshTokenIfNecessary().then(() => request({
-      url: `${this.oauthApi}${url}`,
+      url: `${oAuth ? this.oauthApi: this.api}${url}`,
       method: 'POST',
-      headers: this.getHeaders(),
+      headers: oAuth ? this.getHeaders() : {'User-Agent': this.userAgent},
       content,
     })).then(this.handleResponse);
   }
