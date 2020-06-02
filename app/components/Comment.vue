@@ -1,27 +1,33 @@
 <template>
-  <StackLayout :style="{marginLeft: (17 * comment.depth + '')}" class="comment">
-    <Label textWrap="true">
+  <AbsoluteLayout>
+    <IndentedLabel ref="labelHeader" @loaded="loadedHeader($event)">
       <FormattedString>
+        <Span :text="comment.author + ' '"
+              :style="{color: getUserColor(comment, post)}" />
+        <Span :text="comment.ups + ' points '"
+              class="comment-votes" />
+        <Span :text="getTimeFromNow(comment) + ' '"
+              class="comment-created" />
         <Span :text="comment.author_flair_text"
               class="comment-author-flair"
               :style="{'background-color': comment.author_flair_background_color || '#767676'}" />
-        <Span :text="(comment.author_flair_text ? ' ' : '') + comment.author + ' '"
-              :style="{color: getUserColor(comment, post)}" />
-        <Span :text="comment.ups + ' points '" class="comment-votes" />
-        <Span :text="getTimeFromNow(comment)" class="comment-created" />
       </FormattedString>
-    </Label>
-    <MarkdownView class="comment-body" :text="comment.body" />
-  </StackLayout>
+    </IndentedLabel>
+    <IndentedLabel ref="label"
+                   :text="comment.body"
+                   textWrap="true"
+                   top="18"
+                   width="100%"
+                   @loaded="loaded($event)" />
+  </AbsoluteLayout>
 </template>
 
 <script>
-import MarkdownView from './MarkdownView';
 import Reddit from '../services/Reddit';
+import Markdown from '../services/Markdown';
 
 export default {
   name: 'Comment',
-  components: {MarkdownView},
   props: {
     comment: {
       type: Object,
@@ -32,7 +38,38 @@ export default {
       required: true,
     },
   },
+  watch: {
+    $props: {
+      handler(props) {
+        if (this.$refs.label && props.comment) {
+          this.refreshLabel(this.$refs.label.nativeView.android, props.comment);
+        }
+        if (this.$refs.labelHeader && props.comment) {
+          this.$refs.labelHeader.nativeView.android.setDepth(props.comment.depth);
+        }
+      },
+      immediate: true,
+      deep: true,
+    },
+  },
   methods: {
+    loaded(event) {
+      if (this.comment) {
+        this.refreshLabel(event.object.nativeView, this.comment);
+      }
+    },
+
+    loadedHeader(event) {
+      if (this.comment) {
+        event.object.nativeView.setDepth(this.comment.depth);
+      }
+    },
+
+    refreshLabel(tv, comment) {
+      tv.setDepth(comment.depth);
+      Markdown.setMarkdown(tv, comment.body);
+    },
+
     getTimeFromNow(comment) {
       return Reddit.getTimeFromNow(comment);
     },
@@ -53,12 +90,6 @@ export default {
 </script>
 
 <style scoped>
-  .comment {
-    border-color: #767676;
-    border-width: 6px;
-    border-radius: 30px;
-  }
-
   .comment-author-flair {
     color: #c2c2c2;
   }
@@ -67,16 +98,7 @@ export default {
     color: #767676;
   }
 
-  .comment-votes {
-    color: #767676;
-  }
-
   .comment-created {
     color: #767676;
-  }
-
-  .comment-body {
-    color: white;
-    padding-left: 20px;
   }
 </style>

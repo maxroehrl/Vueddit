@@ -18,12 +18,7 @@
         <Comment :comment="comment" :post="post" />
       </v-template>
       <v-template name="more">
-        <Ripple rippleColor="#53ba82"
-                class="more"
-                :style="{marginLeft: 17 * comment.depth + ''}"
-                @tap="loadMore(comment)">
-          <Label :text="getText(comment)" />
-        </Ripple>
+        <More :comment="comment" :on-click="loadMore" />
       </v-template>
     </RadListView>
   </Page>
@@ -36,10 +31,11 @@ import {ObservableArray} from 'tns-core-modules/data/observable-array';
 import Reddit from '../services/Reddit';
 import Comment from './Comment';
 import Post from './Post';
+import More from './More';
 
 export default {
   name: 'Comments',
-  components: {Post, Comment},
+  components: {Post, Comment, More},
   props: {
     post: {
       type: Object,
@@ -82,10 +78,6 @@ export default {
         this.getComments();
         data.cancel = true;
       }
-    },
-
-    getText(comment) {
-      return comment.count === 0 ? 'continue this thread' : ('load ' + comment.count + ' more comment' + (comment.count === 1 ? '' : 's'));
     },
 
     getComments() {
@@ -150,9 +142,5 @@ export default {
 
   #comment-list {
     background-color: #080808;
-  }
-
-  .more {
-    color: #53ba82;
   }
 </style>
