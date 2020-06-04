@@ -1,10 +1,10 @@
 # Vueddit
 
-A Reddit client for Android built with NativeScript-Vue
+A Reddit client for Android built with NativeScript-Vue.
 
 ## Prerequisites
 
-* NodeJS with npm
+* [NodeJS with npm](https://nodejs.org/en/download/current/)
 * Android SDK 28
 
 ## Usage
@@ -17,7 +17,7 @@ npm install
 tns platform add android
 
 # Build, watch for changes and debug the application
-tns debug <platform>
+tns debug android
 
 # Update app icon
 tns resources generate icons icon.png
