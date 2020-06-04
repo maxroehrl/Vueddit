@@ -98,11 +98,13 @@ export default {
     },
 
     getPreview(post) {
-      return Reddit.getPreview(post).url;
+      const preview = Reddit.getPreview(post);
+      return preview ? preview.url: '';
     },
 
     getImage(post) {
-      return Reddit.getImage(post).url;
+      const preview = Reddit.getImage(post);
+      return preview ? preview.url: '';
     },
 
     getImageHeight(post) {
