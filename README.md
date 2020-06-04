@@ -23,7 +23,7 @@ tns debug <platform>
 tns resources generate icons icon.png
 
 # Update splash image
-tns resources generate splash splash.png
+tns resources generate splashes splash.png --background #53ba82
 ```
 
 ## Libraries used
