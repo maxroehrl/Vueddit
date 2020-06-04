@@ -1,8 +1,9 @@
 import * as app from 'tns-core-modules/application';
+import CustomTabs from './CustomTabs';
 
 export default class Markdown {
   static markwon;
-  static urlOpenCallback = (link, view) => console.log(link);
+  static urlOpenCallback = (link, view) => CustomTabs.openUrl(link);
 
   static getInstance() {
     if (!this.markwon) {
