@@ -97,7 +97,11 @@ export default {
     },
 
     refreshCommentList() {
-      setTimeout(() => this.$refs.commentList.nativeView.refresh());
+      setTimeout(() => {
+        if (this.$refs.commentList) {
+          this.$refs.commentList.nativeView.refresh();
+        }
+      });
     },
 
     processComments(items) {

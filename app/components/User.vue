@@ -169,7 +169,11 @@ export default {
     refresh() {
       this.postList = new ObservableArray([]);
       this.lastPostId = null;
-      return this.getPosts().then(() => this.$refs.postList.nativeView.refresh());
+      return this.getPosts().then(() => {
+        if (this.$refs.postList) {
+          this.$refs.postList.nativeView.refresh();
+        }
+      });
     },
 
     getPosts(lastPostId) {
