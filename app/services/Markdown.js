@@ -83,7 +83,7 @@ export default class Markdown {
 
   static setMarkdown(tv, text) {
     if (!text) {
-      return '';
+      text = '';
     }
     this.getInstance().setMarkdown(tv, text);
   }

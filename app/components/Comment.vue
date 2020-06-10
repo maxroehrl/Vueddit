@@ -14,7 +14,6 @@
       </FormattedString>
     </IndentedLabel>
     <IndentedLabel ref="label"
-                   :text="comment.body"
                    textWrap="true"
                    top="18"
                    width="100%"
