@@ -36,7 +36,7 @@
     "nativescript-vue-devtools": "^1.4.0",
     "path": "^0.12.7",
     "stream": "0.0.2",
-    "tns-core-modules": "^6.5.4",
+    "tns-core-modules": "^6.5.5",
     "url": "^0.11.0",
     "util": "^0.12.3",
     "vuex": "^3.4.0"
