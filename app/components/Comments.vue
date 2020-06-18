@@ -88,7 +88,7 @@ export default {
     },
 
     fetchComments(comment) {
-      return Reddit.getComments(this.post, comment).then((r) => {
+      return Reddit.getComments(this.post.permalink, comment).then((r) => {
         if (r && r.length === 2 && r[1].data) {
           return r[1].data.children.map((d) => d.data);
         }

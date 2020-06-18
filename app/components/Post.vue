@@ -63,6 +63,7 @@ import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
 import Votes from './Votes';
 import User from './User';
+import Comments from './Comments';
 
 export default {
   name: 'Post',
@@ -164,7 +165,26 @@ export default {
     },
 
     openUrl(post) {
-      CustomTabs.openUrl(post.url);
+      if (post.domain === 'reddit.com') {
+        const permalink = '/' + post.url.split('/').slice(3, 8).join('/') + '/';
+        Reddit.getComments(permalink).then((r) => {
+          if (r && r.length === 2 &&
+            r[0].data &&
+            r[0].data.children &&
+            r[0].data.children.length === 1 &&
+            r[0].data.children[0].data) {
+            this.$navigateTo(Comments, {
+              transition: 'slide',
+              props: {
+                app: this.app,
+                post: r[0].data.children[0].data,
+              },
+            });
+          }
+        });
+      } else {
+        CustomTabs.openUrl(post.url);
+      }
     },
 
     showMoreOptions(post) {
