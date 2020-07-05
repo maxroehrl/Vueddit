@@ -156,9 +156,9 @@ export default {
     showGoBackSnackbar(oldSubreddit, newSubreddit, goBack) {
       const snackbar = new SnackBar();
       snackbar.action({
-        actionText: 'Go back to ' + this.getPrefixedName(oldSubreddit),
+        actionText: 'Go back to ' + (oldSubreddit.subreddits ? '/m/' : '/r/') + oldSubreddit.display_name,
         actionTextColor: '#53ba82',
-        snackText: 'Showing ' + this.getPrefixedName(newSubreddit),
+        snackText: '',
         hideDelay: 8000,
         backgroundColor: '#3e3e3e',
       }).then((args) => {
@@ -166,10 +166,6 @@ export default {
           this.setSubreddit(oldSubreddit, goBack);
         }
       });
-    },
-
-    getPrefixedName(subreddit) {
-      return (subreddit.subreddits ? '/m/' : '/r/') + subreddit.display_name;
     },
 
     showSidebar() {
