@@ -133,6 +133,7 @@ export default {
         item.title = sorting;
         return item;
       }),
+      selectedTemplate: null,
       sorting: 'best',
       loadingIndicator: new LoadingIndicator(),
       loadingIndicatorOptions: {
@@ -143,14 +144,32 @@ export default {
     };
   },
   methods: {
-    templateSelector(item, index, items) {
-      const subHasMoreThanHalfPictures = items
-          .slice(0, 10)
-          .map((post) => Boolean(post && post.preview && post.preview.images && post.preview.images.length))
-          .reduce((a, b) => a + b, 0) > 5;
+    templateSelector(item) {
       const itemHasPreview = Boolean(Reddit.getPreview(item, 300, false));
+      return itemHasPreview ? this.getDefaultTemplate() : 'small';
+    },
+
+    getDefaultTemplate() {
+      const subHasMoreThanHalfPictures = this.postList
+          .slice(2, 10)
+          .map((post) => Boolean(post && post.preview && post.preview.images && post.preview.images.length))
+          .reduce((a, b) => a + b, 0) > 4;
       const isNotFrontPage = this.subreddit.display_name !== Reddit.frontpage;
-      return subHasMoreThanHalfPictures && isNotFrontPage && itemHasPreview ? 'big' : 'small';
+      return this.selectedTemplate ? this.selectedTemplate : (subHasMoreThanHalfPictures && isNotFrontPage ? 'big' : 'small');
+    },
+
+    toggleTemplate() {
+      if (!this.selectedTemplate) {
+        this.selectedTemplate = this.getDefaultTemplate();
+      }
+      if (this.selectedTemplate === 'big') {
+        this.selectedTemplate = 'small';
+      } else if (this.selectedTemplate === 'small') {
+        this.selectedTemplate = 'big';
+      }
+      if (this.$refs.postList) {
+        this.$refs.postList.nativeView.refresh();
+      }
     },
 
     onPullDown(args) {
@@ -169,6 +188,7 @@ export default {
     },
 
     setSubreddit({subreddit, postList, lastPostId, index}) {
+      this.selectedTemplate = null;
       this.subreddit = subreddit;
       if (postList && lastPostId && index) {
         this.postList = postList;

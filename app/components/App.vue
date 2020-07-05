@@ -13,6 +13,9 @@
       <ActionItem text="Remove from visited"
                   android.position="popup"
                   @tap="clearVisited" />
+      <ActionItem text="Toggle list item size"
+                  android.position="popup"
+                  @tap="toggleTemplate" />
       <ActionItem text="Logout"
                   android.position="popup"
                   @tap="logout" />
@@ -104,6 +107,10 @@ export default {
         this.setSubreddit(null, true);
         data.cancel = true;
       }
+    },
+
+    toggleTemplate() {
+      this.$refs.postList.toggleTemplate();
     },
 
     refreshSelectedSubreddit() {
