@@ -8,7 +8,7 @@
               class="comment-votes" />
         <Span :text="getTimeFromNow(comment) + ' '"
               class="comment-created" />
-        <Span :text="comment.author_flair_text"
+        <Span :text="comment.author_flair_text ? comment.author_flair_text : ''"
               class="comment-author-flair"
               :style="{'background-color': comment.author_flair_background_color || '#767676'}" />
       </FormattedString>

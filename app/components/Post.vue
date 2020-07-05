@@ -11,18 +11,16 @@
               @tap="showMoreOptions(post)">
         <Label textWrap="true">
           <FormattedString>
-            <Span v-if="post.link_flair_text"
-                  :style="{'background-color': post.link_flair_background_color}"
-                  :text="post.link_flair_text"
+            <Span :style="{'background-color': post.link_flair_background_color}"
+                  :text="post.link_flair_text ? post.link_flair_text : ''"
                   class="post-flair" />
-            <Span v-if="post.link_flair_text" text=" " />
-            <Span :text="post.title" />
+            <Span :text="post.link_flair_text ? ' ' + post.title : post.title" />
             <Span :text="' (' + post.domain + ')\n'" class="post" />
             <Span :text="post.num_comments + ' comments '" class="post" />
             <Span :text="post.subreddit + '\n'" class="post" />
             <Span :text="getTimeFromNow(post) + ' by '" class="post" />
             <Span :text="post.author + ' '" class="post-author" />
-            <Span :text="post.author_flair_text"
+            <Span :text="post.author_flair_text ? post.author_flair_text : ''"
                   class="post-author-flair"
                   :style="{'background-color': post.author_flair_background_color || '#767676'}" />
           </FormattedString>

@@ -33,7 +33,7 @@
               <Label textWrap="true">
                 <FormattedString>
                   <Span :style="{'background-color': post.link_flair_background_color || defaultFlairColor}"
-                        :text="post.link_flair_text"
+                        :text="post.link_flair_text ? post.link_flair_text : ''"
                         class="post-flair" />
                   <Span :text="post.link_flair_text ? ' ' + post.title : post.title"
                         class="post-title"
@@ -75,7 +75,7 @@
                      style="width: 80%">
                 <FormattedString>
                   <Span :style="{'background-color': post.link_flair_background_color || defaultFlairColor}"
-                        :text="post.link_flair_text"
+                        :text="post.link_flair_text ? post.link_flair_text : ''"
                         class="post-flair" />
                   <Span :text="post.link_flair_text ? ' ' + post.title : post.title"
                         class="post-title"
