@@ -168,9 +168,19 @@ export default {
       this.refresh().finally(() => this.loadingIndicator.hide());
     },
 
-    setSubreddit(subreddit) {
+    setSubreddit({subreddit, postList, lastPostId, index}) {
       this.subreddit = subreddit;
-      return this.refresh();
+      if (postList && lastPostId && index) {
+        this.postList = postList;
+        this.lastPostId = lastPostId;
+        if (this.$refs.postList) {
+          this.$refs.postList.nativeView.refresh();
+          setTimeout(() => this.$refs.postList.scrollToIndex(index));
+        }
+        return Promise.resolve();
+      } else {
+        return this.refresh();
+      }
     },
 
     refresh() {
