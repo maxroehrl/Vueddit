@@ -6,7 +6,7 @@
     <ActionBar :title="subreddit.display_name" flat="false">
       <ActionItem text="Refresh"
                   icon="res://ic_menu_refresh"
-                  @tap="refreshPosts" />
+                  @tap="refreshPosts()" />
       <ActionItem text="Sidebar"
                   android.position="popup"
                   @tap="showSidebar" />
