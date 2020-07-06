@@ -14,16 +14,6 @@ const nativescriptTarget = require('nativescript-dev-webpack/nativescript-target
 const {NativeScriptWorkerPlugin} = require('nativescript-worker-loader/NativeScriptWorkerPlugin');
 const hashSalt = Date.now().toString();
 
-// Remove hook, as this will only cause problems at this point.
-// Checking and deleting within webpack ensures that it will be deleted during a cloud build.
-const fs = require('fs');
-const process = require('process');
-if (fs.existsSync(__dirname + '/hooks/after-prepare/nativescript-nodeify.js')) {
-  process.stdout.write('Found evil hook, deleting...\n');
-  fs.unlinkSync(__dirname + '/hooks/after-prepare/nativescript-nodeify.js');
-  process.stdout.write('Should be fixed now.\n');
-} else process.stdout.write('Hooks seem clean, moving on.\n');
-
 module.exports = (env) => {
   // Add your custom Activities, Services and other android app components here.
   const appComponents = env.appComponents || [];
@@ -76,12 +66,10 @@ module.exports = (env) => {
   const appFullPath = resolve(projectRoot, appPath);
   const hasRootLevelScopedModules = nsWebpack.hasRootLevelScopedModules({projectDir: projectRoot});
   let coreModulesPackageName = 'tns-core-modules';
-  const alias = {
-    ...env.alias,
-    '~': appFullPath,
-    '@': appFullPath,
-    'vue': 'nativescript-vue',
-  };
+  const alias = env.alias || {};
+  alias['~'] = appFullPath;
+  alias['@'] = appFullPath;
+  alias['vue'] = 'nativescript-vue';
 
   if (hasRootLevelScopedModules) {
     coreModulesPackageName = '@nativescript/core';
@@ -134,7 +122,6 @@ module.exports = (env) => {
       hashSalt,
     },
     resolve: {
-      // aliasFields: ["browser"], // <-- ADDED LINE
       extensions: ['.vue', '.ts', '.js', '.scss', '.css'],
       // Resolve {N} system modules from tns-core-modules
       modules: [
@@ -158,7 +145,6 @@ module.exports = (env) => {
       'setImmediate': false,
       'fs': 'empty',
       '__dirname': false,
-      'net': 'empty',
     },
     devtool: hiddenSourceMap ? 'hidden-source-map' : (sourceMap ? 'inline-source-map' : 'none'),
     optimization: {
