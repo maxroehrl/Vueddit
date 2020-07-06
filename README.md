@@ -5,7 +5,9 @@ A Reddit client for Android built with NativeScript-Vue.
 ## Prerequisites
 
 * [NodeJS with npm](https://nodejs.org/en/download/current/)
-* Android SDK 28
+* [Android SDK 28](https://developer.android.com/studio)
+* [Java SE Development Kit 8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html)
+* [Nativescript CLI](https://github.com/NativeScript/nativescript-cli) `npm install -g nativescript`
 
 ## Usage
 
