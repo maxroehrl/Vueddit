@@ -4,8 +4,8 @@ import App from './components/App';
 import store from './store';
 import VueDevtools from 'nativescript-vue-devtools';
 
-import RadSideDrawer from 'nativescript-ui-sidedrawer/vue';
-import RadListView from 'nativescript-ui-listview/vue';
+import RadSideDrawerPlugin from 'nativescript-ui-sidedrawer/vue';
+import RadListViewPlugin from 'nativescript-ui-listview/vue';
 import {Ripple} from 'nativescript-ripple2';
 import IndentedLabel from './components/IndentedLabel';
 
@@ -28,8 +28,8 @@ if (TNS_ENV !== 'production') {
 // Prints Colored logs when --env.production is *NOT* set while building
 // Vue.config.debug = (TNS_ENV !== 'production')
 
-Vue.use(RadSideDrawer);
-Vue.use(RadListView);
+RadSideDrawerPlugin.install(Vue);
+RadListViewPlugin.install(Vue, {});
 Vue.registerElement('Ripple', () => Ripple);
 Vue.registerElement('IndentedLabel', () => IndentedLabel);
 

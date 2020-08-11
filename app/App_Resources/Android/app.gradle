@@ -3,8 +3,10 @@
 // Uncomment to add recyclerview-v7 dependency
 dependencies {
 //	implementation 'com.android.support:recyclerview-v7:+'
+  // https://github.com/saschpe/android-customtabs/releases
   implementation 'saschpe.android:customtabs:3.0.2'
-  implementation "io.noties.markwon:core:4.4.0"
+  // https://github.com/noties/Markwon/releases
+  implementation "io.noties.markwon:core:4.5.0"
 }
 
 // If you want to add something to be applied before applying plugins' include.gradle files
