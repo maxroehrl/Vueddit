@@ -4,6 +4,9 @@
       <NavigationButton text="Back"
                         icon="res://ic_arrow_left"
                         @tap="$navigateBack" />
+      <ActionItem text="Toggle list item size"
+                  android.position="popup"
+                  @tap="toggleTemplate" />
     </ActionBar>
     <RadListView id="post-list"
                  ref="postList"
@@ -142,13 +145,34 @@ export default {
     };
   },
   methods: {
-    templateSelector(item, index, items) {
-      const subHasMoreThanHalfPictures = items
-          .slice(0, 10)
-          .map((post) => Boolean(post && post.preview && post.preview.images && post.preview.images.length))
-          .reduce((a, b) => a + b, 0) > 5;
+    templateSelector(item) {
+      if (item.body) {
+        return 'comment';
+      }
       const itemHasPreview = Boolean(Reddit.getPreview(item, 300, false));
-      return subHasMoreThanHalfPictures && itemHasPreview ? 'big' : 'small';
+      return itemHasPreview ? this.getDefaultTemplate() : 'small';
+    },
+
+    getDefaultTemplate() {
+      const subHasMoreThanHalfPictures = this.postList
+          .slice(2, 10)
+          .map((post) => Boolean(post && post.preview && post.preview.images && post.preview.images.length))
+          .reduce((a, b) => a + b, 0) > 4;
+      return this.selectedTemplate ? this.selectedTemplate : (subHasMoreThanHalfPictures ? 'big' : 'small');
+    },
+
+    toggleTemplate() {
+      if (!this.selectedTemplate) {
+        this.selectedTemplate = this.getDefaultTemplate();
+      }
+      if (this.selectedTemplate === 'big') {
+        this.selectedTemplate = 'small';
+      } else if (this.selectedTemplate === 'small') {
+        this.selectedTemplate = 'big';
+      }
+      if (this.$refs.postList) {
+        this.$refs.postList.nativeView.refresh();
+      }
     },
 
     onPullDown(args) {
