@@ -1,9 +1,7 @@
 <template>
   <FlexboxLayout flexDirection="column"
                  justifyContent="center"
-                 alignSelf="center"
-                 alignContent="center"
-                 width="15%">
+                 alignContent="center">
     <Ripple rippleColor="#53ba82"
             class="chevron"
             @tap="vote(true)">

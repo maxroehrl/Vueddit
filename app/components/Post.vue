@@ -1,39 +1,11 @@
 <template>
   <StackLayout>
-    <FlexboxLayout flexDirection="row"
-                   flexWrap="nowrap"
-                   alignSelf="flex-start"
-                   justifyContent="flex-start"
-                   class="post-header">
-      <Votes :post="post" />
-      <Ripple rippleColor="#53ba82"
-              class="post-info"
-              @tap="showMoreOptions(post)">
-        <Label textWrap="true">
-          <FormattedString>
-            <Span :style="{'background-color': post.link_flair_background_color}"
-                  :text="post.link_flair_text ? post.link_flair_text : ''"
-                  class="post-flair" />
-            <Span :text="post.link_flair_text ? ' ' + post.title : post.title" />
-            <Span :text="' (' + post.domain + ')\n'" class="post" />
-            <Span :text="post.num_comments + ' comments '" class="post" />
-            <Span :text="post.subreddit + '\n'" class="post" />
-            <Span :text="getTimeFromNow(post) + ' by '" class="post" />
-            <Span :text="post.author + ' '" class="post-author" />
-            <Span :text="post.author_flair_text ? post.author_flair_text : ''"
-                  class="post-author-flair"
-                  :style="{'background-color': post.author_flair_background_color || '#767676'}" />
-          </FormattedString>
-        </Label>
-      </Ripple>
-      <Ripple rippleColor="#53ba82"
-              class="post-preview"
-              @tap="openUrl(post)">
-        <Image :src="getPreview(post)"
-               stretch="aspectFit"
-               loadMode="async" />
-      </Ripple>
-    </FlexboxLayout>
+    <PostHeader :post="post"
+                bigPreview="false"
+                highlightAuthor="true"
+                width="100%"
+                :onLongPress="showMoreOptions"
+                :onTab="openUrl" />
     <WebView v-if="getVideo(post)"
              :height="getVideoHeight(post)"
              :src="getVideo(post).src"
@@ -43,7 +15,7 @@
            :src="getImage(post)"
            :style="{height: getImageHeight(post)}"
            stretch="aspectFit"
-           class="post-image"
+           width="100%"
            loadMode="async" />
     <MarkdownView v-if="post.selftext !== ''"
                   :text="post.selftext"
@@ -59,13 +31,13 @@ import {screen} from 'tns-core-modules/platform';
 import MarkdownView from './MarkdownView';
 import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
-import Votes from './Votes';
 import User from './User';
 import Comments from './Comments';
+import PostHeader from './PostHeader';
 
 export default {
   name: 'Post',
-  components: {Votes, MarkdownView},
+  components: {MarkdownView, PostHeader},
   props: {
     post: {
       type: Object,
@@ -107,7 +79,8 @@ export default {
     },
 
     getImageHeight(post) {
-      return Reddit.getAspectFixHeight(Reddit.getImage(post));
+      const image = Reddit.getImage(post);
+      return image ? Reddit.getAspectFixHeight(image) : '0px';
     },
 
     getVideo(post) {
@@ -156,10 +129,6 @@ export default {
 
     getVideoHeight(post) {
       return Reddit.getAspectFixHeight(this.getVideo(post));
-    },
-
-    getTimeFromNow(post) {
-      return Reddit.getTimeFromNow(post);
     },
 
     openUrl(post) {
@@ -217,45 +186,12 @@ export default {
 </script>
 
 <style scoped>
-  .post {
-    color: #767676;
-  }
-
-  .post-header {
-    background-color: #080808;
-  }
-
-  .post-info {
-    width: 65%;
-  }
-
-  .post-preview {
-    width: 20%;
-  }
-
-  .post-image {
-    width: 100%;
-  }
-
-  .post-flair {
-    font-size: 12px;
-    color: #f3f3f3;
-  }
-
   .post-text {
     border-width: 6px;
     border-color: #767676;
     margin: 10px;
     padding: 30px;
     border-radius: 30px;
-  }
-
-  .post-author {
-    color: #53ba82;
-  }
-
-  .post-author-flair {
-    color: #c2c2c2;
   }
 
   .post-comment-num-label {

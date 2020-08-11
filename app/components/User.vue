@@ -23,81 +23,15 @@
                       selectedBackgroundColor="#53ba82"
                       @selectedIndexChange="onSortingChange" />
       </v-template>
-      <v-template name="big">
-        <StackLayout>
-          <FlexboxLayout flexDirection="row"
-                         alignSelf="flex-start"
-                         justifyContent="flex-start">
-            <Votes :post="post" width="15%" />
-            <Ripple rippleColor="#53ba82"
-                    width="85%"
-                    @longPress="onLongPress(post)"
-                    @tap="openComments(post)">
-              <Label textWrap="true">
-                <FormattedString>
-                  <Span :style="{'background-color': post.link_flair_background_color || defaultFlairColor}"
-                        :text="post.link_flair_text ? post.link_flair_text : ''"
-                        class="post-flair" />
-                  <Span :text="post.link_flair_text ? ' ' + post.title : post.title"
-                        class="post-title"
-                        :style="{color: post.stickied ? '#53ba82' : 'white'}" />
-                  <Span :text="' (' + post.domain + ') \n'" class="post-domain" />
-                  <Span :text="post.over_18 ? 'nsfw ' : ''" class="post-nsfw" />
-                  <Span :text="post.spoiler ? 'spoiler ' : ''" class="post-spoiler" />
-                  <Span :text="post.num_comments + ' comments '" class="post-num-comments" />
-                  <Span :text="post.subreddit" class="post-subreddit" />
-                </FormattedString>
-              </Label>
-            </Ripple>
-          </FlexboxLayout>
-          <Ripple rippleColor="#53ba82"
-                  width="100%"
-                  @longPress="onLongPress(post)"
-                  @tap="openComments(post)">
-            <Image :src="getImage(post)"
-                   :style="{height: getImageHeight(post)}"
-                   stretch="aspectFit"
-                   class="post-image"
-                   loadMode="async" />
-          </Ripple>
-        </StackLayout>
+      <v-template name="post">
+        <PostHeader :post="post"
+                    :bigPreview="shouldShowBigPreview(post)"
+                    width="100%"
+                    :onLongPress="onLongPress"
+                    :onTab="openComments" />
       </v-template>
-      <v-template name="small">
-        <FlexboxLayout flexDirection="row"
-                       alignSelf="flex-start"
-                       justifyContent="flex-start">
-          <Votes :post="post" />
-          <Ripple rippleColor="#53ba82"
-                  width="80%"
-                  @longPress="onLongPress(post)"
-                  @tap="openComments(post)">
-            <FlexboxLayout flexDirection="row"
-                           alignSelf="flex-start"
-                           justifyContent="flex-start">
-              <Label textWrap="true"
-                     style="width: 80%">
-                <FormattedString>
-                  <Span :style="{'background-color': post.link_flair_background_color || defaultFlairColor}"
-                        :text="post.link_flair_text ? post.link_flair_text : ''"
-                        class="post-flair" />
-                  <Span :text="post.link_flair_text ? ' ' + post.title : post.title"
-                        class="post-title"
-                        :style="{color: post.stickied ? '#53ba82' : 'white'}" />
-                  <Span :text="' (' + post.domain + ') \n'" class="post-domain" />
-                  <Span :text="post.over_18 ? 'nsfw ' : ''" class="post-nsfw" />
-                  <Span :text="post.spoiler ? 'spoiler ' : ''" class="post-spoiler" />
-                  <Span :text="post.num_comments + ' comments '" class="post-num-comments" />
-                  <Span :text="post.subreddit" class="post-subreddit" />
-                </FormattedString>
-              </Label>
-              <Image :src="getPreview(post)"
-                     stretch="aspectFit"
-                     width="20%"
-                     height="300px"
-                     loadMode="async" />
-            </FlexboxLayout>
-          </Ripple>
-        </FlexboxLayout>
+      <v-template name="comment">
+        <MarkdownView :text="post.comment" />
       </v-template>
     </RadListView>
   </Page>
@@ -110,11 +44,12 @@ import {action} from 'tns-core-modules/ui/dialogs';
 import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
 import Reddit from '../services/Reddit';
 import Comments from './Comments';
-import Votes from './Votes';
+import MarkdownView from './MarkdownView';
+import PostHeader from './PostHeader';
 
 export default {
   name: 'User',
-  components: {Votes},
+  components: {MarkdownView, PostHeader},
   props: {
     user: {
       type: String,
@@ -127,7 +62,6 @@ export default {
   },
   data() {
     return {
-      defaultFlairColor: '#767676',
       postList: new ObservableArray([]),
       lastPostId: null,
       sortings: ['new', 'top', 'hot', 'controversial'].map((sorting) => {
@@ -135,6 +69,7 @@ export default {
         item.title = sorting;
         return item;
       }),
+      selectedTemplate: null,
       sorting: 'new',
       loadingIndicator: new LoadingIndicator(),
       loadingIndicatorOptions: {
@@ -146,11 +81,11 @@ export default {
   },
   methods: {
     templateSelector(item) {
-      if (item.body) {
-        return 'comment';
-      }
-      const itemHasPreview = Boolean(Reddit.getPreview(item, 300, false));
-      return itemHasPreview ? this.getDefaultTemplate() : 'small';
+      return item.body ? 'comment' : 'post';
+    },
+
+    shouldShowBigPreview(post) {
+      return Reddit.getPreview(post, 300, false) && this.getDefaultTemplate() === 'big';
     },
 
     getDefaultTemplate() {
@@ -212,20 +147,6 @@ export default {
       });
     },
 
-    getPreview(post) {
-      const preview = Reddit.getPreview(post);
-      return preview ? preview.url: '';
-    },
-
-    getImage(post) {
-      const preview = Reddit.getImage(post);
-      return preview ? preview.url: '';
-    },
-
-    getImageHeight(post) {
-      return Reddit.getAspectFixHeight(Reddit.getImage(post));
-    },
-
     openComments(post) {
       this.$navigateTo(Comments, {
         transition: 'slide',
@@ -265,35 +186,5 @@ export default {
     height: 100%;
     width: 100%;
     background-color: #080808;
-  }
-
-  .post-flair {
-    font-size: 12px;
-    color: #f3f3f3;
-  }
-
-  .post-title {
-    color: white;
-    font-size: 14px;
-  }
-
-  .post-num-comments {
-    color: #767676;
-  }
-
-  .post-domain {
-    color: #767676;
-  }
-
-  .post-subreddit {
-    color: #767676;
-  }
-
-  .post-nsfw {
-    color: red;
-  }
-
-  .post-spoiler {
-    color: yellow;
   }
 </style>

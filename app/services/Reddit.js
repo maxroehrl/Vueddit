@@ -221,7 +221,11 @@ export default class Reddit {
   }
 
   static getAspectFixHeight({height, width}) {
-    return (height * screen.mainScreen.widthPixels / width).toFixed(0) + 'px';
+    if (height && width) {
+      return (height * screen.mainScreen.widthPixels / width).toFixed(0) + 'px';
+    } else {
+      return '0px';
+    }
   }
 
   static getTimeFromNow({created}) {
