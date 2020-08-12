@@ -113,14 +113,17 @@ export default {
                 margin: 0;
                 background-color: black;
               }
-              video {
-                  width: ${screen.mainScreen.widthDIPs}px;
-              }
             </style>
           </head>
           <body>
             <script src="https://cdn.dashjs.org/latest/dash.all.min.js"><` + `/script>
-            <video data-dashjs-player autoplay controls src="${video.dash_url}"></video>
+            <video autoplay controls loop width="${screen.mainScreen.widthDIPs}px"></video>
+            <script>
+              document.addEventListener("DOMContentLoaded", function () {
+                const player = dashjs.MediaPlayer().create();
+                player.initialize(document.querySelector("video"), '${video.dash_url}', true);
+            });
+            <` + `/script>
           </body>
         </html>`;
     },
