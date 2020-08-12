@@ -21,7 +21,7 @@
                   class="post-nsfw" />
             <Span :text="post.spoiler ? 'spoiler ' : ''"
                   class="post-spoiler" />
-            <Span :text="post.num_comments + ' comments in /r/'" />
+            <Span :text="post.num_comments + ' comment' + (post.num_comments === 1 ? '' : 's') + ' in /r/'" />
             <Span :text="post.subreddit" />
             <Span :text="'\n' + getTimeFromNow(post) + ' by '" />
             <Span :text="'/u/' + post.author + ' '"
