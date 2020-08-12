@@ -39,7 +39,6 @@
               @tap="onTab(post)">
         <Image :src="getPreview(post)"
                stretch="aspectFit"
-               width="30%"
                height="300px"
                loadMode="async" />
       </Ripple>
@@ -47,10 +46,11 @@
     <Ripple v-if="bigPreview"
             rippleColor="#53ba82"
             width="100%"
+            :height="bigPreview ? getImageHeight(post) : '0'"
             @longPress="onLongPress(post)"
             @tap="onTab(post)">
-      <Image :src="getImage(post)"
-             :style="{height: getImageHeight(post)}"
+      <Image :src="bigPreview && getImage(post)"
+             :height="bigPreview ? getImageHeight(post) : '0'"
              stretch="aspectFit"
              width="100%"
              loadMode="async" />

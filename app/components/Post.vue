@@ -1,7 +1,7 @@
 <template>
   <StackLayout>
     <PostHeader :post="post"
-                bigPreview="false"
+                :bigPreview="shouldShowBigPreview(post) && !getVideo(post)"
                 highlightAuthor="true"
                 width="100%"
                 :onLongPress="showMoreOptions"
@@ -11,12 +11,6 @@
              :src="getVideo(post).src"
              @loadFinished="onVideoPreviewLoadFinished"
              @loaded="onVideoPreviewLoaded" />
-    <Image v-else-if="post.preview && post.preview.enabled"
-           :src="getImage(post)"
-           :style="{height: getImageHeight(post)}"
-           stretch="aspectFit"
-           width="100%"
-           loadMode="async" />
     <MarkdownView v-if="post.selftext !== ''"
                   :text="post.selftext"
                   class="post-text" />
@@ -71,6 +65,10 @@ export default {
     getPreview(post) {
       const preview = Reddit.getPreview(post);
       return preview ? preview.url: '';
+    },
+
+    shouldShowBigPreview(post) {
+      return !!Reddit.getPreview(post, 300, false);
     },
 
     getImage(post) {
