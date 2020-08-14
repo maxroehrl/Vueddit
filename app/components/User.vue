@@ -116,7 +116,7 @@ export default {
 
     onLoadMorePostsRequested(args) {
       this.getPosts(this.lastPostId)
-          .then(() => args.object.notifyAppendItemsOnDemandFinished(this.postList.length, false));
+          .then((items) => args.object.notifyAppendItemsOnDemandFinished(items.length, false));
     },
 
     onSortingChange(args) {
@@ -142,8 +142,10 @@ export default {
           if (items.length) {
             this.lastPostId = items[items.length - 1].name;
             this.postList.push(...items);
+            return items;
           }
         }
+        return [];
       });
     },
 
