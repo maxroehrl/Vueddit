@@ -4,6 +4,9 @@
       <NavigationButton text="Back"
                         icon="res://ic_arrow_left"
                         @tap="$navigateBack" />
+      <ActionItem text="Refresh"
+                  icon="res://ic_menu_refresh"
+                  @tap="refreshPosts()" />
       <ActionItem text="Toggle list item size"
                   android.position="popup"
                   @tap="toggleTemplate" />
@@ -120,8 +123,12 @@ export default {
     },
 
     onSortingChange(args) {
-      this.loadingIndicator.show(this.loadingIndicatorOptions);
       this.sorting = this.sortings[args.value].title;
+      this.refreshPosts();
+    },
+
+    refreshPosts() {
+      this.loadingIndicator.show(this.loadingIndicatorOptions);
       this.refresh().finally(() => this.loadingIndicator.hide());
     },
 
