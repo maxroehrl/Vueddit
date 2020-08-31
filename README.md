@@ -5,7 +5,7 @@ A Reddit client for Android built with NativeScript-Vue.
 ## Prerequisites
 
 * [NodeJS with npm](https://nodejs.org/en/download/current/)
-* [Android SDK 28](https://developer.android.com/studio)
+* [Android SDK](https://developer.android.com/studio)
 * [Java SE Development Kit 8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html)
 * [Nativescript CLI](https://github.com/NativeScript/nativescript-cli) `npm install -g nativescript`
 
@@ -26,6 +26,9 @@ tns resources generate icons icon.png
 
 # Update splash image
 tns resources generate splashes splash.png --background #53ba82
+
+# Build a release bundle
+# tns build android --release --key-store-path "XXX.jks" --key-store-password XXX --key-store-alias XXX --key-store-alias-password XXX --aab
 ```
 
 ## Libraries used
