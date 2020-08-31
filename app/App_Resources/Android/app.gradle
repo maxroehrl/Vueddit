@@ -6,7 +6,7 @@ dependencies {
   // https://github.com/saschpe/android-customtabs/releases
   implementation 'saschpe.android:customtabs:3.0.2'
   // https://github.com/noties/Markwon/releases
-  implementation "io.noties.markwon:core:4.5.0"
+  implementation "io.noties.markwon:core:4.5.1"
 }
 
 // If you want to add something to be applied before applying plugins' include.gradle files
