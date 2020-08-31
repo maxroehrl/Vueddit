@@ -1,6 +1,6 @@
 {
   "name": "vueddit",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Reddit client built with NativeScript-Vue",
   "author": "Max Röhrl <max.roehrl11@gmail.com>",
   "license": "MIT",
