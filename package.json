@@ -1,6 +1,7 @@
 {
   "name": "vueddit",
   "version": "1.0.2",
+  "main": "main",
   "description": "A Reddit client built with NativeScript-Vue",
   "author": "Max Röhrl <max.roehrl11@gmail.com>",
   "license": "MIT",
@@ -8,53 +9,42 @@
     "type": "git",
     "url": "git+https://github.com/maxroehrl/Vueddit.git"
   },
-  "nativescript": {
-    "id": "de.max.roehrl.vueddit",
-    "templateVersion": "v2",
-    "tns-ios": {
-      "version": "6.5.2"
-    },
-    "tns-android": {
-      "version": "6.5.3"
-    }
-  },
   "dependencies": {
+    "@nativescript/core": "7.0.0",
     "@nativescript/theme": "^2.3.3",
     "@nstudio/nativescript-loading-indicator": "^4.0.0",
-    "@nstudio/nativescript-snackbar": "^1.1.2",
     "@vue/devtools": "^5.3.3",
     "base-64": "^0.1.0",
     "events": "^3.2.0",
     "fs": "0.0.1-security",
     "moment": "^2.27.0",
-    "nativescript-ripple2": "^2.3.0",
     "nativescript-socketio": "^3.3.1",
     "nativescript-toasty": "^3.0.0-alpha.2",
-    "nativescript-ui-listview": "^8.2.0",
-    "nativescript-ui-sidedrawer": "^8.0.1",
-    "nativescript-vue": "^2.7.1",
+    "nativescript-ui-listview": "^9.0.2",
+    "nativescript-ui-sidedrawer": "^9.0.3",
+    "nativescript-vue": "^2.8.1",
     "nativescript-vue-devtools": "^1.4.0",
     "path": "^0.12.7",
     "stream": "0.0.2",
-    "tns-core-modules": "^6.5.15",
     "url": "^0.11.0",
     "util": "^0.12.3",
     "vuex": "^3.5.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.1",
+    "@babel/core": "^7.11.6",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
-    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-env": "^7.11.5",
+    "@nativescript/android": "7.0.0",
+    "@nativescript/webpack": "3.0.1",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
-    "eslint": "^7.6.0",
+    "eslint": "^7.8.1",
     "eslint-config-google": "^0.14.0",
     "eslint-config-i-am-meticulous": "^12.0.0",
     "eslint-loader": "^4.0.2",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-vue": "^6.2.2",
-    "nativescript-dev-webpack": "^1.5.1",
-    "nativescript-vue-template-compiler": "^2.7.1",
+    "nativescript-vue-template-compiler": "^2.8.1",
     "nativescript-worker-loader": "~0.12.1",
     "node-sass": "^4.14.1",
     "vue-loader": "^15.9.3"
