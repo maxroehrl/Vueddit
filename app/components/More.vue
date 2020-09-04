@@ -1,6 +1,5 @@
 <template>
-  <Ripple rippleColor="#53ba82"
-          class="more"
+  <Ripple class="more"
           @tap="onClick(comment)">
     <IndentedLabel ref="label"
                    :text="getText(comment)"

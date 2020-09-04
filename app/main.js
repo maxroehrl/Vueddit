@@ -6,7 +6,7 @@ import VueDevtools from 'nativescript-vue-devtools';
 
 import RadSideDrawerPlugin from 'nativescript-ui-sidedrawer/vue';
 import RadListViewPlugin from 'nativescript-ui-listview/vue';
-import {Ripple} from 'nativescript-ripple2';
+import Ripple from './components/Ripple';
 import IndentedLabel from './components/IndentedLabel';
 
 import {decode, encode} from 'base-64';

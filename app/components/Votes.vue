@@ -2,8 +2,7 @@
   <FlexboxLayout flexDirection="column"
                  justifyContent="center"
                  alignContent="center">
-    <Ripple rippleColor="#53ba82"
-            class="chevron"
+    <Ripple class="chevron"
             @tap="vote(true)">
       <Image src="res://ic_chevron_up_white_18dp"
              loadMode="async"
@@ -12,8 +11,7 @@
     <Label :text="getScore(post.score)"
            class="vote-label"
            :style="{color: getColor()}" />
-    <Ripple rippleColor="#53ba82"
-            class="chevron"
+    <Ripple class="chevron"
             @tap="vote(false)">
       <Image src="res://ic_chevron_down_white_18dp"
              loadMode="async"

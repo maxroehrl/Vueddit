@@ -2,8 +2,7 @@
   <StackLayout padding="0">
     <StackLayout orientation="horizontal" padding="0">
       <Votes :post="post" width="14%" />
-      <Ripple rippleColor="#53ba82"
-              :width="bigPreview ? '86%' : '66%'"
+      <Ripple :width="bigPreview ? '86%' : '66%'"
               @longPress="onLongPress(post)"
               @tap="onTab(post)">
         <Label textWrap="true"
@@ -33,7 +32,6 @@
         </Label>
       </Ripple>
       <Ripple v-if="!bigPreview"
-              rippleColor="#53ba82"
               width="20%"
               @longPress="onLongPress(post)"
               @tap="onTab(post)">
@@ -44,7 +42,6 @@
       </Ripple>
     </StackLayout>
     <Ripple v-if="bigPreview"
-            rippleColor="#53ba82"
             width="100%"
             :height="bigPreview ? getImageHeight(post) : '0'"
             @longPress="onLongPress(post)"

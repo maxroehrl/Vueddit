@@ -18,16 +18,14 @@
       </v-template>
       <v-template>
         <FlexboxLayout class="subreddit-item" :style="{backgroundColor: isSelected(subreddit) ? '#53ba82': '#2d2d2d'}">
-          <Ripple rippleColor="#53ba82"
-                  width="20%"
+          <Ripple width="20%"
                   @tap="star(subreddit)">
             <Image :src="getStarredSrc(subreddit)"
                    class="star"
                    stretch="fill"
                    loadMode="async" />
           </Ripple>
-          <Ripple rippleColor="#53ba82"
-                  width="80%"
+          <Ripple width="80%"
                   @tap="onSelection(subreddit)">
             <Label :text="subreddit.display_name"
                    class="subreddit-label" />
