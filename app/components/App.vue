@@ -42,10 +42,10 @@
 <script>
 import {PushTransition} from 'nativescript-ui-sidedrawer';
 import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
-import {SnackBar} from '@nstudio/nativescript-snackbar';
 import * as ApplicationSettings from '@nativescript/core/application-settings';
 import * as application from '@nativescript/core/application';
 import {AndroidApplication} from '@nativescript/core/application';
+import showSnackbar from './Snackbar';
 import Posts from './Posts';
 import Subreddits from './Subreddits';
 import SidebarDialog from './SidebarDialog';
@@ -167,8 +167,7 @@ export default {
     },
 
     showGoBackSnackbar(oldSubreddit, newSubreddit, goBack) {
-      const snackbar = new SnackBar();
-      snackbar.action({
+      showSnackbar({
         actionText: 'Go back to ' + (oldSubreddit.subreddits ? '/m/' : '/r/') + oldSubreddit.display_name,
         actionTextColor: '#53ba82',
         snackText: '',
