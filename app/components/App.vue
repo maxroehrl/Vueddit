@@ -43,9 +43,9 @@
 import {PushTransition} from 'nativescript-ui-sidedrawer';
 import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
 import {SnackBar} from '@nstudio/nativescript-snackbar';
-import * as ApplicationSettings from 'tns-core-modules/application-settings';
-import * as application from 'tns-core-modules/application';
-import {AndroidApplication} from 'tns-core-modules/application';
+import * as ApplicationSettings from '@nativescript/core/application-settings';
+import * as application from '@nativescript/core/application';
+import {AndroidApplication} from '@nativescript/core/application';
 import Posts from './Posts';
 import Subreddits from './Subreddits';
 import SidebarDialog from './SidebarDialog';

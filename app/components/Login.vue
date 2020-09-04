@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import * as application from 'tns-core-modules/application';
-import {AndroidApplication} from 'tns-core-modules/application';
+import * as application from '@nativescript/core/application';
+import {AndroidApplication} from '@nativescript/core/application';
 
 export default {
   name: 'Login',

@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import * as application from 'tns-core-modules/application';
-import {AndroidApplication} from 'tns-core-modules/application';
-import {ObservableArray} from 'tns-core-modules/data/observable-array';
+import * as application from '@nativescript/core/application';
+import {AndroidApplication} from '@nativescript/core/application';
+import {ObservableArray} from '@nativescript/core/data/observable-array';
 import Reddit from '../services/Reddit';
 import Comment from './Comment';
 import Post from './Post';

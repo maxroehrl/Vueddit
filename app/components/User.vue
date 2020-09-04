@@ -41,9 +41,9 @@
 </template>
 
 <script>
-import {SegmentedBarItem} from 'tns-core-modules/ui/segmented-bar';
-import {ObservableArray} from 'tns-core-modules/data/observable-array';
-import {action} from 'tns-core-modules/ui/dialogs';
+import {SegmentedBarItem} from '@nativescript/core/ui/segmented-bar';
+import {ObservableArray} from '@nativescript/core/data/observable-array';
+import {action} from '@nativescript/core/ui/dialogs';
 import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
 import Reddit from '../services/Reddit';
 import Comments from './Comments';

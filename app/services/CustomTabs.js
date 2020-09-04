@@ -1,5 +1,5 @@
-import * as app from 'tns-core-modules/application';
-import {ad} from 'tns-core-modules/utils/utils';
+import * as app from '@nativescript/core/application';
+import {ad} from '@nativescript/core/utils/utils';
 
 export default class CustomTabs {
   static slideInRight = ad.resources.getId(':anim/slide_in_right');

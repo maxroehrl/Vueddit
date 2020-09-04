@@ -40,9 +40,9 @@
 
 <script>
 import Reddit from '../services/Reddit';
-import {ObservableArray} from 'tns-core-modules/data/observable-array';
+import {ObservableArray} from '@nativescript/core/data/observable-array';
 import store from '../store';
-import {ad} from 'tns-core-modules/utils/utils';
+import {ad} from '@nativescript/core/utils/utils';
 
 export default {
   name: 'Subreddits',

@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import {action} from 'tns-core-modules/ui/dialogs';
-import {screen} from 'tns-core-modules/platform';
+import {action} from '@nativescript/core/ui/dialogs';
+import {Screen} from '@nativescript/core/platform';
 import MarkdownView from './MarkdownView';
 import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
@@ -117,7 +117,7 @@ export default {
           </head>
           <body>
             <script src="https://cdn.dashjs.org/latest/dash.all.min.js"><` + `/script>
-            <video autoplay controls loop width="${screen.mainScreen.widthDIPs}px"></video>
+            <video autoplay controls loop width="${Screen.mainScreen.widthDIPs}px"></video>
             <script>
               document.addEventListener("DOMContentLoaded", function () {
                 const player = dashjs.MediaPlayer().create();

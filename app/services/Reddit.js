@@ -1,6 +1,6 @@
-import * as app from 'tns-core-modules/application';
-import {request} from 'tns-core-modules/http';
-import {screen} from 'tns-core-modules/platform';
+import * as app from '@nativescript/core/application';
+import {request} from '@nativescript/core//http';
+import {Screen} from '@nativescript/core/platform';
 import moment from 'moment';
 import Login from '../components/Login';
 import store from '../store';
@@ -204,7 +204,7 @@ export default class Reddit {
   }
 
   static getImage(post) {
-    return this.getPreview(post, screen.mainScreen.widthPixels, {url: ''});
+    return this.getPreview(post, Screen.mainScreen.widthPixels, {url: ''});
   }
 
   static getPreview(post, width=300, noPreview={url: 'res://ic_comment_text_multiple_outline_white_48dp'}) {
@@ -222,7 +222,7 @@ export default class Reddit {
 
   static getAspectFixHeight({height, width}) {
     if (height && width) {
-      return (height * screen.mainScreen.widthPixels / width).toFixed(0) + 'px';
+      return (height * Screen.mainScreen.widthPixels / width).toFixed(0) + 'px';
     } else {
       return '0px';
     }

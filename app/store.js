@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import * as ApplicationSettings from 'tns-core-modules/application-settings';
+import * as ApplicationSettings from '@nativescript/core/application-settings';
 
 Vue.use(Vuex);
 

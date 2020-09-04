@@ -1,4 +1,4 @@
-import {Label} from 'tns-core-modules/ui/label';
+import {Label} from '@nativescript/core/ui/label';
 
 const paint = new android.graphics.Paint();
 paint.setStyle(android.graphics.Paint.Style.STROKE);
