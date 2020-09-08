@@ -15,7 +15,7 @@
             <Span :text="post.link_flair_text ? ' ' + post.title : post.title"
                   class="post-title"
                   :style="{color: post.stickied ? '#53ba82' : 'white'}" />
-            <Span :text="' (' + post.domain + ') \n'" />
+            <Span :text="' (' + post.domain + ')\n'" />
             <Span :text="post.over_18 ? 'nsfw ' : ''"
                   class="post-nsfw" />
             <Span :text="post.spoiler ? 'spoiler ' : ''"
@@ -25,9 +25,12 @@
             <Span :text="'\n' + getTimeFromNow(post) + ' by '" />
             <Span :text="'/u/' + post.author + ' '"
                   :style="{'color': highlightAuthor ? '#53ba82' : '#767676'}" />
-            <Span :text="highlightAuthor && post.author_flair_text ? post.author_flair_text : ''"
+            <Span :text="highlightAuthor && post.author_flair_text ? post.author_flair_text + '\n' : '\n'"
                   class="post-author-flair"
                   :style="{'background-color': post.author_flair_background_color || defaultFlairColor}" />
+            <Span :text="post.gildings && post.gildings.gid_1 ? ('🥈x' + post.gildings.gid_1 + ' ') : ''" />
+            <Span :text="post.gildings && post.gildings.gid_2 ? ('🥇x' + post.gildings.gid_2 + ' ') : ''" />
+            <Span :text="post.gildings && post.gildings.gid_3 ? ('🥉x' + post.gildings.gid_3 + ' ') : ''" />
           </FormattedString>
         </Label>
       </Ripple>

@@ -8,6 +8,9 @@
               class="comment-votes" />
         <Span :text="getTimeFromNow(comment) + ' '"
               class="comment-created" />
+        <Span :text="comment.gildings && comment.gildings.gid_1 ? ('🥈x' + comment.gildings.gid_1 + ' ') : ''" />
+        <Span :text="comment.gildings && comment.gildings.gid_2 ? ('🥇x' + comment.gildings.gid_2 + ' ') : ''" />
+        <Span :text="comment.gildings && comment.gildings.gid_3 ? ('🥉x' + comment.gildings.gid_3 + ' ') : ''" />
         <Span :text="comment.author_flair_text ? comment.author_flair_text : ''"
               class="comment-author-flair"
               :style="{'background-color': comment.author_flair_background_color || '#767676'}" />
