@@ -11,7 +11,7 @@ export default class IndentedLabel extends Label {
       depth: 0,
       onDraw(canvas) {
         const factor = 60;
-        this.super.setPadding(factor * this.depth + 20, 0, 10, 10);
+        this.super.setPadding(factor * this.depth + 20, 0, 10, 50);
         this.super.onDraw(canvas);
         for (let i = 1; i <= this.depth; i++) {
           const indent = i * factor;

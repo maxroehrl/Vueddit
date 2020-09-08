@@ -1,6 +1,8 @@
 <template>
   <AbsoluteLayout>
-    <IndentedLabel ref="labelHeader" @loaded="loadedHeader($event)">
+    <IndentedLabel ref="labelHeader"
+                   class="comment-author"
+                   @loaded="loadedHeader($event)">
       <FormattedString>
         <Span :text="comment.author + ' '"
               :style="{color: getUserColor(comment)}" />
@@ -17,6 +19,7 @@
       </FormattedString>
     </IndentedLabel>
     <IndentedLabel ref="label"
+                   class="comment-body"
                    textWrap="true"
                    top="18"
                    width="100%"
@@ -101,6 +104,14 @@ export default {
 </script>
 
 <style scoped>
+  .comment-author {
+    font-size: 13px;
+  }
+
+  .comment-body {
+    font-size: 13px;
+  }
+
   .comment-author-flair {
     color: #c2c2c2;
   }

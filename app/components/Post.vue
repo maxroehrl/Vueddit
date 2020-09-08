@@ -188,6 +188,7 @@ export default {
 
 <style scoped>
   .post-text {
+    font-size: 13px;
     border-width: 6px;
     border-color: #767676;
     margin: 10px;
