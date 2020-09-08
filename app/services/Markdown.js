@@ -87,4 +87,8 @@ export default class Markdown {
     }
     this.getInstance().setMarkdown(tv, text);
   }
+
+  static setSpannableFactory(tv) {
+    tv.setSpannableFactory(io.noties.markwon.utils.NoCopySpannableFactory.getInstance());
+  }
 }

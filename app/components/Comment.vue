@@ -40,6 +40,11 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      isInitialized: false,
+    };
+  },
   watch: {
     $props: {
       handler(props) {
@@ -56,6 +61,10 @@ export default {
   },
   methods: {
     loaded(event) {
+      if (!this.isInitialized) {
+        Markdown.setSpannableFactory(event.object.nativeView);
+        this.isInitialized = true;
+      }
       if (this.comment) {
         this.refreshLabel(event.object.nativeView, this.comment);
       }
