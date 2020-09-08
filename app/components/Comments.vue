@@ -4,6 +4,9 @@
       <NavigationButton text="Back"
                         icon="res://ic_arrow_left"
                         @tap="$navigateBack" />
+      <ActionItem text="Refresh"
+                  icon="res://ic_menu_refresh"
+                  @tap="getComments()" />
     </ActionBar>
     <RadListView id="comment-list"
                  ref="commentList"
