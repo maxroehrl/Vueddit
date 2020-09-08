@@ -215,9 +215,9 @@ export default {
   }
 
   .subreddit-item {
-    flex-directionDirection: row;
-    align-selfSelf: flex-start;
-    justify-contentContent: flex-start;
+    flex-direction: row;
+    align-self: flex-start;
+    justify-content: flex-start;
   }
 
   .subreddit-label {
