@@ -3,7 +3,7 @@
     <IndentedLabel ref="labelHeader" @loaded="loadedHeader($event)">
       <FormattedString>
         <Span :text="comment.author + ' '"
-              :style="{color: getUserColor(comment, post)}" />
+              :style="{color: getUserColor(comment)}" />
         <Span :text="comment.ups + ' points '"
               class="comment-votes" />
         <Span :text="getTimeFromNow(comment) + ' '"
@@ -76,8 +76,8 @@ export default {
       return Reddit.getTimeFromNow(comment);
     },
 
-    getUserColor(comment, post) {
-      if (comment.author === post.author) {
+    getUserColor(comment) {
+      if (comment.is_submitter) {
         return '#53ba82';
       } else if (comment.distinguished === 'moderator') {
         return '#4afff5';
