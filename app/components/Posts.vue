@@ -3,7 +3,6 @@
                ref="postList"
                for="post in postList"
                loadOnDemandMode="Auto"
-               loadOnDemandBufferSize="5"
                pullToRefresh="true"
                :itemTemplateSelector="templateSelector"
                @loadMoreDataRequested="onLoadMorePostsRequested"
