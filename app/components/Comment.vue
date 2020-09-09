@@ -113,7 +113,7 @@ export default {
     refreshLabel(tv, comment) {
       tv.setDepth(comment.depth);
       Markdown.setMarkdown(tv, comment.body);
-      this.setSelectedComment(comment.isSelected ? comment : null);
+      this.selectedComment = comment.isSelected ? comment : null;
     },
 
     setSelectedComment(comment) {
@@ -121,7 +121,7 @@ export default {
         this.deselectSelectedComment(this.setSelectedComment.bind(this, null));
         comment.isSelected = true;
       }
-      if (comment == null) {
+      if (!comment) {
         this.comment.isSelected = false;
       }
       this.selectedComment = comment;
