@@ -18,7 +18,10 @@
         <Post :post="post" :app="app" />
       </v-template>
       <v-template name="comment">
-        <Comment :comment="comment" :post="post" />
+        <Comment :comment="comment"
+                 :post="post"
+                 :deselect-selected-comment="deselectSelectedComment"
+                 :select-other-comment="selectComment" />
       </v-template>
       <v-template name="more">
         <More :comment="comment" :on-click="loadMore" />
@@ -53,6 +56,7 @@ export default {
     return {
       commentList: new ObservableArray([]),
       isShowingSubtree: false,
+      deselectCommentCallback: null,
     };
   },
   methods: {
@@ -110,6 +114,7 @@ export default {
     processComments(items) {
       const commentList = [];
       const addAllChildren = (comment) => {
+        comment.isSelected = false;
         commentList.push(comment);
         if (comment.replies && comment.replies !== '') {
           comment.replies.data.children.map((d) => d.data).forEach(addAllChildren);
@@ -135,6 +140,31 @@ export default {
             this.refreshCommentList();
           }
         });
+      }
+    },
+
+    deselectSelectedComment(newDeselectCommentCallback) {
+      if (this.deselectCommentCallback) {
+        this.deselectCommentCallback();
+      }
+      this.deselectCommentCallback = newDeselectCommentCallback;
+    },
+
+    selectComment(comment, depth, next, callback) {
+      let commentCandidates;
+      let index = this.commentList.indexOf(comment);
+      if (next) {
+        commentCandidates = this.commentList.slice(index + 1, this.commentList.length);
+      } else {
+        commentCandidates = this.commentList.slice(0, index);
+      }
+      commentCandidates = commentCandidates.filter((c) => c.depth === depth);
+      if (commentCandidates.length !== 0) {
+        const newlySelectedComment = commentCandidates[next ? 0 : commentCandidates.length - 1];
+        index = this.commentList.indexOf(newlySelectedComment);
+        callback();
+        newlySelectedComment.isSelected = true;
+        setTimeout(() => this.$refs.commentList.scrollToIndex(index, false, 'Start'));
       }
     },
   },

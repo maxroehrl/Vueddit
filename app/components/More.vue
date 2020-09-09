@@ -48,5 +48,6 @@ export default {
 <style scoped>
   .more {
     color: #53ba82;
+    padding-left: 6px;
   }
 </style>

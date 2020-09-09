@@ -1,9 +1,27 @@
 <template>
-  <AbsoluteLayout>
+  <AbsoluteLayout class="comment"
+                  :style="{borderWidth: isSelectedComment() ? '6px' : '0 6px',
+                           borderColor: isSelectedComment() ? '#53ba82' : '#53ba82 #080808'}">
+    <FlexboxLayout v-if="isSelectedComment()" class="button-bar">
+      <Votes :voteable="comment" />
+      <Label text="Done"
+             class="button-bar-label"
+             @tap="setSelectedComment(null)" />
+      <Label :text="comment.depth === 0 ? '▲ Prev' : '▲ Parent'"
+             class="button-bar-label"
+             @tap="selectOther(0)" />
+      <Label :text="comment.depth === 0 ? 'Next ▼' : '▲ Root'"
+             class="button-bar-label"
+             @tap="selectOther(1)" />
+    </FlexboxLayout>
     <IndentedLabel ref="labelHeader"
                    class="comment-author"
+                   :top="isSelectedComment() ? buttonBarHeight.toString() : '0'"
+                   @tap="setSelectedComment(comment)"
                    @loaded="loadedHeader($event)">
       <FormattedString>
+        <Span :text="comment.likes == null ? '' : (comment.likes ? '▲' : '▼')"
+              :style="{color: comment.likes ? '#53ba82' : '#bf5826'}" />
         <Span :text="comment.author + ' '"
               :style="{color: getUserColor(comment)}" />
         <Span :text="comment.ups + ' points '"
@@ -21,8 +39,9 @@
     <IndentedLabel ref="label"
                    class="comment-body"
                    textWrap="true"
-                   top="18"
+                   :top="((isSelectedComment() ? buttonBarHeight : 0) + 18).toString()"
                    width="100%"
+                   @tap="setSelectedComment(comment)"
                    @loaded="loaded($event)" />
   </AbsoluteLayout>
 </template>
@@ -30,9 +49,11 @@
 <script>
 import Reddit from '../services/Reddit';
 import Markdown from '../services/Markdown';
+import Votes from './Votes';
 
 export default {
   name: 'Comment',
+  components: {Votes},
   props: {
     comment: {
       type: Object,
@@ -42,10 +63,20 @@ export default {
       type: Object,
       required: true,
     },
+    deselectSelectedComment: {
+      type: Function,
+      required: true,
+    },
+    selectOtherComment: {
+      type: Function,
+      required: true,
+    },
   },
   data() {
     return {
       isInitialized: false,
+      selectedComment: null,
+      buttonBarHeight: 90,
     };
   },
   watch: {
@@ -82,6 +113,29 @@ export default {
     refreshLabel(tv, comment) {
       tv.setDepth(comment.depth);
       Markdown.setMarkdown(tv, comment.body);
+      this.setSelectedComment(comment.isSelected ? comment : null);
+    },
+
+    setSelectedComment(comment) {
+      if (comment && comment !== this.selectedComment) {
+        this.deselectSelectedComment(this.setSelectedComment.bind(this, null));
+        comment.isSelected = true;
+      }
+      if (comment == null) {
+        this.comment.isSelected = false;
+      }
+      this.selectedComment = comment;
+    },
+
+    isSelectedComment() {
+      return this.selectedComment === this.comment;
+    },
+
+    selectOther(buttonIndex) {
+      let depth = this.comment.depth;
+      const next = buttonIndex === 1 && depth === 0;
+      depth = (buttonIndex === 1 || depth === 0) ? 0 : depth - 1;
+      this.selectOtherComment(this.comment, depth, next, this.setSelectedComment.bind(this, null));
     },
 
     getTimeFromNow(comment) {
@@ -104,6 +158,25 @@ export default {
 </script>
 
 <style scoped>
+  .comment {
+    border-radius: 30px;
+  }
+
+  .button-bar {
+    padding: 0 40px;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom-color: #53ba82;
+    border-bottom-width: 6px;
+  }
+
+  .button-bar-label {
+    align-self: center;
+    font-size: 13px;
+    padding: 40px;
+  }
+
   .comment-author {
     font-size: 13px;
   }
