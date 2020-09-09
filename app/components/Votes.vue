@@ -2,21 +2,17 @@
   <FlexboxLayout flexDirection="column"
                  justifyContent="center"
                  alignContent="center">
-    <Ripple class="chevron"
-            @tap="vote(true)">
-      <Image src="res://ic_chevron_up_white_18dp"
-             loadMode="async"
-             :tintColor="getColor(true)" />
-    </Ripple>
-    <Label :text="getScore(post.score)"
+    <Label text="▲"
+           class="chevron"
+           :style="{color: getColor(true)}"
+           @tap="vote(true)" />
+    <Label :text="getScore(voteable.score)"
            class="vote-label"
            :style="{color: getColor()}" />
-    <Ripple class="chevron"
-            @tap="vote(false)">
-      <Image src="res://ic_chevron_down_white_18dp"
-             loadMode="async"
-             :tintColor="getColor(false)" />
-    </Ripple>
+    <Label text="▼"
+           class="chevron"
+           :style="{color: getColor(false)}"
+           @tap="vote(false)" />
   </FlexboxLayout>
 </template>
 
@@ -26,7 +22,7 @@ import Reddit from '../services/Reddit';
 export default {
   name: 'Votes',
   props: {
-    post: {
+    voteable: {
       type: Object,
       required: true,
     },
@@ -37,8 +33,8 @@ export default {
     },
 
     getColor(up) {
-      if (this.post.likes === up || (up === undefined && this.post.likes !== null)) {
-        return this.post.likes ? '#53ba82' : '#bf5826';
+      if (this.voteable.likes === up || (up === undefined && this.voteable.likes !== null)) {
+        return this.voteable.likes ? '#53ba82' : '#bf5826';
       } else {
         return '#b8b8b8';
       }
@@ -46,15 +42,15 @@ export default {
 
     vote(up) {
       let dir = up ? 1 : -1;
-      if (this.post.likes === up) {
-        this.post.likes = null;
-        this.post.score -= dir;
+      if (this.voteable.likes === up) {
+        this.voteable.likes = null;
+        this.voteable.score -= dir;
         dir = 0;
       } else {
-        this.post.likes = up;
-        this.post.score += dir;
+        this.voteable.likes = up;
+        this.voteable.score += dir;
       }
-      Reddit.vote(this.post.name, dir);
+      Reddit.vote(this.voteable.name, dir);
     },
   },
 };
@@ -63,10 +59,10 @@ export default {
 <style scoped>
   .vote-label {
     text-align: center;
-    height: 100px;
+    padding: 0;
   }
 
   .chevron {
-    height: 90px;
+    text-align: center;
   }
 </style>
