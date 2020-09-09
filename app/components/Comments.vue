@@ -164,7 +164,9 @@ export default {
         index = this.commentList.indexOf(newlySelectedComment);
         callback();
         newlySelectedComment.isSelected = true;
-        setTimeout(() => this.$refs.commentList.scrollToIndex(index, false, 'Start'));
+        if (index >= 0 && index < this.commentList.length) {
+          setTimeout(() => this.$refs.commentList.scrollToIndex(index, false, 'Start'));
+        }
       }
     },
   },

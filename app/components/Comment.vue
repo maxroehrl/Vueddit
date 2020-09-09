@@ -76,7 +76,7 @@ export default {
     return {
       isInitialized: false,
       selectedComment: null,
-      buttonBarHeight: 90,
+      buttonBarHeight: 70,
     };
   },
   watch: {
