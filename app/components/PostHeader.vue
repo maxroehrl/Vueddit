@@ -1,8 +1,8 @@
 <template>
   <StackLayout padding="0">
     <StackLayout orientation="horizontal" padding="0">
-      <Votes :voteable="post" width="10%" />
-      <Ripple :width="bigPreview ? '90%' : '70%'"
+      <Votes :voteable="post" width="14%" />
+      <Ripple :width="bigPreview ? '86%' : '66%'"
               @longPress="onLongPress(post)"
               @tap="onTab(post)">
         <Label textWrap="true"
