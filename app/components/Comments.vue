@@ -20,8 +20,9 @@
       <v-template name="comment">
         <Comment :comment="comment"
                  :post="post"
-                 :deselect-selected-comment="deselectSelectedComment"
-                 :select-other-comment="selectComment" />
+                 :selected="comment === selectedComment"
+                 :select-comment="selectComment"
+                 :select-neighboring-comment="selectNeighboringComment" />
       </v-template>
       <v-template name="more">
         <More :comment="comment" :on-click="loadMore" />
@@ -56,7 +57,7 @@ export default {
     return {
       commentList: new ObservableArray([]),
       isShowingSubtree: false,
-      deselectCommentCallback: null,
+      selectedComment: null,
     };
   },
   methods: {
@@ -114,7 +115,6 @@ export default {
     processComments(items) {
       const commentList = [];
       const addAllChildren = (comment) => {
-        comment.isSelected = false;
         commentList.push(comment);
         if (comment.replies && comment.replies !== '') {
           comment.replies.data.children.map((d) => d.data).forEach(addAllChildren);
@@ -143,16 +143,30 @@ export default {
       }
     },
 
-    deselectSelectedComment(newDeselectCommentCallback) {
-      if (this.deselectCommentCallback) {
-        this.deselectCommentCallback();
+    selectComment(comment, scrollTo=false) {
+      if (comment !== this.selectedComment) {
+        const oldComment = this.selectedComment;
+        this.selectedComment = comment;
+        this.notifyCommentChanged(oldComment, false);
+        this.notifyCommentChanged(comment, scrollTo);
       }
-      this.deselectCommentCallback = newDeselectCommentCallback;
     },
 
-    selectComment(comment, depth, next, callback) {
+    notifyCommentChanged(comment, scrollTo) {
+      if (comment) {
+        const index = this.commentList.indexOf(comment);
+        if (index >= 0 && index < this.commentList.length) {
+          this.$refs.commentList.nativeView._listViewAdapter.notifyItemChanged(index);
+          if (scrollTo) {
+            this.$refs.commentList.scrollToIndex(index, false, 'Start');
+          }
+        }
+      }
+    },
+
+    selectNeighboringComment(comment, depth, next) {
       let commentCandidates;
-      let index = this.commentList.indexOf(comment);
+      const index = this.commentList.indexOf(comment);
       if (next) {
         commentCandidates = this.commentList.slice(index + 1, this.commentList.length);
       } else {
@@ -161,11 +175,8 @@ export default {
       commentCandidates = commentCandidates.filter((c) => c.depth === depth);
       if (commentCandidates.length !== 0) {
         const newlySelectedComment = commentCandidates[next ? 0 : commentCandidates.length - 1];
-        index = this.commentList.indexOf(newlySelectedComment);
-        callback();
-        newlySelectedComment.isSelected = true;
-        if (index >= 0 && index < this.commentList.length) {
-          setTimeout(() => this.$refs.commentList.scrollToIndex(index, false, 'Start'));
+        if (newlySelectedComment) {
+          this.selectComment(newlySelectedComment, true);
         }
       }
     },

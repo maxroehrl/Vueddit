@@ -1,12 +1,12 @@
 <template>
   <AbsoluteLayout class="comment"
-                  :style="{borderWidth: isSelectedComment() ? '6px' : '0 6px',
-                           borderColor: isSelectedComment() ? '#53ba82' : '#53ba82 #080808'}">
-    <FlexboxLayout v-if="isSelectedComment()" class="button-bar">
+                  :style="{borderWidth: selected ? '6px' : '0 6px',
+                           borderColor: selected ? '#53ba82' : '#53ba82 #080808'}">
+    <FlexboxLayout v-if="selected" class="button-bar">
       <Votes :voteable="comment" />
       <Label text="Done"
              class="button-bar-label"
-             @tap="setSelectedComment(null)" />
+             @tap="selectComment(null)" />
       <Label :text="comment.depth === 0 ? '▲ Prev' : '▲ Parent'"
              class="button-bar-label"
              @tap="selectOther(0)" />
@@ -16,8 +16,8 @@
     </FlexboxLayout>
     <IndentedLabel ref="labelHeader"
                    class="comment-author"
-                   :top="isSelectedComment() ? buttonBarHeight.toString() : '0'"
-                   @tap="setSelectedComment(comment)"
+                   :top="selected ? buttonBarHeight.toString() : '0'"
+                   @tap="selectComment(comment)"
                    @loaded="loadedHeader($event)">
       <FormattedString>
         <Span :text="comment.likes == null ? '' : (comment.likes ? '▲' : '▼')"
@@ -39,9 +39,9 @@
     <IndentedLabel ref="label"
                    class="comment-body"
                    textWrap="true"
-                   :top="((isSelectedComment() ? buttonBarHeight : 0) + 18).toString()"
+                   :top="((selected ? buttonBarHeight : 0) + 18).toString()"
                    width="100%"
-                   @tap="setSelectedComment(comment)"
+                   @tap="selectComment(comment)"
                    @loaded="loaded($event)" />
   </AbsoluteLayout>
 </template>
@@ -63,11 +63,15 @@ export default {
       type: Object,
       required: true,
     },
-    deselectSelectedComment: {
+    selected: {
+      type: Boolean,
+      required: true,
+    },
+    selectComment: {
       type: Function,
       required: true,
     },
-    selectOtherComment: {
+    selectNeighboringComment: {
       type: Function,
       required: true,
     },
@@ -75,7 +79,6 @@ export default {
   data() {
     return {
       isInitialized: false,
-      selectedComment: null,
       buttonBarHeight: 70,
     };
   },
@@ -113,29 +116,13 @@ export default {
     refreshLabel(tv, comment) {
       tv.setDepth(comment.depth);
       Markdown.setMarkdown(tv, comment.body);
-      this.selectedComment = comment.isSelected ? comment : null;
-    },
-
-    setSelectedComment(comment) {
-      if (comment && comment !== this.selectedComment) {
-        this.deselectSelectedComment(this.setSelectedComment.bind(this, null));
-        comment.isSelected = true;
-      }
-      if (!comment) {
-        this.comment.isSelected = false;
-      }
-      this.selectedComment = comment;
-    },
-
-    isSelectedComment() {
-      return this.selectedComment === this.comment;
     },
 
     selectOther(buttonIndex) {
       let depth = this.comment.depth;
       const next = buttonIndex === 1 && depth === 0;
       depth = (buttonIndex === 1 || depth === 0) ? 0 : depth - 1;
-      this.selectOtherComment(this.comment, depth, next, this.setSelectedComment.bind(this, null));
+      this.selectNeighboringComment(this.comment, depth, next);
     },
 
     getTimeFromNow(comment) {
