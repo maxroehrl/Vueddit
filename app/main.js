@@ -8,6 +8,7 @@ import RadSideDrawerPlugin from 'nativescript-ui-sidedrawer/vue';
 import RadListViewPlugin from 'nativescript-ui-listview/vue';
 import Ripple from './components/Ripple';
 import IndentedLabel from './components/IndentedLabel';
+import CachedImage from './components/CachedImage';
 
 import {decode, encode} from 'base-64';
 
@@ -32,6 +33,7 @@ RadSideDrawerPlugin.install(Vue);
 RadListViewPlugin.install(Vue, {});
 Vue.registerElement('Ripple', () => Ripple);
 Vue.registerElement('IndentedLabel', () => IndentedLabel);
+Vue.registerElement('CachedImage', () => CachedImage);
 
 new Vue({
   store,

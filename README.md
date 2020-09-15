@@ -36,3 +36,4 @@ ns resources generate splashes splash.png --background #53ba82
 * [android-customtabs](https://github.com/saschpe/android-customtabs)
 * [Markwon](https://github.com/noties/Markwon)
 * [material-ripple](https://github.com/balysv/material-ripple)
+* [fresco](https://github.com/facebook/fresco)

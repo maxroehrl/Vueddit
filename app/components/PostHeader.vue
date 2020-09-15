@@ -35,25 +35,23 @@
         </Label>
       </Ripple>
       <Ripple v-if="!bigPreview"
+              height="300px"
               width="20%"
               @longPress="onLongPress(post)"
               @tap="onTab(post)">
-        <Image :src="getPreview(post)"
-               stretch="aspectFit"
-               height="300px"
-               loadMode="async" />
+        <CachedImage :src="getPreview(post)"
+                     height="300px"
+                     width="100%" />
       </Ripple>
     </StackLayout>
     <Ripple v-if="bigPreview"
-            width="100%"
             :height="bigPreview ? getImageHeight(post) : '0'"
+            width="100%"
             @longPress="onLongPress(post)"
             @tap="onTab(post)">
-      <Image :src="bigPreview && getImage(post)"
-             :height="bigPreview ? getImageHeight(post) : '0'"
-             stretch="aspectFit"
-             width="100%"
-             loadMode="async" />
+      <CachedImage :src="bigPreview && getImage(post)"
+                   :height="bigPreview ? getImageHeight(post) : '0'"
+                   width="100%" />
     </Ripple>
   </StackLayout>
 </template>

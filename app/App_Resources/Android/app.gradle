@@ -9,6 +9,8 @@ dependencies {
   implementation 'io.noties.markwon:core:4.5.1'
   // https://github.com/balysv/material-ripple/releases
   implementation 'com.balysv:material-ripple:1.0.2'
+  // https://github.com/facebook/fresco/releases
+  implementation 'com.facebook.fresco:fresco:2.3.0'
 }
 
 // If you want to add something to be applied before applying plugins' include.gradle files
