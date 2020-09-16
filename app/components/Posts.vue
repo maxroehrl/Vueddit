@@ -97,7 +97,7 @@ export default {
         this.selectedTemplate = 'big';
       }
       if (this.$refs.postList) {
-        this.$refs.postList.nativeView.refresh();
+        this.$refs.postList.nativeView._listViewAdapter.notifyDataSetChanged();
       }
     },
 
@@ -123,7 +123,7 @@ export default {
         this.postList = postList;
         this.lastPostId = lastPostId;
         if (this.$refs.postList) {
-          this.$refs.postList.nativeView.refresh();
+          this.$refs.postList.nativeView._listViewAdapter.notifyDataSetChanged();
           setTimeout(() => this.$refs.postList.scrollToIndex(index));
         }
         return Promise.resolve();
@@ -137,7 +137,7 @@ export default {
       this.lastPostId = null;
       return this.getPosts().then(() => {
         if (this.$refs.postList) {
-          this.$refs.postList.nativeView.refresh();
+          this.$refs.postList.nativeView._listViewAdapter.notifyDataSetChanged();
         }
       });
     },

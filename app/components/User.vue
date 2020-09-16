@@ -108,7 +108,7 @@ export default {
         this.selectedTemplate = 'big';
       }
       if (this.$refs.postList) {
-        this.$refs.postList.nativeView.refresh();
+        this.$refs.postList.nativeView._listViewAdapter.notifyDataSetChanged();
       }
     },
 
@@ -136,7 +136,7 @@ export default {
       this.lastPostId = null;
       return this.getPosts().then(() => {
         if (this.$refs.postList) {
-          this.$refs.postList.nativeView.refresh();
+          this.$refs.postList.nativeView._listViewAdapter.notifyDataSetChanged();
         }
       });
     },

@@ -104,7 +104,7 @@ export default {
     refreshList() {
       setTimeout(() => {
         if (this.$refs.subredditList) {
-          this.$refs.subredditList.nativeView.refresh();
+          this.$refs.subredditList.nativeView._listViewAdapter.notifyDataSetChanged();
         }
       });
     },

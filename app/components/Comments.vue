@@ -107,7 +107,7 @@ export default {
     refreshCommentList() {
       setTimeout(() => {
         if (this.$refs.commentList) {
-          this.$refs.commentList.nativeView.refresh();
+          this.$refs.commentList.nativeView._listViewAdapter.notifyDataSetChanged();
         }
       });
     },
