@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     templateSelector(item) {
-      return item.body ? 'comment' : 'post';
+      return (item && item.body) ? 'comment' : 'post';
     },
 
     shouldShowBigPreview(post) {

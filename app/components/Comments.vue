@@ -61,8 +61,8 @@ export default {
     };
   },
   methods: {
-    templateSelector(item, index, items) {
-      return item.body ? 'comment' : 'more';
+    templateSelector(item) {
+      return (item && item.body) ? 'comment' : 'more';
     },
 
     onPullDown(args) {
