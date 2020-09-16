@@ -185,7 +185,7 @@ export default {
       if (this.isMultireddit(subreddit)) {
         return '⧟';
       } else if (this.defaultSubreddits.includes(subreddit)) {
-        return '';
+        return '⌂';
       } else if (this.isSubscribedTo(subreddit)) {
         return this.isStarred(subreddit) ? '★' : '☆';
       } else {
