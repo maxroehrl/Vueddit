@@ -1,7 +1,6 @@
 <template>
   <StackLayout @loaded="loaded($event)">
-    <RadListView id="subreddit-list"
-                 ref="subredditList"
+    <RadListView ref="subredditList"
                  for="subreddit in subredditList"
                  @load="subredditListLoaded">
       <v-template name="header">
@@ -17,20 +16,16 @@
         </StackLayout>
       </v-template>
       <v-template>
-        <FlexboxLayout class="subreddit-item" :style="{backgroundColor: isSelected(subreddit) ? '#53ba82': '#2d2d2d'}">
-          <Ripple width="20%"
-                  @tap="star(subreddit)">
-            <Image :src="getStarredSrc(subreddit)"
-                   class="star"
-                   stretch="fill"
-                   loadMode="async" />
+        <StackLayout orientation="horizontal"
+                     padding="0"
+                     :style="{backgroundColor: isSelected(subreddit) ? '#53ba82': '#2d2d2d'}">
+          <Ripple width="20%" @tap="star(subreddit)">
+            <Label :text="getSubredditIcon(subreddit)" class="subreddit-icon" />
           </Ripple>
-          <Ripple width="80%"
-                  @tap="onSelection(subreddit)">
-            <Label :text="subreddit.display_name"
-                   class="subreddit-label" />
+          <Ripple width="80%" @tap="onSelection(subreddit)">
+            <Label :text="subreddit.display_name" class="subreddit-label" />
           </Ripple>
-        </FlexboxLayout>
+        </StackLayout>
       </v-template>
     </RadListView>
   </StackLayout>
@@ -182,15 +177,15 @@ export default {
       return !!subreddit.subreddits;
     },
 
-    getStarredSrc(subreddit) {
+    getSubredditIcon(subreddit) {
       if (this.isMultireddit(subreddit)) {
-        return 'res://ic_folder_multiple_outline_white_48dp';
+        return '⧟';
       } else if (this.defaultSubreddits.includes(subreddit)) {
         return '';
       } else if (this.isSubscribedTo(subreddit)) {
-        return this.isStarred(subreddit) ? 'res://ic_star_face_white_48dp' : 'res://ic_star_outline_white_48dp';
+        return this.isStarred(subreddit) ? '★' : '☆';
       } else {
-        return 'res://ic_plus_white_48dp';
+        return '＋';
       }
     },
 
@@ -209,28 +204,20 @@ export default {
 </script>
 
 <style scoped>
-  #subreddit-list {
-    height: 100%;
-    width: 100%;
-  }
-
-  .subreddit-item {
-    flex-direction: row;
-    align-self: flex-start;
-    justify-content: flex-start;
-  }
-
   .subreddit-label {
     font-size: 20px;
-    padding: 50px;
+    margin: 20px;
   }
 
-  .star {
-    margin: 30px;
+  .subreddit-icon {
+    font-size: 30px;
+    text-align: center;
+    margin: 20px;
   }
 
   .searchbar {
     font-size: 16px;
+    height: 300px;
     width: 100%;
   }
 </style>
