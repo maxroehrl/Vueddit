@@ -105,23 +105,9 @@ export default {
       });
     },
 
-    notifyListChanged(subreddit, scrollTo) {
-      if (subreddit) {
-        const index = this.subredditList.indexOf(subreddit);
-        if (index >= 0 && index < this.subredditList.length) {
-          this.$refs.subredditList.nativeView._listViewAdapter.notifyItemChanged(index);
-          if (scrollTo) {
-            this.$refs.subredditList.scrollToIndex(index, false, 'Center');
-          }
-        }
-      }
-    },
-
     setSubreddit(subreddit) {
-      const old = this.selected;
       this.selected = subreddit;
-      this.notifyListChanged(old, false);
-      this.notifyListChanged(subreddit, true);
+      this.refreshList();
       setTimeout(() => ad.dismissSoftInput(), 50);
     },
 
