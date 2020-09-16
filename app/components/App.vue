@@ -132,6 +132,7 @@ export default {
     refreshPosts(last={subreddit: this.subreddit}) {
       if (this.$refs.postList) {
         this.loadingIndicator.show(this.loadingIndicatorOptions);
+        this.subreddit = last.subreddit;
         this.$refs.postList.setSubreddit(last).finally(() => this.loadingIndicator.hide());
       }
     },
@@ -148,7 +149,7 @@ export default {
       this.$refs.drawer.nativeView.toggleDrawerState();
     },
 
-    setSubreddit(subreddit, goBack) {
+    setSubreddit(subreddit, goBack=false) {
       let last;
       if (goBack) {
         last = this.lastSubreddits.pop();

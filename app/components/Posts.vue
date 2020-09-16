@@ -123,9 +123,8 @@ export default {
       return !!this.subreddit.user;
     },
 
-    setSubreddit({subreddit, postList, lastPostId, index}) {
+    setSubreddit({postList, lastPostId, index}) {
       this.selectedTemplate = null;
-      this.subreddit = subreddit;
       if (postList && lastPostId && index) {
         this.postList = postList;
         this.lastPostId = lastPostId;
