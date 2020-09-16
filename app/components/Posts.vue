@@ -38,7 +38,7 @@ import PostHeader from './PostHeader';
 import MarkdownView from './MarkdownView';
 
 export default {
-  name: 'Subreddits',
+  name: 'Posts',
   components: {MarkdownView, PostHeader},
   props: {
     subreddit: {

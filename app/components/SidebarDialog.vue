@@ -12,7 +12,7 @@ import {AndroidApplication} from '@nativescript/core/application';
 import MarkdownView from './MarkdownView';
 
 export default {
-  name: 'Sidebar',
+  name: 'SidebarDialog',
   components: {MarkdownView},
   props: {
     sidebar: {
