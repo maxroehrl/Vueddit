@@ -8,7 +8,7 @@
                @loadMoreDataRequested="onLoadMorePostsRequested"
                @pullToRefreshInitiated="onPullDown">
     <v-template name="header">
-      <SegmentedBar :items="sortings"
+      <SegmentedBar :items="segmentedBarItems"
                     selectedIndex="0"
                     selectedBackgroundColor="#53ba82"
                     @selectedIndexChange="onSortingChange" />
@@ -21,7 +21,7 @@
                   :onTab="openComments" />
     </v-template>
     <v-template name="comment">
-      <MarkdownView :text="post.body" />
+      <MarkdownView :text="post.body" width="100%" />
     </v-template>
   </RadListView>
 </template>
@@ -33,7 +33,6 @@ import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
 import {action} from '@nativescript/core/ui/dialogs';
 import Reddit from '../services/Reddit';
 import Comments from './Comments';
-import User from './User';
 import PostHeader from './PostHeader';
 import MarkdownView from './MarkdownView';
 
@@ -49,18 +48,22 @@ export default {
       type: Object,
       required: true,
     },
+    sortings: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {
       postList: new ObservableArray([]),
       lastPostId: null,
-      sortings: Object.values(Reddit.sortings).slice(0, 4).map((sorting) => {
+      segmentedBarItems: this.sortings.map((sorting) => {
         const item = new SegmentedBarItem();
         item.title = sorting;
         return item;
       }),
       selectedTemplate: null,
-      sorting: 'best',
+      sorting: this.sortings[0],
       loadingIndicator: new LoadingIndicator(),
       loadingIndicatorOptions: {
         hideBezel: true,
@@ -112,8 +115,12 @@ export default {
 
     onSortingChange(args) {
       this.loadingIndicator.show(this.loadingIndicatorOptions);
-      this.sorting = this.sortings[args.value].title;
+      this.sorting = this.sortings[args.value];
       this.refresh().finally(() => this.loadingIndicator.hide());
+    },
+
+    isUserReddit() {
+      return !!this.subreddit.user;
     },
 
     setSubreddit({subreddit, postList, lastPostId, index}) {
@@ -144,13 +151,16 @@ export default {
 
     getPosts(lastPostId) {
       let sub;
-      if (this.subreddit.subreddits) {
+      if (this.isUserReddit()) {
+        sub = this.subreddit.user;
+      } else if (this.subreddit.subreddits) {
         sub = this.subreddit.subreddits.map((s) => s.name).join('+');
       } else {
         sub = this.subreddit.display_name;
       }
       if (sub && sub !== '') {
-        return Reddit.getPosts(sub, lastPostId, this.sorting).then((r) => {
+        const request = this.isUserReddit() ? Reddit.getUserPosts : Reddit.getPosts;
+        return request.apply(Reddit, [sub, lastPostId, this.sorting]).then((r) => {
           if (r && r.data && r.data.children) {
             const items = r.data.children.map((d) => d.data);
             if (items.length) {
@@ -180,27 +190,24 @@ export default {
     },
 
     onLongPress(post) {
-      const actions = [
-        post.saved ? 'Unsave' : 'Save',
-        'Goto /u/' + post.author,
-      ];
+      const actions = [post.saved ? 'Unsave' : 'Save'];
       if (post.subreddit !== this.subreddit.display_name) {
         actions.push('Goto /r/' + post.subreddit);
+      }
+      if (!this.isUserReddit()) {
+        actions.push('Goto /u/' + post.author);
       }
       action({actions}).then((action) => {
         if (action === 'Save') {
           const promise = post.saved ? Reddit.unsave(post.name) : Reddit.save(post.name);
           promise.then(() => post.saved = !post.saved);
         } else if (action.startsWith('Goto /r/')) {
+          if (this.isUserReddit()) {
+            this.$navigateBack();
+          }
           this.app.setSubreddit({display_name: post.subreddit});
         } else if (action.startsWith('Goto /u/')) {
-          this.app.$navigateTo(User, {
-            transition: 'slide',
-            props: {
-              user: post.author,
-              app: this.app,
-            },
-          });
+          this.app.gotoUserPosts(post.author);
         }
       });
     },

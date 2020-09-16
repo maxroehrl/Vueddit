@@ -33,7 +33,8 @@
       <StackLayout ~mainContent>
         <Posts ref="postList"
                :subreddit="subreddit"
-               :app="this" />
+               :app="this"
+               :sortings="['best', 'hot', 'top', 'new']" />
       </StackLayout>
     </RadSideDrawer>
   </Page>
@@ -47,6 +48,7 @@ import * as application from '@nativescript/core/application';
 import {AndroidApplication} from '@nativescript/core/application';
 import showSnackbar from './Snackbar';
 import Posts from './Posts';
+import User from './User';
 import Subreddits from './Subreddits';
 import SidebarDialog from './SidebarDialog';
 import Reddit from '../services/Reddit';
@@ -192,6 +194,13 @@ export default {
           }
         });
       }
+    },
+
+    gotoUserPosts(user) {
+      this.$navigateTo(User, {
+        transition: 'slide',
+        props: {user, app: this},
+      });
     },
 
     visitSubreddit(subreddit) {
