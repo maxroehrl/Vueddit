@@ -4,16 +4,14 @@
                  for="subreddit in subredditList"
                  @load="subredditListLoaded">
       <v-template name="header">
-        <StackLayout @loaded="searchLayoutLoaded">
-          <SearchBar ref="searchbar"
-                     v-model="searchText"
-                     hint="Search for subreddit"
-                     class="searchbar"
-                     @loaded="searchbarLoaded"
-                     @textChange="onSearchTextChanged"
-                     @submit="onSubmit"
-                     @clear="onClear" />
-        </StackLayout>
+        <SearchBar ref="searchbar"
+                   v-model="searchText"
+                   hint="Search for subreddit"
+                   class="searchbar"
+                   @loaded="searchbarLoaded"
+                   @textChange="onSearchTextChanged"
+                   @submit="onSubmit"
+                   @clear="onClear" />
       </v-template>
       <v-template>
         <StackLayout orientation="horizontal"
@@ -94,11 +92,11 @@ export default {
     },
 
     displaySubscriptions() {
-      this.subredditList = new ObservableArray(this.defaultSubreddits);
-      this.subredditList.push(this.subscriptions);
-      this.subredditList.push(...store.state.lastVisitedSubreddits.map((s) => ({display_name: s})));
-      this.subredditList.push(this.multis);
-      this.refreshList();
+      if (!this.searchText.length) {
+        this.subredditList = new ObservableArray();
+        this.subredditList.push(...this.defaultSubreddits, ...this.subscriptions, ...store.state.lastVisitedSubreddits.map((s) => ({display_name: s})), ...this.multis);
+        this.refreshList();
+      }
     },
 
     refreshList() {
@@ -126,6 +124,7 @@ export default {
       this.selected = subreddit;
       this.notifyListChanged(old, false);
       this.notifyListChanged(subreddit, true);
+      setTimeout(() => ad.dismissSoftInput(), 50);
     },
 
     isSubscribedTo(subreddit) {
@@ -156,12 +155,6 @@ export default {
     searchbarLoaded(event) {
       if (event.object.android) {
         event.object.android.clearFocus();
-      }
-    },
-
-    searchLayoutLoaded(event) {
-      if (event.object.android) {
-        event.object.android.setFocusableInTouchMode(true);
       }
     },
 
