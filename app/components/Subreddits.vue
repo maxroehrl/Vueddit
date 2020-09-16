@@ -1,8 +1,6 @@
 <template>
   <StackLayout @loaded="loaded($event)">
-    <RadListView ref="subredditList"
-                 for="subreddit in subredditList"
-                 @load="subredditListLoaded">
+    <RadListView ref="subredditList" for="subreddit in subredditList">
       <v-template name="header">
         <SearchBar ref="searchbar"
                    v-model="searchText"

@@ -1,16 +1,13 @@
 import Vue from 'nativescript-vue';
-import App from './components/App';
-
-import store from './store';
 import VueDevtools from 'nativescript-vue-devtools';
-
 import RadSideDrawerPlugin from 'nativescript-ui-sidedrawer/vue';
 import RadListViewPlugin from 'nativescript-ui-listview/vue';
+import {decode, encode} from 'base-64';
+import store from './store';
+import App from './components/App';
 import Ripple from './components/Ripple';
 import IndentedLabel from './components/IndentedLabel';
 import CachedImage from './components/CachedImage';
-
-import {decode, encode} from 'base-64';
 
 if (!global.btoa) {
   global.btoa = encode;
@@ -24,10 +21,8 @@ if (TNS_ENV !== 'production') {
   Vue.use(VueDevtools);
 }
 
-// Prints Vue logs when --env.production is *NOT* set while building
-// Vue.config.silent = (TNS_ENV === 'production')
-// Prints Colored logs when --env.production is *NOT* set while building
-// Vue.config.debug = (TNS_ENV !== 'production')
+Vue.config.silent = (TNS_ENV === 'production');
+Vue.config.suppressRenderLogs = true;
 
 RadSideDrawerPlugin.install(Vue);
 RadListViewPlugin.install(Vue, {});

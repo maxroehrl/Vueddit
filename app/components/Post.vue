@@ -2,7 +2,7 @@
   <StackLayout>
     <PostHeader :post="post"
                 :bigPreview="shouldShowBigPreview(post) && !getVideo(post)"
-                highlightAuthor="true"
+                :highlightAuthor="true"
                 width="100%"
                 :onLongPress="showMoreOptions"
                 :onTab="openUrl" />

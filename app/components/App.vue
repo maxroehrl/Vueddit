@@ -74,7 +74,7 @@ export default {
     };
   },
   methods: {
-    loaded(event) {
+    loaded() {
       if (this.refreshAll) {
         store.subscribe(((mutation, state) => ApplicationSettings.setString('store', JSON.stringify(state))));
         this.login();
@@ -82,7 +82,7 @@ export default {
       application.android.on(AndroidApplication.activityBackPressedEvent, this.navigateBack, this);
     },
 
-    unloaded(event) {
+    unloaded() {
       application.android.off(AndroidApplication.activityBackPressedEvent, this.navigateBack, this);
     },
 
