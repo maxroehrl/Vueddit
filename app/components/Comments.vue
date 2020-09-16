@@ -19,7 +19,6 @@
       </v-template>
       <v-template name="comment">
         <Comment :comment="comment"
-                 :post="post"
                  :selected="comment === selectedComment"
                  :select-comment="selectComment"
                  :select-neighboring-comment="selectNeighboringComment" />

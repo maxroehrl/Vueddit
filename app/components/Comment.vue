@@ -59,21 +59,20 @@ export default {
       type: Object,
       required: true,
     },
-    post: {
-      type: Object,
-      required: true,
-    },
     selected: {
       type: Boolean,
-      required: true,
+      required: false,
+      default: false,
     },
     selectComment: {
       type: Function,
-      required: true,
+      required: false,
+      default(comment) {},
     },
     selectNeighboringComment: {
       type: Function,
-      required: true,
+      required: false,
+      default(comment, depth, next) {},
     },
   },
   data() {

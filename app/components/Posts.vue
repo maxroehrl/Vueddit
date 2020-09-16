@@ -21,7 +21,7 @@
                   :onTab="openComments" />
     </v-template>
     <v-template name="comment">
-      <MarkdownView :text="post.body" width="100%" />
+      <Comment :comment="post" width="100%" />
     </v-template>
   </RadListView>
 </template>
@@ -34,11 +34,11 @@ import {action} from '@nativescript/core/ui/dialogs';
 import Reddit from '../services/Reddit';
 import Comments from './Comments';
 import PostHeader from './PostHeader';
-import MarkdownView from './MarkdownView';
+import Comment from './Comment';
 
 export default {
   name: 'Posts',
-  components: {MarkdownView, PostHeader},
+  components: {Comment, PostHeader},
   props: {
     subreddit: {
       type: Object,
