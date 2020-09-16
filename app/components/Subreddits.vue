@@ -18,7 +18,7 @@
           <Ripple width="20%" @tap="star(subreddit)">
             <Label :text="getSubredditIcon(subreddit)" class="subreddit-icon" />
           </Ripple>
-          <Ripple width="80%" @tap="onSelection(subreddit)">
+          <Ripple width="80%" @tap="selectSubreddit(subreddit)">
             <Label :text="subreddit.display_name" class="subreddit-label" />
           </Ripple>
         </StackLayout>
@@ -40,7 +40,7 @@ export default {
       type: Object,
       required: true,
     },
-    onSelection: {
+    selectSubreddit: {
       type: Function,
       required: true,
     },
@@ -105,12 +105,6 @@ export default {
       });
     },
 
-    setSubreddit(subreddit) {
-      this.selected = subreddit;
-      this.refreshList();
-      setTimeout(() => ad.dismissSoftInput(), 50);
-    },
-
     isSubscribedTo(subreddit) {
       return this.subscribedSubredditNames.includes(subreddit.display_name) && !this.isMultireddit(subreddit);
     },
@@ -128,7 +122,7 @@ export default {
     },
 
     onSubmit() {
-      this.onSelection({display_name: this.searchText});
+      this.selectSubreddit({display_name: this.searchText});
     },
 
     onClear() {

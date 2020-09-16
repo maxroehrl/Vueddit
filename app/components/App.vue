@@ -27,7 +27,7 @@
       <StackLayout ~drawerContent>
         <Subreddits ref="subredditList"
                     :selected="subreddit"
-                    :on-selection="setSubreddit" />
+                    :select-subreddit="setSubreddit" />
       </StackLayout>
 
       <StackLayout ~mainContent>
@@ -53,6 +53,7 @@ import Subreddits from './Subreddits';
 import SidebarDialog from './SidebarDialog';
 import Reddit from '../services/Reddit';
 import store from '../store';
+import {ad} from '@nativescript/core/utils/utils';
 
 export default {
   name: 'App',
@@ -117,7 +118,8 @@ export default {
 
     refreshSelectedSubreddit() {
       if (this.$refs.subredditList) {
-        this.$refs.subredditList.setSubreddit(this.subreddit);
+        this.$refs.subredditList.refreshList();
+        setTimeout(() => ad.dismissSoftInput(), 50);
       }
     },
 
