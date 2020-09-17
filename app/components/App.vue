@@ -129,10 +129,9 @@ export default {
       }
     },
 
-    refreshPosts(last={subreddit: this.subreddit}) {
+    refreshPosts(last={}) {
       if (this.$refs.postList) {
         this.loadingIndicator.show(this.loadingIndicatorOptions);
-        this.subreddit = last.subreddit;
         this.$refs.postList.setSubreddit(last).finally(() => this.loadingIndicator.hide());
       }
     },
@@ -150,11 +149,10 @@ export default {
     },
 
     setSubreddit(subreddit, goBack=false) {
-      let last;
+      let last = {};
       if (goBack) {
         last = this.lastSubreddits.pop();
-        this.showGoBackSnackbar(this.subreddit, last.subreddit, !goBack);
-        this.subreddit = last.subreddit;
+        subreddit = last.subreddit;
       } else {
         this.lastSubreddits.push({
           subreddit: this.subreddit,
@@ -162,13 +160,15 @@ export default {
           lastPostId: this.$refs.postList.lastPostId,
           index: this.$refs.postList.$refs.postList.nativeView.getFirstVisiblePosition(),
         });
-        this.showGoBackSnackbar(this.subreddit, subreddit, !goBack);
-        this.subreddit = subreddit;
         this.visitSubreddit(subreddit);
       }
       this.$refs.drawer.nativeView.closeDrawer();
-      this.refreshSelectedSubreddit();
-      this.refreshPosts(last);
+      this.showGoBackSnackbar(this.subreddit, subreddit, !goBack);
+      this.subreddit = subreddit;
+      setTimeout(() => {
+        this.refreshSelectedSubreddit();
+        this.refreshPosts(last);
+      });
     },
 
     showGoBackSnackbar(oldSubreddit, newSubreddit, goBack) {
