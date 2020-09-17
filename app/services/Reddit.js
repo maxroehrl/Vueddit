@@ -1,5 +1,5 @@
 import * as app from '@nativescript/core/application';
-import {request} from '@nativescript/core/http';
+import {getJSON} from '@nativescript/core/http';
 import {Screen} from '@nativescript/core/platform';
 import moment from 'moment';
 import Login from '../components/Login';
@@ -50,12 +50,12 @@ export default class Reddit {
     if (state === this.randomState) {
       if (responseUrl.includes('code=')) {
         const code = responseUrl.match(/code=([^&]+)/)[1];
-        return request({
+        return getJSON({
           url: `${this.api}/api/v1/access_token`,
           method: 'POST',
           content: `grant_type=authorization_code&code=${code}&redirect_uri=${this.redirectUri}`,
           headers: {'Authorization': `Basic ${btoa(this.clientId + ':')}`},
-        }).then(this.handleResponse).then(this.updateToken.bind(this)).then(() => {
+        }).then(this.updateToken.bind(this)).then(() => {
           if (page) {
             page.$navigateBack({
               transition: 'slide',
@@ -75,12 +75,12 @@ export default class Reddit {
 
   static refreshAuthToken() {
     if (store.state.reddit.refreshToken) {
-      return request({
+      return getJSON({
         url: `${this.api}/api/v1/access_token`,
         method: 'POST',
         content: `grant_type=refresh_token&refresh_token=${store.state.reddit.refreshToken}`,
         headers: {'Authorization': `Basic ${btoa(this.clientId + ':')}`},
-      }).then(this.handleResponse).then(this.updateToken.bind(this));
+      }).then(this.updateToken.bind(this));
     } else {
       return Promise.reject(new Error('No refresh token'));
     }
@@ -154,45 +154,25 @@ export default class Reddit {
     return this.post(`/api/unsave?id=${id}`);
   }
 
-  static getSaved(user) {
-    return this.get(`/user/${user}/saved?raw_json=1`);
+  static get(url) {
+    return this.request(url, 'GET');
   }
 
-  static getUpvoted(user) {
-    return this.get(`/user/${user}/upvoted?raw_json=1`);
+  static post(url, content) {
+    return this.request(url, 'POST', content);
   }
 
-  static getDownvoted(user) {
-    return this.get(`/user/${user}/downvoted?raw_json=1`);
-  }
-
-  static get(url, oAuth=true) {
-    return this.refreshTokenIfNecessary().then(() => request({
-      url: `${oAuth ? this.oauthApi : this.api}${url}`,
-      method: 'GET',
-      headers: oAuth ? this.getHeaders() : {'User-Agent': this.userAgent},
-    })).then(this.handleResponse);
-  }
-
-  static post(url, content, oAuth=true) {
-    return this.refreshTokenIfNecessary().then(() => request({
-      url: `${oAuth ? this.oauthApi: this.api}${url}`,
-      method: 'POST',
-      headers: oAuth ? this.getHeaders() : {'User-Agent': this.userAgent},
+  static request(url, method, content) {
+    return this.refreshTokenIfNecessary().then(() => getJSON({
+      url: `${this.oauthApi}${url}`,
+      method,
+      headers: this.getHeaders(),
       content,
-    })).then(this.handleResponse);
+    }));
   }
 
   static refreshTokenIfNecessary() {
     return store.state.reddit.validUntil <= this.getUnixTime() ? this.refreshAuthToken() : Promise.resolve();
-  }
-
-  static handleResponse(response) {
-    if (response.statusCode === 200) {
-      return response.content.toJSON();
-    } else {
-      throw new Error('Error: ' + response.statusCode);
-    }
   }
 
   static getImage(post) {
