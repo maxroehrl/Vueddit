@@ -1,5 +1,5 @@
 import * as app from '@nativescript/core/application';
-import {request} from '@nativescript/core//http';
+import {request} from '@nativescript/core/http';
 import {Screen} from '@nativescript/core/platform';
 import moment from 'moment';
 import Login from '../components/Login';
@@ -132,10 +132,6 @@ export default class Reddit {
     return this.get('/api/multi/mine?raw_json=1');
   }
 
-  static getMultisSubreddits(multipath) {
-    return this.get(`/api/multi/${multipath}?raw_json=1`);
-  }
-
   static searchForSubreddit(query) {
     return this.get(`/api/search_reddit_names?raw_json=1&include_over_18=true&include_unadvertisable=true&query=${query}`);
   }
@@ -168,10 +164,6 @@ export default class Reddit {
 
   static getDownvoted(user) {
     return this.get(`/user/${user}/downvoted?raw_json=1`);
-  }
-
-  static getEmojis(subreddit) {
-    return this.get(`/api/v1/${subreddit}/emojis/all?raw_json=1`);
   }
 
   static get(url, oAuth=true) {
