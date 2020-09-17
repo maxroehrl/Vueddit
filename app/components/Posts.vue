@@ -35,6 +35,7 @@ import Reddit from '../services/Reddit';
 import Comments from './Comments';
 import PostHeader from './PostHeader';
 import Comment from './Comment';
+import showSnackbar from './Snackbar';
 
 export default {
   name: 'Posts',
@@ -166,6 +167,14 @@ export default {
               this.lastPostId = items[items.length - 1].name;
               this.postList.push(...items);
               return items;
+            } else if (!lastPostId) {
+              showSnackbar({
+                actionText: '',
+                actionTextColor: '#53ba82',
+                snackText: 'No items received',
+                hideDelay: 8000,
+                backgroundColor: '#3e3e3e',
+              });
             }
           }
           return [];
