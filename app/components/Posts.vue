@@ -78,7 +78,7 @@ export default {
     },
 
     shouldShowBigPreview(post) {
-      return Reddit.getPreview(post, 300, false) && this.getDefaultTemplate() === 'big';
+      return !!(Reddit.getPreview(post, 300, false) && this.getDefaultTemplate() === 'big');
     },
 
     getDefaultTemplate() {
