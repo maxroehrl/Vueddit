@@ -1,7 +1,7 @@
 <template>
-  <AbsoluteLayout class="comment"
-                  :style="{borderWidth: selected ? '6px' : '0 6px',
-                           borderColor: selected ? '#53ba82' : '#53ba82 #080808'}">
+  <StackLayout class="comment"
+               :style="{borderWidth: selected ? '6px' : '0 6px',
+                        borderColor: selected ? '#53ba82' : '#53ba82 #080808'}">
     <FlexboxLayout v-if="selected" class="button-bar">
       <Votes :voteable="comment" />
       <Label text="Done"
@@ -16,7 +16,7 @@
     </FlexboxLayout>
     <IndentedLabel ref="labelHeader"
                    class="comment-author"
-                   :top="selected ? buttonBarHeight.toString() : '0'"
+                   textWrap="true"
                    @tap="selectComment(comment)"
                    @loaded="loadedHeader($event)">
       <FormattedString>
@@ -28,6 +28,8 @@
               class="comment-votes" />
         <Span :text="getTimeFromNow(comment) + ' '"
               class="comment-created" />
+        <Span :text="showSubreddit ? 'in /r/' + comment.subreddit + ' ' : ''"
+              class="comment-subreddit" />
         <Span :text="comment.gildings && comment.gildings.gid_1 ? ('🥈x' + comment.gildings.gid_1 + ' ') : ''" />
         <Span :text="comment.gildings && comment.gildings.gid_2 ? ('🥇x' + comment.gildings.gid_2 + ' ') : ''" />
         <Span :text="comment.gildings && comment.gildings.gid_3 ? ('🥉x' + comment.gildings.gid_3 + ' ') : ''" />
@@ -39,11 +41,10 @@
     <IndentedLabel ref="label"
                    class="comment-body"
                    textWrap="true"
-                   :top="((selected ? buttonBarHeight : 0) + 18).toString()"
                    width="100%"
                    @tap="selectComment(comment)"
                    @loaded="loaded($event)" />
-  </AbsoluteLayout>
+  </StackLayout>
 </template>
 
 <script>
@@ -73,6 +74,11 @@ export default {
       type: Function,
       required: false,
       default(comment, depth, next) {},
+    },
+    showSubreddit: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
@@ -145,6 +151,7 @@ export default {
 
 <style scoped>
   .comment {
+    padding: 0;
     border-radius: 30px;
   }
 
@@ -163,11 +170,7 @@ export default {
     padding: 40px;
   }
 
-  .comment-author {
-    font-size: 13px;
-  }
-
-  .comment-body {
+  .comment-author, .comment-body {
     font-size: 13px;
   }
 
@@ -175,7 +178,7 @@ export default {
     color: #c2c2c2;
   }
 
-  .comment-votes, .comment-created {
+  .comment-votes, .comment-created, .comment-subreddit {
     color: #767676;
   }
 </style>

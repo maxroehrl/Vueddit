@@ -21,7 +21,9 @@
                   :onTab="openComments" />
     </v-template>
     <v-template name="comment">
-      <Comment :comment="post" width="100%" />
+      <Comment :comment="post"
+               :show-subreddit="true"
+               width="100%" />
     </v-template>
   </RadListView>
 </template>
