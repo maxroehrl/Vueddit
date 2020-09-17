@@ -175,11 +175,7 @@ export default {
     color: #c2c2c2;
   }
 
-  .comment-votes {
-    color: #767676;
-  }
-
-  .comment-created {
+  .comment-votes, .comment-created {
     color: #767676;
   }
 </style>

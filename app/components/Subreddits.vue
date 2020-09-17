@@ -200,6 +200,5 @@ export default {
   .searchbar {
     font-size: 16px;
     height: 240px;
-    width: 100%;
   }
 </style>

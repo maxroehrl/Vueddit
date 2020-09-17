@@ -58,11 +58,10 @@ export default {
 
 <style scoped>
   .vote-label {
-    text-align: center;
     padding: 0;
   }
 
-  .chevron {
+  .chevron, .vote-label {
     text-align: center;
   }
 </style>
