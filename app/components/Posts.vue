@@ -23,6 +23,7 @@
     <v-template name="comment">
       <Comment :comment="post"
                :show-subreddit="true"
+               :select-comment="openCommentsByPermalink"
                width="100%" />
     </v-template>
   </RadListView>
@@ -205,6 +206,14 @@ export default {
           app: this.app,
           post,
         },
+      });
+    },
+
+    openCommentsByPermalink({permalink}) {
+      Reddit.getComments(permalink).then((r) => {
+        if (r && r.length === 2 && r[0].data && r[0].data.children && r[0].data.children.length === 1) {
+          this.openComments(r[0].data.children[0].data);
+        }
       });
     },
 
