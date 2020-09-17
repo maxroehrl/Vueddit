@@ -53,6 +53,11 @@ export default {
       type: Array,
       required: true,
     },
+    group: {
+      type: String,
+      required: false,
+      default: Reddit.groups[0],
+    },
   },
   data() {
     return {
@@ -115,9 +120,8 @@ export default {
     },
 
     onSortingChange(args) {
-      this.loadingIndicator.show(this.loadingIndicatorOptions);
       this.sorting = this.sortings[args.value];
-      this.refresh().finally(() => this.loadingIndicator.hide());
+      this.refreshWithLoadingIndicator();
     },
 
     isUserReddit() {
@@ -137,6 +141,11 @@ export default {
       } else {
         return this.refresh();
       }
+    },
+
+    refreshWithLoadingIndicator() {
+      this.loadingIndicator.show(this.loadingIndicatorOptions);
+      this.refresh().finally(() => this.loadingIndicator.hide());
     },
 
     refresh() {
@@ -159,8 +168,8 @@ export default {
         sub = this.subreddit.display_name;
       }
       if (sub && sub !== '') {
-        const request = this.isUserReddit() ? Reddit.getUserPosts : Reddit.getPosts;
-        return request.apply(Reddit, [sub, lastPostId, this.sorting]).then((r) => {
+        const request = this.isUserReddit() ? Reddit.getUserPosts : Reddit.getSubredditPosts;
+        return request.apply(Reddit, [sub, lastPostId, this.sorting, this.group.toLowerCase()]).then((r) => {
           if (r && r.data && r.data.children) {
             const items = r.data.children.map((d) => d.data);
             if (items.length) {

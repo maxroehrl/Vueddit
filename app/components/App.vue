@@ -7,7 +7,7 @@
       <ActionItem text="Refresh"
                   icon="res://ic_menu_refresh"
                   @tap="refreshPosts()" />
-      <ActionItem text="Sidebar"
+      <ActionItem text="Show sidebar"
                   android.position="popup"
                   @tap="showSidebar" />
       <ActionItem text="Remove from visited"
@@ -16,7 +16,10 @@
       <ActionItem text="Toggle list item size"
                   android.position="popup"
                   @tap="toggleTemplate" />
-      <ActionItem text="Logout"
+      <ActionItem :text="'Goto /u/' + getCurrentUserName() + '\'s profile'"
+                  android.position="popup"
+                  @tap="gotoMyProfile" />
+      <ActionItem :text="'Logout /u/' + getCurrentUserName()"
                   android.position="popup"
                   @tap="logout" />
       <NavigationButton text="Navigation"
@@ -220,6 +223,14 @@ export default {
         store.dispatch('unVisitSubreddit', {subreddit: this.subreddit})
             .then(() => this.refreshSubredditList());
       }
+    },
+
+    getCurrentUserName() {
+      return store.state.reddit && store.state.reddit.user ? store.state.reddit.user : '';
+    },
+
+    gotoMyProfile() {
+      this.gotoUserPosts(this.getCurrentUserName());
     },
 
     logout() {

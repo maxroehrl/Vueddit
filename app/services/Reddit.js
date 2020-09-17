@@ -12,8 +12,10 @@ export default class Reddit {
   static randomState = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 10);
   static clientId = 'm_gI8cFDcqC7uA';
   static redirectUri = encodeURIComponent('http://localhost:8080');
-  static scope = encodeURIComponent('mysubreddits read vote save subscribe wikiread identity');
+  static scope = encodeURIComponent('mysubreddits read vote save subscribe wikiread identity history flair');
   static frontpage = 'reddit front page';
+  static limit = 25;
+  static groups = ['Submitted', 'Saved', 'Upvoted', 'Downvoted'];
   static sortings = {
     best: 'best',
     hot: 'hot',
@@ -99,17 +101,18 @@ export default class Reddit {
     return this.get(`/api/v1/me?raw_json=1`);
   }
 
-  static getPosts(subreddit, after=null, sorting=this.sortings.best, limit=25) {
-    subreddit = subreddit === this.frontpage ? '' : `/r/${subreddit}`;
-    let url = `${subreddit}/${sorting}.json?limit=${limit}&raw_json=1`;
-    url = after ? `${url}&after=${after}` : url;
-    return this.get(url);
+  static getSubredditPosts(subreddit, after=null, sorting=this.sortings.best) {
+    return this.getPosts(`${subreddit === this.frontpage ? '' : '/r/' + subreddit}/${sorting}.json?raw_json=1`, after);
   }
 
-  static getUserPosts(user, after=null, sorting=this.sortings.new, limit=25, type='links') {
-    let url = `/user/${user}/submitted.json?limit=${limit}&raw_json=1&sort=${sorting}&type=${type}`;
-    url = after ? `${url}&after=${after}` : url;
-    return this.get(url, false);
+  static getUserPosts(user, after=null, sorting=this.sortings.new, group='submitted') {
+    // TODO Add type='links'|'comments'
+    return this.getPosts(`/user/${user}/${group}.json?raw_json=1&sort=${sorting}`, after);
+  }
+
+  static getPosts(url, after, limit=this.limit) {
+    // TODO Add t='all' parameter (hour, day, week, month, year, all)
+    return this.get(url + `&limit=${limit}` + (after ? `&after=${after}` : ''));
   }
 
   static getComments(permalink, comment='') {
