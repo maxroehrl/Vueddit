@@ -11,16 +11,18 @@ export default class IndentedLabel extends Label {
   createNativeView() {
     const TV = android.widget.TextView.extend({
       depth: 0,
+      paddingBottom: 10,
       onDraw(canvas) {
-        this.super.setPadding(factor * this.depth + 20, 0, 10, 10);
+        this.super.setPadding(factor * this.depth + 20, 0, 10, this.paddingBottom);
         this.super.onDraw(canvas);
         for (let i = 1; i <= this.depth; i++) {
           const indent = i * factor;
           canvas.drawLine(indent, 0, indent, this.super.getHeight(), paint);
         }
       },
-      setDepth(depth) {
+      setDepth(depth, paddingBottom=10) {
         this.depth = depth;
+        this.paddingBottom = paddingBottom;
       },
     });
     return new TV(this._context);

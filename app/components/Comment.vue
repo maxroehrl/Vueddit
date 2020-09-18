@@ -119,7 +119,7 @@ export default {
     },
 
     refreshLabel(tv, comment) {
-      tv.setDepth(comment.depth);
+      tv.setDepth(comment.depth, 50);
       Markdown.setMarkdown(tv, comment.body);
     },
 
