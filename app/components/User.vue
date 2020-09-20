@@ -7,6 +7,9 @@
       <ActionItem text="Refresh"
                   icon="res://ic_menu_refresh"
                   @tap="refresh" />
+      <ActionItem text="Select type"
+                  android.position="popup"
+                  @tap="selectType" />
       <ActionItem text="Toggle list item size"
                   android.position="popup"
                   @tap="toggleTemplate" />
@@ -22,12 +25,14 @@
              :subreddit="{user}"
              :app="app"
              :group="selectedGroup"
+             :type="selectedType"
              :sortings="['new', 'top', 'hot', 'controversial']" />
     </StackLayout>
   </Page>
 </template>
 
 <script>
+import {action} from '@nativescript/core/ui/dialogs';
 import {SegmentedBarItem} from '@nativescript/core/ui/segmented-bar';
 import store from '../store';
 import Reddit from '../services/Reddit';
@@ -48,6 +53,7 @@ export default {
   data() {
     return {
       selectedGroup: Reddit.groups[0],
+      selectedType: 'all',
       segmentedBarItems: Reddit.groups.map((sorting) => {
         const item = new SegmentedBarItem();
         item.title = sorting;
@@ -62,11 +68,18 @@ export default {
 
     onGroupChange(args) {
       this.selectedGroup = Reddit.groups[args.value];
-      setTimeout(() => this.$refs.posts.refreshWithLoadingIndicator());
+      this.refresh();
     },
 
     refresh() {
-      this.$refs.posts.refreshWithLoadingIndicator();
+      setTimeout(() => this.$refs.posts.refreshWithLoadingIndicator());
+    },
+
+    selectType() {
+      const actions = ['All', 'Comments', 'Links'];
+      action({actions})
+          .then((action) => this.selectedType = action || this.selectedType)
+          .then(this.refresh.bind(this));
     },
 
     toggleTemplate() {

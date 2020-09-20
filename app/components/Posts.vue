@@ -61,6 +61,11 @@ export default {
       required: false,
       default: Reddit.groups[0],
     },
+    type: {
+      type: String,
+      required: false,
+      default: 'all',
+    },
   },
   data() {
     return {
@@ -73,6 +78,7 @@ export default {
       }),
       selectedTemplate: null,
       sorting: this.sortings[0],
+      time: 'all',
       loadingIndicator: new LoadingIndicator(),
       loadingIndicatorOptions: {
         hideBezel: true,
@@ -124,7 +130,14 @@ export default {
 
     onSortingChange(args) {
       this.sorting = this.sortings[args.value];
-      this.refreshWithLoadingIndicator();
+      if (this.sorting === 'top') {
+        const actions = ['Hour', 'Day', 'Week', 'Month', 'Year', 'All'];
+        action({title: 'Choose time:', actions})
+            .then((action) => this.time = action || this.time)
+            .then(this.refreshWithLoadingIndicator.bind(this));
+      } else {
+        this.refreshWithLoadingIndicator();
+      }
     },
 
     isUserReddit() {
@@ -172,7 +185,8 @@ export default {
       }
       if (sub && sub !== '') {
         const request = this.isUserReddit() ? Reddit.getUserPosts : Reddit.getSubredditPosts;
-        return request.apply(Reddit, [sub, lastPostId, this.sorting, this.group.toLowerCase()]).then((r) => {
+        const args = [sub, lastPostId, this.sorting, this.group, this.time, this.type];
+        return request.apply(Reddit, args.map((s) => s && s.toLowerCase())).then((r) => {
           if (r && r.data && r.data.children) {
             const items = r.data.children.map((d) => d.data);
             if (items.length) {

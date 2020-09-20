@@ -101,18 +101,22 @@ export default class Reddit {
     return this.get(`/api/v1/me?raw_json=1`);
   }
 
-  static getSubredditPosts(subreddit, after=null, sorting=this.sortings.best) {
-    return this.getPosts(`${subreddit === this.frontpage ? '' : '/r/' + subreddit}/${sorting}.json?raw_json=1`, after);
+  static getSubredditPosts(subreddit, after=null, sorting=this.sortings.best, group='', time='') {
+    return this.getPosts(`${subreddit === this.frontpage ? '' : '/r/' + subreddit}/${sorting}.json?raw_json=1`, after, sorting, time);
   }
 
-  static getUserPosts(user, after=null, sorting=this.sortings.new, group='submitted') {
-    // TODO Add type='links'|'comments'
-    return this.getPosts(`/user/${user}/${group}.json?raw_json=1&sort=${sorting}`, after);
+  static getUserPosts(user, after=null, sorting=this.sortings.new, group='submitted', time='all', type='all') {
+    let url = `/user/${user}/${group}.json?raw_json=1&sort=${sorting}`;
+    url += type !== 'all' ? `&type=${type}`: '';
+    return this.getPosts(url, after, sorting, time);
   }
 
-  static getPosts(url, after, limit=this.limit) {
-    // TODO Add t='all' parameter (hour, day, week, month, year, all)
-    return this.get(url + `&limit=${limit}` + (after ? `&after=${after}` : ''));
+  static getPosts(url, after, sorting, time, limit=this.limit) {
+    url += `&limit=${limit}` + (after ? `&after=${after}` : '');
+    if (time && sorting === 'top') {
+      url += `&t=${time}`;
+    }
+    return this.get(url);
   }
 
   static getComments(permalink, comment='') {
