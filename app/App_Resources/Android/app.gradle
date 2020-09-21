@@ -1,12 +1,10 @@
 // Add your native dependencies here:
 
-// Uncomment to add recyclerview-v7 dependency
 dependencies {
-//	implementation 'com.android.support:recyclerview-v7:+'
   // https://github.com/saschpe/android-customtabs/releases
   implementation 'saschpe.android:customtabs:3.0.2'
   // https://github.com/noties/Markwon/releases
-  implementation 'io.noties.markwon:core:4.5.1'
+  implementation 'io.noties.markwon:core:4.6.0'
   // https://github.com/balysv/material-ripple/releases
   implementation 'com.balysv:material-ripple:1.0.2'
   // https://github.com/facebook/fresco/releases
