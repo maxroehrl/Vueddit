@@ -14,8 +14,6 @@
     <MarkdownView v-if="post.selftext !== ''"
                   :text="post.selftext"
                   class="post-text" />
-    <Label class="post-comment-num-label"
-           :text="post.num_comments + ' comment' + (post.num_comments === 1 ? '' : 's')" />
   </StackLayout>
 </template>
 
@@ -194,15 +192,5 @@ export default {
     margin: 10px;
     padding: 30px;
     border-radius: 30px;
-  }
-
-  .post-comment-num-label {
-    background-color: #3e3e3e;
-    color: white;
-    font-size: 14px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    width: 100%;
-    text-align: center;
   }
 </style>

@@ -108,8 +108,8 @@ export default class Reddit {
     return this.get(url);
   }
 
-  static getComments(permalink, comment='') {
-    return this.get(`${permalink}${comment}.json?raw_json=1`);
+  static getComments(permalink, comment='', sort='top') {
+    return this.get(`${permalink}${comment}.json?raw_json=1&sort=${sort}`);
   }
 
   static getMoreComments(link, children) {

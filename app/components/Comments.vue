@@ -15,7 +15,15 @@
                  :itemTemplateSelector="templateSelector"
                  @pullToRefreshInitiated="onPullDown">
       <v-template name="header">
-        <Post :post="post" :app="app" />
+        <StackLayout padding="0">
+          <Post :post="post" :app="app" />
+          <Label class="num-comments"
+                 :text="post.num_comments + ' comment' + (post.num_comments === 1 ? '' : 's')"
+                 @tap="changeSorting()" />
+          <Label ref="sortedLabel"
+                 class="sorted-label"
+                 :text="'sorted by ' + sorting" />
+        </StackLayout>
       </v-template>
       <v-template name="comment">
         <Comment :comment="comment"
@@ -34,6 +42,7 @@
 import * as application from '@nativescript/core/application';
 import {AndroidApplication} from '@nativescript/core/application';
 import {ObservableArray} from '@nativescript/core/data/observable-array';
+import {action} from '@nativescript/core/ui/dialogs';
 import Reddit from '../services/Reddit';
 import Comment from './Comment';
 import Post from './Post';
@@ -57,6 +66,8 @@ export default {
       commentList: new ObservableArray([]),
       isShowingSubtree: false,
       selectedComment: null,
+      sortings: ['top', 'new', 'controversial', 'old', 'random', 'qa'],
+      sorting: 'top',
     };
   },
   methods: {
@@ -95,7 +106,7 @@ export default {
     },
 
     fetchComments(comment) {
-      return Reddit.getComments(this.post.permalink, comment).then((r) => {
+      return Reddit.getComments(this.post.permalink, comment, this.sorting).then((r) => {
         if (r && r.length === 2 && r[1].data) {
           return r[1].data.children.map((d) => d.data);
         }
@@ -179,6 +190,16 @@ export default {
         }
       }
     },
+
+    changeSorting() {
+      return action({title: 'Select sorting:', actions: this.sortings}).then((sorting) => {
+        if (sorting && sorting !== this.sorting) {
+          this.sorting = sorting || this.sorting;
+          this.$refs.sortedLabel.setText('sorted by ' + sorting);
+          return this.getComments();
+        }
+      });
+    },
   },
 };
 </script>
@@ -191,5 +212,25 @@ export default {
 
   #comment-list {
     background-color: #080808;
+  }
+
+  .num-comments {
+    background-color: #3e3e3e;
+    color: #ffffff;
+    font-size: 14px;
+    margin-top: 20px;
+    padding-bottom: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .sorted-label {
+    background-color: #3e3e3e;
+    color: #c6c6c6;
+    font-size: 12px;
+    padding-top: 0;
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
   }
 </style>
