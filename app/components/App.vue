@@ -37,7 +37,7 @@
         <Posts ref="postList"
                :subreddit="subreddit"
                :app="this"
-               :sortings="['best', 'hot', 'top', 'new']" />
+               :sortings="['best', 'hot', 'top', 'new', 'controversial', 'rising']" />
       </StackLayout>
     </RadSideDrawer>
   </Page>

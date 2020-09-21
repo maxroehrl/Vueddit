@@ -14,17 +14,6 @@ export default class Reddit {
   static redirectUri = encodeURIComponent('http://localhost:8080');
   static scope = encodeURIComponent('mysubreddits read vote save subscribe wikiread identity history flair');
   static frontpage = 'reddit front page';
-  static limit = 25;
-  static groups = ['Submitted', 'Saved', 'Upvoted', 'Downvoted'];
-  static sortings = {
-    best: 'best',
-    hot: 'hot',
-    top: 'top',
-    new: 'new',
-    rising: 'rising',
-    random: 'random',
-    controversial: 'controversial',
-  };
 
   static getHeaders() {
     if (!this.userAgent) {
@@ -111,9 +100,9 @@ export default class Reddit {
     return this.getPosts(url, after, sorting, time);
   }
 
-  static getPosts(url, after, sorting, time, limit=this.limit) {
+  static getPosts(url, after, sorting, time, limit=25) {
     url += `&limit=${limit}` + (after ? `&after=${after}` : '');
-    if (time && sorting === 'top') {
+    if (time && ['top', 'rising'].includes(sorting)) {
       url += `&t=${time}`;
     }
     return this.get(url);

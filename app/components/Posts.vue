@@ -8,10 +8,9 @@
                @loadMoreDataRequested="onLoadMorePostsRequested"
                @pullToRefreshInitiated="onPullDown">
     <v-template name="header">
-      <SegmentedBar :items="segmentedBarItems"
-                    selectedIndex="0"
-                    selectedBackgroundColor="#53ba82"
-                    @selectedIndexChange="onSortingChange" />
+      <SegmentedBar :items="sortings"
+                    :background="'#303030'"
+                    :on-selection="onSortingSelected" />
     </v-template>
     <v-template name="post">
       <PostHeader :post="post"
@@ -31,7 +30,6 @@
 
 <script>
 import {ObservableArray} from '@nativescript/core/data/observable-array';
-import {SegmentedBarItem} from '@nativescript/core/ui/segmented-bar';
 import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
 import {action} from '@nativescript/core/ui/dialogs';
 import Reddit from '../services/Reddit';
@@ -39,10 +37,11 @@ import Comments from './Comments';
 import PostHeader from './PostHeader';
 import Comment from './Comment';
 import showSnackbar from './Snackbar';
+import SegmentedBar from './SegmentedBar';
 
 export default {
   name: 'Posts',
-  components: {Comment, PostHeader},
+  components: {SegmentedBar, Comment, PostHeader},
   props: {
     subreddit: {
       type: Object,
@@ -59,7 +58,7 @@ export default {
     group: {
       type: String,
       required: false,
-      default: Reddit.groups[0],
+      default: 'submitted',
     },
     type: {
       type: String,
@@ -71,11 +70,6 @@ export default {
     return {
       postList: new ObservableArray([]),
       lastPostId: null,
-      segmentedBarItems: this.sortings.map((sorting) => {
-        const item = new SegmentedBarItem();
-        item.title = sorting;
-        return item;
-      }),
       selectedTemplate: null,
       sorting: this.sortings[0],
       time: 'all',
@@ -128,15 +122,18 @@ export default {
           .then((items) => args.object.notifyAppendItemsOnDemandFinished(items.length, false));
     },
 
-    onSortingChange(args) {
-      this.sorting = this.sortings[args.value];
-      if (this.sorting === 'top') {
-        const actions = ['Hour', 'Day', 'Week', 'Month', 'Year', 'All'];
-        action({title: 'Choose time:', actions})
-            .then((action) => this.time = action || this.time)
-            .then(this.refreshWithLoadingIndicator.bind(this));
-      } else {
-        this.refreshWithLoadingIndicator();
+    onSortingSelected(sorting, noReload) {
+      this.sorting = sorting;
+      if (!noReload) {
+        let promise = Promise.resolve();
+        if (['top', 'rising'].includes(sorting)) {
+          const actions = ['Hour', 'Day', 'Week', 'Month', 'Year', 'All'];
+          promise = action({title: 'Choose time:', actions});
+        }
+        promise.then((time) => {
+          this.time = time || 'all';
+          this.refreshWithLoadingIndicator();
+        });
       }
     },
 
