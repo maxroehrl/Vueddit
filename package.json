@@ -17,7 +17,7 @@
     "base-64": "^0.1.0",
     "events": "^3.2.0",
     "fs": "0.0.1-security",
-    "moment": "^2.28.0",
+    "moment": "^2.29.0",
     "nativescript-socketio": "^3.3.1",
     "nativescript-toasty": "^3.0.0-alpha.2",
     "nativescript-ui-listview": "^9.0.2",
