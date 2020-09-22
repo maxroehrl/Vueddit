@@ -85,7 +85,7 @@ export default class Markdown {
     if (!text) {
       text = '';
     }
-    this.getInstance().setMarkdown(tv, text);
+    this.getInstance().setMarkdown(tv, text.replace(/^#+(?=[^#\s])/gm, (m) => m + ' '));
   }
 
   static setSpannableFactory(tv) {
