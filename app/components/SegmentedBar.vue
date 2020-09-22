@@ -3,13 +3,13 @@
               scrollBarIndicatorVisible="false"
               padding="0">
     <StackLayout orientation="horizontal"
-                 :style="{backgroundColor: background, padding: '0'}">
+                 :style="{backgroundColor, padding: '0'}">
       <Ripple v-for="item in items"
               :key="item"
               @tap="tap(item, false)">
         <Label class="item"
                :text="item"
-               :style="{borderBottomColor: item === selectedItem ? '#53ba82' : background, backgroundColor: background}" />
+               :style="{borderBottomColor: item === selectedItem ? '#53ba82' : backgroundColor, backgroundColor, padding}" />
       </Ripple>
     </StackLayout>
   </ScrollView>
@@ -26,9 +26,15 @@ export default {
       type: Function,
       required: true,
     },
-    background: {
+    backgroundColor: {
       type: String,
-      required: true,
+      required: false,
+      default: '#3e3e3e',
+    },
+    padding: {
+      type: String,
+      required: false,
+      default: '70px',
     },
   },
   data() {
@@ -59,6 +65,5 @@ export default {
     font-size: 12px;
     border-bottom-width: 6px;
     text-transform: uppercase;
-    padding: 70px;
   }
 </style>

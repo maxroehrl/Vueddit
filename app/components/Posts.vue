@@ -9,8 +9,8 @@
                @pullToRefreshInitiated="onPullDown">
     <v-template name="header">
       <SegmentedBar :items="sortings"
-                    :background="'#303030'"
-                    :on-selection="onSortingSelected" />
+                    :backgroundColor="'#303030'"
+                    :on-selection="setSorting" />
     </v-template>
     <v-template name="post">
       <PostHeader :post="post"
@@ -122,7 +122,7 @@ export default {
           .then((items) => args.object.notifyAppendItemsOnDemandFinished(items.length, false));
     },
 
-    onSortingSelected(sorting, noReload) {
+    setSorting(sorting, noReload) {
       this.sorting = sorting;
       if (!noReload) {
         let promise = Promise.resolve();

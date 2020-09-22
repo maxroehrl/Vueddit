@@ -12,9 +12,7 @@
                   @tap="toggleTemplate" />
     </ActionBar>
     <StackLayout padding="0">
-      <SegmentedBar :items="groups"
-                    :background="'#3e3e3e'"
-                    :on-selection="selectGroup" />
+      <SegmentedBar :items="groups" :on-selection="setGroup" />
       <Posts ref="posts"
              :subreddit="{user}"
              :app="app"
@@ -60,7 +58,7 @@ export default {
       return groups;
     },
 
-    selectGroup(group) {
+    setGroup(group) {
       this.selectedGroup = group;
       this.updateSortings();
       let promise = Promise.resolve();
