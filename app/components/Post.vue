@@ -1,5 +1,5 @@
 <template>
-  <StackLayout>
+  <StackLayout padding="0">
     <PostHeader :post="post"
                 :bigPreview="shouldShowBigPreview(post) && !getVideo(post)"
                 :highlightAuthor="true"
