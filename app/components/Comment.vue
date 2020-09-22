@@ -14,36 +14,38 @@
              class="button-bar-label"
              @tap="selectOther(1)" />
     </FlexboxLayout>
-    <IndentedLabel ref="labelHeader"
-                   class="comment-author"
-                   textWrap="true"
-                   @tap="selectComment(comment)"
-                   @loaded="loadedHeader($event)">
-      <FormattedString>
-        <Span :text="comment.likes == null ? '' : (comment.likes ? '▲' : '▼')"
-              :style="{color: comment.likes ? '#53ba82' : '#bf5826'}" />
-        <Span :text="comment.author + ' '"
-              :style="{color: getUserColor(comment)}" />
-        <Span :text="comment.ups + ' points '"
-              class="comment-votes" />
-        <Span :text="getTimeFromNow(comment) + ' '"
-              class="comment-created" />
-        <Span :text="showSubreddit ? 'in /r/' + comment.subreddit + ' ' : ''"
-              class="comment-subreddit" />
-        <Span :text="comment.gildings && comment.gildings.gid_1 ? ('🥈x' + comment.gildings.gid_1 + ' ') : ''" />
-        <Span :text="comment.gildings && comment.gildings.gid_2 ? ('🥇x' + comment.gildings.gid_2 + ' ') : ''" />
-        <Span :text="comment.gildings && comment.gildings.gid_3 ? ('🥉x' + comment.gildings.gid_3 + ' ') : ''" />
-        <Span :text="comment.author_flair_text ? comment.author_flair_text : ''"
-              class="comment-author-flair"
-              :style="{'background-color': comment.author_flair_background_color || '#767676'}" />
-      </FormattedString>
-    </IndentedLabel>
-    <IndentedLabel ref="label"
-                   class="comment-body"
-                   textWrap="true"
-                   width="100%"
-                   @tap="selectComment(comment)"
-                   @loaded="loaded($event)" />
+    <Ripple ref="commentBodyRipple" @tap="selectComment(comment)">
+      <StackLayout padding="0">
+        <IndentedLabel ref="commentHeader"
+                       class="comment-header"
+                       textWrap="true"
+                       @loaded="loadedHeader($event)">
+          <FormattedString>
+            <Span :text="comment.likes == null ? '' : (comment.likes ? '▲' : '▼')"
+                  :style="{color: comment.likes ? '#53ba82' : '#bf5826'}" />
+            <Span :text="comment.author + ' '"
+                  :style="{color: getUserColor(comment)}" />
+            <Span :text="comment.ups + ' points '"
+                  class="comment-votes" />
+            <Span :text="getTimeFromNow(comment) + ' '"
+                  class="comment-created" />
+            <Span :text="showSubreddit ? 'in /r/' + comment.subreddit + ' ' : ''"
+                  class="comment-subreddit" />
+            <Span :text="comment.gildings && comment.gildings.gid_1 ? ('🥈x' + comment.gildings.gid_1 + ' ') : ''" />
+            <Span :text="comment.gildings && comment.gildings.gid_2 ? ('🥇x' + comment.gildings.gid_2 + ' ') : ''" />
+            <Span :text="comment.gildings && comment.gildings.gid_3 ? ('🥉x' + comment.gildings.gid_3 + ' ') : ''" />
+            <Span :text="comment.author_flair_text ? comment.author_flair_text : ''"
+                  class="comment-author-flair"
+                  :style="{'background-color': comment.author_flair_background_color || '#767676'}" />
+          </FormattedString>
+        </IndentedLabel>
+        <IndentedLabel ref="commentBody"
+                       class="comment-body"
+                       textWrap="true"
+                       width="100%"
+                       @loaded="loadedBody($event)" />
+      </StackLayout>
+    </Ripple>
   </StackLayout>
 </template>
 
@@ -90,11 +92,11 @@ export default {
   watch: {
     $props: {
       handler(props) {
-        if (this.$refs.label && props.comment) {
-          this.refreshLabel(this.$refs.label.nativeView.android, props.comment);
+        if (this.$refs.commentBody && props.comment) {
+          this.refreshLabel(this.$refs.commentBody.nativeView.android, props.comment);
         }
-        if (this.$refs.labelHeader && props.comment) {
-          this.$refs.labelHeader.nativeView.android.setDepth(props.comment.depth);
+        if (this.$refs.commentHeader && props.comment) {
+          this.$refs.commentHeader.nativeView.android.setDepth(props.comment.depth);
         }
       },
       immediate: true,
@@ -102,8 +104,10 @@ export default {
     },
   },
   methods: {
-    loaded(event) {
+    loadedBody(event) {
       if (!this.isInitialized) {
+        Markdown.setOnTouchListener(event.object.nativeView, (event) => this.$refs.commentBodyRipple.nativeView.android.onTouchEvent(event));
+        Markdown.setOnClickListener(event.object.nativeView, () => this.selectComment(this.comment));
         Markdown.setSpannableFactory(event.object.nativeView);
         this.isInitialized = true;
       }
@@ -170,7 +174,7 @@ export default {
     padding: 40px;
   }
 
-  .comment-author, .comment-body {
+  .comment-header, .comment-body {
     font-size: 13px;
   }
 

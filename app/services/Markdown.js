@@ -88,6 +88,23 @@ export default class Markdown {
     this.getInstance().setMarkdown(tv, text.replace(/^#+(?=[^#\s])/gm, (m) => m + ' '));
   }
 
+  static setOnTouchListener(tv, listener) {
+    tv.setOnTouchListener(new android.view.View.OnTouchListener({
+      onTouch(v, event) {
+        listener(event);
+        return false;
+      },
+    }));
+  }
+
+  static setOnClickListener(tv, listener) {
+    tv.setOnClickListener(new android.view.View.OnClickListener({
+      onClick(v) {
+        listener();
+      },
+    }));
+  }
+
   static setSpannableFactory(tv) {
     tv.setSpannableFactory(io.noties.markwon.utils.NoCopySpannableFactory.getInstance());
   }
