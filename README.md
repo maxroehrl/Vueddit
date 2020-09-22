@@ -28,10 +28,10 @@ ns resources generate icons icon.png
 ns resources generate splashes splash.png --background #53ba82
 
 # Build a signed release APK
-# ns build android --release --key-store-path "XXX.jks" --key-store-password XXX --key-store-alias XXX --key-store-alias-password XXX
+ns build android --release --key-store-path "XXX.jks" --key-store-password XXX --key-store-alias XXX --key-store-alias-password XXX
 
 # Build a signed release bundle
-# ns build android --release --key-store-path "XXX.jks" --key-store-password XXX --key-store-alias XXX --key-store-alias-password XXX --aab
+ns build android --release --key-store-path "XXX.jks" --key-store-password XXX --key-store-alias XXX --key-store-alias-password XXX --aab
 ```
 
 ## Libraries used
