@@ -91,7 +91,6 @@ export default {
 
     navigateBack(data) {
       if (this.isShowingSubtree) {
-        this.isShowingSubtree = false;
         this.getComments();
         data.cancel = true;
       }
@@ -101,6 +100,7 @@ export default {
       return this.fetchComments().then((items) => {
         this.commentList = this.processComments(items);
         this.selectedComment = null;
+        this.isShowingSubtree = false;
         this.refreshCommentList();
       });
     },
