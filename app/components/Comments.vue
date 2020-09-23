@@ -19,6 +19,7 @@
           <Post :post="post" :app="app" />
           <SegmentedBar :items="sortings"
                         :padding="'40px'"
+                        marginBottom="20px"
                         :on-selection="setSorting" />
         </StackLayout>
       </v-template>
