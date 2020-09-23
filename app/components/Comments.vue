@@ -99,6 +99,7 @@ export default {
     getComments() {
       return this.fetchComments().then((items) => {
         this.commentList = this.processComments(items);
+        this.selectedComment = null;
         this.refreshCommentList();
       });
     },
