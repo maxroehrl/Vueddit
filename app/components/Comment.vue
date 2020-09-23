@@ -139,11 +139,13 @@ export default {
     },
 
     more(comment) {
-      const actions = [comment.saved ? 'Unsave' : 'Save'];
+      const actions = [
+        comment.saved ? 'Unsave' : 'Save',
+        'Goto /u/' + comment.author,
+      ];
       action({actions}).then((action) => {
         if (action === 'Save' || action === 'Unsave') {
-          const promise = comment.saved ? Reddit.unsave(comment.name) : Reddit.save(comment.name);
-          promise.then(() => comment.saved = !comment.saved);
+          Reddit.saveOrUnsave(comment);
         }
       });
     },

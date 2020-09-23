@@ -140,14 +140,9 @@ export default class Reddit {
     return this.post(`/api/vote?id=${id}&dir=${dir}`);
   }
 
-  static save(id, category) {
-    let url = `/api/save?id=${id}`;
-    url = category ? url + '&category=${category}' : url;
-    return this.post(url);
-  }
-
-  static unsave(id) {
-    return this.post(`/api/unsave?id=${id}`);
+  static saveOrUnsave(saveable) {
+    return this.post(`/api/${saveable.saved ? 'un' : ''}save?id=${saveable.name}`)
+        .then(() => saveable.saved = !saveable.saved);
   }
 
   static get(url) {

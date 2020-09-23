@@ -238,8 +238,7 @@ export default {
       }
       action({actions}).then((action) => {
         if (action === 'Save' || action === 'Unsave') {
-          const promise = post.saved ? Reddit.unsave(post.name) : Reddit.save(post.name);
-          promise.then(() => post.saved = !post.saved);
+          Reddit.saveOrUnsave(post);
         } else if (action.startsWith('Goto /r/')) {
           if (this.isUserReddit()) {
             this.$navigateBack();
