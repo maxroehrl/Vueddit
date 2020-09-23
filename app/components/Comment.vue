@@ -5,10 +5,10 @@
     <FlexboxLayout v-if="selected" class="button-bar">
       <Votes class="button-bar-child" :voteable="comment" />
       <Ripple v-for="i in buttonBar"
-              :key="i.text"
+              :key="i.$index"
               class="button-bar-child"
               @tap="i.tap">
-        <Label class="button-bar-label" :text="i.text" />
+        <Label class="button-bar-label" :text="i.text()" />
       </Ripple>
     </FlexboxLayout>
     <Ripple ref="commentBodyRipple" @tap="selectComment(comment)">
@@ -86,10 +86,10 @@ export default {
       isInitialized: false,
       buttonBarHeight: 70,
       buttonBar: [
-        {text: 'Done', tap: () => this.selectComment(null)},
-        {text: 'More', tap: () => this.more(this.comment)},
-        {text: this.comment.depth === 0 ? '▲ Prev' : '▲ Parent', tap: () => this.selectOther(0)},
-        {text: this.comment.depth === 0 ? 'Next ▼' : '▲ Root', tap: () => this.selectOther(1)},
+        {text: () => 'Done', tap: () => this.selectComment(null)},
+        {text: () => 'More', tap: () => this.more(this.comment)},
+        {text: () => this.comment.depth === 0 ? '▲ Prev' : '▲ Parent', tap: () => this.selectOther(0)},
+        {text: () => this.comment.depth === 0 ? 'Next ▼' : '▲ Root', tap: () => this.selectOther(1)},
       ],
     };
   },
