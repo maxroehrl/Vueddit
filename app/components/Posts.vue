@@ -22,6 +22,7 @@
     <v-template name="comment">
       <Comment :comment="post"
                :show-subreddit="true"
+               :goto-user-posts="app.gotoUserPosts"
                :select-comment="openCommentsByPermalink"
                width="100%" />
     </v-template>
@@ -33,7 +34,6 @@ import {ObservableArray} from '@nativescript/core/data/observable-array';
 import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
 import {action} from '@nativescript/core/ui/dialogs';
 import Reddit from '../services/Reddit';
-import Comments from './Comments';
 import PostHeader from './PostHeader';
 import Comment from './Comment';
 import showSnackbar from './Snackbar';
@@ -208,24 +208,11 @@ export default {
     },
 
     openComments(post) {
-      // explode (Android Lollipop(21) and up only), fade,
-      // flip (same as flipRight), flipRight, flipLeft,
-      // slide (same as slideLeft), slideLeft, slideRight, slideTop, slideBottom
-      this.$navigateTo(Comments, {
-        transition: 'slide',
-        props: {
-          app: this.app,
-          post,
-        },
-      });
+      this.app.openComments(post);
     },
 
     openCommentsByPermalink({permalink}) {
-      Reddit.getComments(permalink).then((r) => {
-        if (r && r.length === 2 && r[0].data && r[0].data.children && r[0].data.children.length === 1) {
-          this.openComments(r[0].data.children[0].data);
-        }
-      });
+      Reddit.getPostAndComments(permalink).then(({post}) => this.openComments(post));
     },
 
     onLongPress(post) {
@@ -240,10 +227,7 @@ export default {
         if (action === 'Save' || action === 'Unsave') {
           Reddit.saveOrUnsave(post);
         } else if (action.startsWith('Goto /r/')) {
-          if (this.isUserReddit()) {
-            this.$navigateBack();
-          }
-          this.app.setSubreddit({display_name: post.subreddit});
+          this.app.gotoSubreddit(post.subreddit);
         } else if (action.startsWith('Goto /u/')) {
           this.app.gotoUserPosts(post.author);
         }

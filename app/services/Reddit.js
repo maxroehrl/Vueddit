@@ -108,8 +108,19 @@ export default class Reddit {
     return this.get(url);
   }
 
-  static getComments(permalink, comment='', sort='top') {
-    return this.get(`${permalink}${comment}.json?raw_json=1&sort=${sort}`);
+  static getPostAndComments(permalink, comment='', sort='top') {
+    return this.get(`${permalink}${comment}.json?raw_json=1&sort=${sort}`).then((r) => {
+      if (r && r.length === 2 &&
+        r[0].data && r[0].data.children && r[0].data.children.length === 1 &&
+        r[1].data && r[1].data.children) {
+        return {
+          post: r[0].data.children[0].data,
+          comments: r[1].data.children.map((d) => d.data),
+        };
+      } else {
+        return Promise.reject(new Error('Failed to fetch post and comments for ' + permalink));
+      }
+    });
   }
 
   static getMoreComments(link, children) {

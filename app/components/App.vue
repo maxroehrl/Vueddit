@@ -49,14 +49,15 @@ import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
 import * as ApplicationSettings from '@nativescript/core/application-settings';
 import * as application from '@nativescript/core/application';
 import {AndroidApplication} from '@nativescript/core/application';
+import {ad} from '@nativescript/core/utils/utils';
 import showSnackbar from './Snackbar';
 import Posts from './Posts';
 import User from './User';
 import Subreddits from './Subreddits';
 import SidebarDialog from './SidebarDialog';
+import Comments from './Comments';
 import Reddit from '../services/Reddit';
 import store from '../store';
-import {ad} from '@nativescript/core/utils/utils';
 
 export default {
   name: 'App',
@@ -77,6 +78,7 @@ export default {
         mode: Mode.Indeterminate,
       },
       isSidebarDialogOpen: false,
+      navigationDepth: 0,
     };
   },
   methods: {
@@ -202,11 +204,28 @@ export default {
       }
     },
 
+    openComments(post) {
+      this.navigationDepth += 1;
+      this.$navigateTo(Comments, {
+        transition: 'slide',
+        props: {app: this, post},
+      });
+    },
+
     gotoUserPosts(user) {
+      this.navigationDepth += 1;
       this.$navigateTo(User, {
         transition: 'slide',
-        props: {user, app: this},
+        props: {app: this, user},
       });
+    },
+
+    gotoSubreddit(subreddit) {
+      for (let i = 0; i < this.navigationDepth; i++) {
+        this.$navigateBack();
+      }
+      this.setSubreddit({display_name: subreddit});
+      this.navigationDepth = 0;
     },
 
     visitSubreddit(subreddit) {

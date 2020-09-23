@@ -26,6 +26,7 @@
       <v-template name="comment">
         <Comment :comment="comment"
                  :selected="comment === selectedComment"
+                 :goto-user-posts="app.gotoUserPosts"
                  :select-comment="selectComment"
                  :select-neighboring-comment="selectNeighboringComment" />
       </v-template>
@@ -105,12 +106,7 @@ export default {
     },
 
     fetchComments(comment) {
-      return Reddit.getComments(this.post.permalink, comment, this.sorting).then((r) => {
-        if (r && r.length === 2 && r[1].data) {
-          return r[1].data.children.map((d) => d.data);
-        }
-        return [];
-      });
+      return Reddit.getPostAndComments(this.post.permalink, comment, this.sorting).then(({comments}) => comments);
     },
 
     refreshCommentList() {

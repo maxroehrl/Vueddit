@@ -65,6 +65,10 @@ export default {
       required: false,
       default: false,
     },
+    gotoUserPosts: {
+      type: Function,
+      required: true,
+    },
     selectComment: {
       type: Function,
       required: false,
@@ -146,6 +150,8 @@ export default {
       action({actions}).then((action) => {
         if (action === 'Save' || action === 'Unsave') {
           Reddit.saveOrUnsave(comment);
+        } else if (action.startsWith('Goto /u/')) {
+          this.gotoUserPosts(comment.author);
         }
       });
     },

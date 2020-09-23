@@ -25,8 +25,6 @@ import {Screen} from '@nativescript/core/platform';
 import MarkdownView from './MarkdownView';
 import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
-import User from './User';
-import Comments from './Comments';
 import PostHeader from './PostHeader';
 
 export default {
@@ -135,21 +133,7 @@ export default {
     openUrl(post) {
       if (post.domain === 'reddit.com') {
         const permalink = '/' + post.url.split('/').slice(3, 8).join('/') + '/';
-        Reddit.getComments(permalink).then((r) => {
-          if (r && r.length === 2 &&
-            r[0].data &&
-            r[0].data.children &&
-            r[0].data.children.length === 1 &&
-            r[0].data.children[0].data) {
-            this.$navigateTo(Comments, {
-              transition: 'slide',
-              props: {
-                app: this.app,
-                post: r[0].data.children[0].data,
-              },
-            });
-          }
-        });
+        Reddit.getPostAndComments(permalink).then(({post}) => this.app.openComments(post));
       } else {
         CustomTabs.openUrl(post.url);
       }
@@ -158,7 +142,7 @@ export default {
     showMoreOptions(post) {
       const actions = [
         post.saved ? 'Unsave' : 'Save',
-        // 'Goto /u/' + post.author, // Needs double back navigation if post is opened from user page
+        'Goto /u/' + post.author,
       ];
       if (post.subreddit !== this.app.subreddit.display_name && post.subreddit_type !== 'user') {
         actions.push('Goto /r/' + post.subreddit);
@@ -167,17 +151,9 @@ export default {
         if (action === 'Save' || action === 'Unsave') {
           Reddit.saveOrUnsave(post);
         } else if (action.startsWith('Goto /r/')) {
-          this.app.$navigateBack();
-          this.app.setSubreddit({display_name: post.subreddit});
+          this.app.gotoSubreddit(post.subreddit);
         } else if (action.startsWith('Goto /u/')) {
-          this.app.$navigateBack();
-          this.app.$navigateTo(User, {
-            transition: 'slide',
-            props: {
-              user: post.author,
-              app: this.app,
-            },
-          });
+          this.app.gotoUserPosts(post.author);
         }
       });
     },
