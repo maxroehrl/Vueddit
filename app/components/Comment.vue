@@ -3,16 +3,16 @@
                :style="{borderWidth: selected ? '6px' : '0 6px',
                         borderColor: selected ? '#53ba82' : '#53ba82 #080808'}">
     <FlexboxLayout v-if="selected" class="button-bar">
-      <Votes :voteable="comment" />
-      <Label text="Done"
-             class="button-bar-label"
-             @tap="selectComment(null)" />
-      <Label :text="comment.depth === 0 ? '▲ Prev' : '▲ Parent'"
-             class="button-bar-label"
-             @tap="selectOther(0)" />
-      <Label :text="comment.depth === 0 ? 'Next ▼' : '▲ Root'"
-             class="button-bar-label"
-             @tap="selectOther(1)" />
+      <Votes class="button-bar-child" :voteable="comment" />
+      <Ripple class="button-bar-child" @tap="selectComment(null)">
+        <Label class="button-bar-label" text="Done" />
+      </Ripple>
+      <Ripple class="button-bar-child" @tap="selectOther(0)">
+        <Label class="button-bar-label" :text="comment.depth === 0 ? '▲ Prev' : '▲ Parent'" />
+      </Ripple>
+      <Ripple class="button-bar-child" @tap="selectOther(1)">
+        <Label class="button-bar-label" :text="comment.depth === 0 ? 'Next ▼' : '▲ Root'" />
+      </Ripple>
     </FlexboxLayout>
     <Ripple ref="commentBodyRipple" @tap="selectComment(comment)">
       <StackLayout padding="0">
@@ -160,12 +160,15 @@ export default {
   }
 
   .button-bar {
-    padding: 0 40px;
     width: 100%;
     flex-direction: row;
     justify-content: space-between;
     border-bottom-color: #53ba82;
     border-bottom-width: 6px;
+  }
+
+  .button-bar-child {
+    width: 20%;
   }
 
   .button-bar-label {
