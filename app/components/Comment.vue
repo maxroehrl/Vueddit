@@ -188,9 +188,9 @@ export default {
   }
 
   .button-bar-label {
-    align-self: center;
+    text-align: center;
     font-size: 13px;
-    padding: 40px;
+    padding: 40px 0;
   }
 
   .comment-header, .comment-body {
