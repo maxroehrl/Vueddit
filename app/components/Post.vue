@@ -20,7 +20,6 @@
 </template>
 
 <script>
-import {action} from '@nativescript/core/ui/dialogs';
 import {Screen} from '@nativescript/core/platform';
 import MarkdownView from './MarkdownView';
 import CustomTabs from '../services/CustomTabs';
@@ -140,22 +139,7 @@ export default {
     },
 
     showMoreOptions(post) {
-      const actions = [
-        post.saved ? 'Unsave' : 'Save',
-        'Goto /u/' + post.author,
-      ];
-      if (post.subreddit !== this.app.subreddit.display_name && post.subreddit_type !== 'user') {
-        actions.push('Goto /r/' + post.subreddit);
-      }
-      action({actions}).then((action) => {
-        if (action === 'Save' || action === 'Unsave') {
-          Reddit.saveOrUnsave(post);
-        } else if (action.startsWith('Goto /r/')) {
-          this.app.gotoSubreddit(post.subreddit);
-        } else if (action.startsWith('Goto /u/')) {
-          this.app.gotoUserPosts(post.author);
-        }
-      });
+      this.app.showMoreDialog(post, post.subreddit_type !== 'user', true);
     },
   },
 };

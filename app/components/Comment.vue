@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import {action} from '@nativescript/core/ui/dialogs';
 import Reddit from '../services/Reddit';
 import Markdown from '../services/Markdown';
 import Votes from './Votes';
@@ -65,7 +64,7 @@ export default {
       required: false,
       default: false,
     },
-    gotoUserPosts: {
+    showMoreDialog: {
       type: Function,
       required: true,
     },
@@ -143,17 +142,7 @@ export default {
     },
 
     more(comment) {
-      const actions = [
-        comment.saved ? 'Unsave' : 'Save',
-        'Goto /u/' + comment.author,
-      ];
-      action({actions}).then((action) => {
-        if (action === 'Save' || action === 'Unsave') {
-          Reddit.saveOrUnsave(comment);
-        } else if (action.startsWith('Goto /u/')) {
-          this.gotoUserPosts(comment.author);
-        }
-      });
+      this.showMoreDialog(comment, false, true);
     },
 
     getTimeFromNow(comment) {

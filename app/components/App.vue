@@ -50,6 +50,7 @@ import * as ApplicationSettings from '@nativescript/core/application-settings';
 import * as application from '@nativescript/core/application';
 import {AndroidApplication} from '@nativescript/core/application';
 import {ad} from '@nativescript/core/utils/utils';
+import {action} from '@nativescript/core/ui/dialogs';
 import showSnackbar from './Snackbar';
 import Posts from './Posts';
 import User from './User';
@@ -226,6 +227,25 @@ export default {
       }
       this.setSubreddit({display_name: subreddit});
       this.navigationDepth = 0;
+    },
+
+    showMoreDialog({saved, subreddit, author, name}, showGotoSubreddit=true, showGotoUser=true) {
+      const actions = [saved ? 'Unsave' : 'Save'];
+      if (showGotoSubreddit && subreddit !== this.subreddit.display_name) {
+        actions.push('Goto /r/' + subreddit);
+      }
+      if (showGotoUser) {
+        actions.push('Goto /u/' + author);
+      }
+      action({actions}).then((action) => {
+        if (action === 'Save' || action === 'Unsave') {
+          Reddit.saveOrUnsave({name, saved});
+        } else if (action.startsWith('Goto /r/')) {
+          this.gotoSubreddit(subreddit);
+        } else if (action.startsWith('Goto /u/')) {
+          this.gotoUserPosts(author);
+        }
+      });
     },
 
     visitSubreddit(subreddit) {

@@ -22,7 +22,7 @@
     <v-template name="comment">
       <Comment :comment="post"
                :show-subreddit="true"
-               :goto-user-posts="app.gotoUserPosts"
+               :show-more-dialog="app.showMoreDialog"
                :select-comment="openCommentsByPermalink"
                width="100%" />
     </v-template>
@@ -216,22 +216,7 @@ export default {
     },
 
     onLongPress(post) {
-      const actions = [post.saved ? 'Unsave' : 'Save'];
-      if (post.subreddit !== this.subreddit.display_name) {
-        actions.push('Goto /r/' + post.subreddit);
-      }
-      if (!this.isUserReddit()) {
-        actions.push('Goto /u/' + post.author);
-      }
-      action({actions}).then((action) => {
-        if (action === 'Save' || action === 'Unsave') {
-          Reddit.saveOrUnsave(post);
-        } else if (action.startsWith('Goto /r/')) {
-          this.app.gotoSubreddit(post.subreddit);
-        } else if (action.startsWith('Goto /u/')) {
-          this.app.gotoUserPosts(post.author);
-        }
-      });
+      this.app.showMoreDialog(post, true, !this.isUserReddit());
     },
   },
 };

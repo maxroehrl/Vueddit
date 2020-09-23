@@ -26,7 +26,7 @@
       <v-template name="comment">
         <Comment :comment="comment"
                  :selected="comment === selectedComment"
-                 :goto-user-posts="app.gotoUserPosts"
+                 :show-more-dialog="app.showMoreDialog"
                  :select-comment="selectComment"
                  :select-neighboring-comment="selectNeighboringComment" />
       </v-template>
