@@ -164,7 +164,7 @@ export default {
         actions.push('Goto /r/' + post.subreddit);
       }
       action({actions}).then((action) => {
-        if (action === 'Save') {
+        if (action === 'Save' || action === 'Unsave') {
           const promise = post.saved ? Reddit.unsave(post.name) : Reddit.save(post.name);
           promise.then(() => post.saved = !post.saved);
         } else if (action.startsWith('Goto /r/')) {
