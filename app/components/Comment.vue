@@ -4,14 +4,11 @@
                         borderColor: selected ? '#53ba82' : '#53ba82 #080808'}">
     <FlexboxLayout v-if="selected" class="button-bar">
       <Votes class="button-bar-child" :voteable="comment" />
-      <Ripple class="button-bar-child" @tap="selectComment(null)">
-        <Label class="button-bar-label" text="Done" />
-      </Ripple>
-      <Ripple class="button-bar-child" @tap="selectOther(0)">
-        <Label class="button-bar-label" :text="comment.depth === 0 ? '▲ Prev' : '▲ Parent'" />
-      </Ripple>
-      <Ripple class="button-bar-child" @tap="selectOther(1)">
-        <Label class="button-bar-label" :text="comment.depth === 0 ? 'Next ▼' : '▲ Root'" />
+      <Ripple v-for="i in buttonBar"
+              :key="i.text"
+              class="button-bar-child"
+              @tap="i.tap">
+        <Label class="button-bar-label" :text="i.text" />
       </Ripple>
     </FlexboxLayout>
     <Ripple ref="commentBodyRipple" @tap="selectComment(comment)">
@@ -50,6 +47,7 @@
 </template>
 
 <script>
+import {action} from '@nativescript/core/ui/dialogs';
 import Reddit from '../services/Reddit';
 import Markdown from '../services/Markdown';
 import Votes from './Votes';
@@ -87,6 +85,12 @@ export default {
     return {
       isInitialized: false,
       buttonBarHeight: 70,
+      buttonBar: [
+        {text: 'Done', tap: () => this.selectComment(null)},
+        {text: 'More', tap: () => this.more(this.comment)},
+        {text: this.comment.depth === 0 ? '▲ Prev' : '▲ Parent', tap: () => this.selectOther(0)},
+        {text: this.comment.depth === 0 ? 'Next ▼' : '▲ Root', tap: () => this.selectOther(1)},
+      ],
     };
   },
   watch: {
@@ -132,6 +136,16 @@ export default {
       const next = buttonIndex === 1 && depth === 0;
       depth = (buttonIndex === 1 || depth === 0) ? 0 : depth - 1;
       this.selectNeighboringComment(this.comment, depth, next);
+    },
+
+    more(comment) {
+      const actions = [comment.saved ? 'Unsave' : 'Save'];
+      action({actions}).then((action) => {
+        if (action === 'Save' || action === 'Unsave') {
+          const promise = comment.saved ? Reddit.unsave(comment.name) : Reddit.save(comment.name);
+          promise.then(() => comment.saved = !comment.saved);
+        }
+      });
     },
 
     getTimeFromNow(comment) {
