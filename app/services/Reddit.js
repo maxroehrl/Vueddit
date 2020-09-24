@@ -181,17 +181,16 @@ export default class Reddit {
     return this.getPreview(post, Screen.mainScreen.widthPixels, {url: ''});
   }
 
-  static getPreview(post, width=300, noPreview={url: 'res://ic_comment_text_multiple_outline_white_48dp'}) {
+  static getPreview(post, preferredWidth=300, noPreview={url: 'res://ic_comment_text_multiple_outline_white_48dp'}) {
     if (post && post.preview && post.preview.images && post.preview.images[0] && post.preview.images[0].resolutions) {
-      return this.getPreferredPreviewSize(post.preview.images[0].resolutions, width);
+      const resolutions = post.preview.images[0].resolutions;
+      const distArr = resolutions.map((resolution) => Math.abs(resolution.width - preferredWidth));
+      return resolutions[distArr.indexOf(Math.min(...distArr))];
+    } else if (post.thumbnail && post.thumbnail !== 'self') {
+      return {url: post.thumbnail, height: post.thumbnail_height, width: post.thumbnail_width};
     } else {
       return noPreview;
     }
-  }
-
-  static getPreferredPreviewSize(resolutions, preferredWidth) {
-    const distArr = resolutions.map((e) => Math.abs(e.width - preferredWidth));
-    return resolutions[distArr.indexOf(Math.min(...distArr))];
   }
 
   static getAspectFixHeight({height, width}) {

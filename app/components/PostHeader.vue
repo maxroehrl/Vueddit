@@ -45,12 +45,12 @@
       </Ripple>
     </StackLayout>
     <Ripple v-if="bigPreview"
-            :height="bigPreview ? getImageHeight(post) : '0'"
+            :height="getImageHeight(post)"
             width="100%"
             @longPress="onLongPress(post)"
             @tap="onTab(post)">
-      <CachedImage :src="bigPreview && getImage(post)"
-                   :height="bigPreview ? getImageHeight(post) : '0'"
+      <CachedImage :src="getImage(post)"
+                   :height="getImageHeight(post)"
                    width="100%" />
     </Ripple>
   </StackLayout>

@@ -80,21 +80,25 @@ export default {
 
     getVideo(post) {
       if (post.secure_media_embed && post.secure_media_embed.media_domain_url) {
-        post.secure_media_embed.src = post.secure_media_embed.media_domain_url;
-        return post.secure_media_embed;
+        return this.getVideoObject(post.secure_media_embed, 'media_domain_url');
       } else if (post.secure_media && post.secure_media.reddit_video) {
-        post.secure_media.reddit_video.src = this.getRedditDashVideoPlayerHtml(post.secure_media.reddit_video);
-        return post.secure_media.reddit_video;
+        return this.getVideoObject(post.secure_media.reddit_video, 'dash');
       } else if (post.preview && post.preview.reddit_video_preview) {
-        post.preview.reddit_video_preview.src = this.getRedditDashVideoPlayerHtml(post.preview.reddit_video_preview);
-        return post.preview.reddit_video_preview;
+        return this.getVideoObject(post.preview.reddit_video_preview, 'dash');
       } else if (post.preview && post.preview.images && post.preview.images.length &&
           post.preview.images[0].variants && post.preview.images[0].variants.mp4) {
-        post.preview.images[0].variants.mp4.source.src = post.preview.images[0].variants.mp4.source.url;
-        return post.preview.images[0].variants.mp4.source;
+        return this.getVideoObject(post.preview.images[0].variants.mp4.source, 'url');
       } else {
         return null;
       }
+    },
+
+    getVideoObject(source, srcProp='src', heightProp='height', widthProp='width') {
+      return {
+        src: srcProp === 'dash' ? this.getRedditDashVideoPlayerHtml(source) : source[srcProp],
+        height: source[heightProp],
+        width: source[widthProp],
+      };
     },
 
     getRedditDashVideoPlayerHtml(video) {
@@ -130,7 +134,7 @@ export default {
     },
 
     openUrl(post) {
-      if (post.domain === 'reddit.com') {
+      if (post.domain === 'reddit.com' && !post.url.startsWith('https://www.reddit.com/gallery/')) {
         const permalink = '/' + post.url.split('/').slice(3, 8).join('/') + '/';
         Reddit.getPostAndComments(permalink).then(({post}) => this.app.openComments(post));
       } else {
