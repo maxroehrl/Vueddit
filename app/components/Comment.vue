@@ -11,7 +11,7 @@
         <Label class="button-bar-label" :text="i.text()" />
       </Ripple>
     </FlexboxLayout>
-    <Ripple ref="commentBodyRipple" @tap="selectComment(comment)">
+    <Ripple ref="commentBodyRipple" @tap="tap(comment)">
       <StackLayout padding="0">
         <IndentedLabel ref="commentHeader"
                        class="comment-header"
@@ -26,6 +26,8 @@
                   class="comment-votes" />
             <Span :text="getTimeFromNow(comment) + ' '"
                   class="comment-created" />
+            <Span :text="isCollapsed(comment) ? '[+] (' + comment.children.length + ` child${comment.children.length !== 1 ? 'ren' : ''}) ` : ''"
+                  class="comment-subreddit" />
             <Span :text="showSubreddit ? 'in /r/' + comment.subreddit + ' ' : ''"
                   class="comment-subreddit" />
             <Span :text="comment.gildings && comment.gildings.gid_1 ? ('🥈x' + comment.gildings.gid_1 + ' ') : ''" />
@@ -78,6 +80,11 @@ export default {
       required: false,
       default(comment, depth, next) {},
     },
+    collapse: {
+      type: Function,
+      required: false,
+      default(comment) {},
+    },
     showSubreddit: {
       type: Boolean,
       required: false,
@@ -90,6 +97,7 @@ export default {
       buttonBarHeight: 70,
       buttonBar: [
         {text: () => 'Done', tap: () => this.selectComment(null)},
+        {text: () => 'Hide', tap: () => this.collapse(this.comment)},
         {text: () => 'More', tap: () => this.more(this.comment)},
         {text: () => this.comment.depth === 0 ? '▲ Prev' : '▲ Parent', tap: () => this.selectOther(0)},
         {text: () => this.comment.depth === 0 ? 'Next ▼' : '▲ Root', tap: () => this.selectOther(1)},
@@ -114,7 +122,7 @@ export default {
     loadedBody(event) {
       if (!this.isInitialized) {
         Markdown.setOnTouchListener(event.object.nativeView, (event) => this.$refs.commentBodyRipple.nativeView.android.onTouchEvent(event));
-        Markdown.setOnClickListener(event.object.nativeView, () => this.selectComment(this.comment));
+        Markdown.setOnClickListener(event.object.nativeView, () => this.tap(this.comment));
         Markdown.setSpannableFactory(event.object.nativeView);
         this.isInitialized = true;
       }
@@ -131,7 +139,19 @@ export default {
 
     refreshLabel(tv, comment) {
       tv.setDepth(comment.depth, 50);
-      Markdown.setMarkdown(tv, comment.body);
+      Markdown.setMarkdown(tv, this.isCollapsed(comment) ? '' : comment.body);
+    },
+
+    isCollapsed(comment) {
+      return comment.children;
+    },
+
+    tap(comment) {
+      if (comment && this.isCollapsed(comment)) {
+        this.collapse(comment);
+      } else {
+        this.selectComment(comment);
+      }
     },
 
     selectOther(buttonIndex) {
@@ -179,13 +199,14 @@ export default {
   }
 
   .button-bar-child {
-    width: 20%;
+    width: 16%;
   }
 
   .button-bar-label {
     text-align: center;
-    font-size: 13px;
+    font-size: 11px;
     padding: 40px 0;
+    text-transform: uppercase;
   }
 
   .comment-header, .comment-body {

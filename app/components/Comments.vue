@@ -28,7 +28,8 @@
                  :selected="comment === selectedComment"
                  :show-more-dialog="app.showMoreDialog"
                  :select-comment="selectComment"
-                 :select-neighboring-comment="selectNeighboringComment" />
+                 :select-neighboring-comment="selectNeighboringComment"
+                 :collapse="collapse" />
       </v-template>
       <v-template name="more">
         <More :comment="comment" :on-click="loadMore" />
@@ -124,6 +125,7 @@ export default {
         if (comment.replies && comment.replies !== '') {
           comment.replies.data.children.map((d) => d.data).forEach(addAllChildren);
         }
+        delete comment.replies;
       };
       items.forEach(addAllChildren);
       return new ObservableArray(commentList);
@@ -183,6 +185,37 @@ export default {
         if (newlySelectedComment) {
           this.selectComment(newlySelectedComment, true);
         }
+      }
+    },
+
+    collapse(comment) {
+      const index = this.commentList.indexOf(comment);
+      if (comment.children) {
+        // Restore current and child comments
+        if (comment.children.length) {
+          this.commentList.splice(index + 1, 0, ...comment.children);
+          delete comment.children;
+          this.refreshCommentList();
+        } else {
+          delete comment.children;
+        }
+        this.selectComment(comment);
+      } else {
+        // Collapse current and child comments
+        let nextIndex = index;
+        for (let i = index + 1; i < this.commentList.length; i++) {
+          if (this.commentList.getItem(i).depth <= comment.depth) {
+            nextIndex = i;
+            break;
+          }
+        }
+        if (nextIndex - index > 1) {
+          comment.children = this.commentList.splice(index + 1, nextIndex - index - 1);
+          this.refreshCommentList();
+        } else {
+          comment.children = [];
+        }
+        this.selectComment(null);
       }
     },
 
