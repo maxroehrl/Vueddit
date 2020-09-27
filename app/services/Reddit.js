@@ -201,8 +201,8 @@ export default class Reddit {
     }
   }
 
-  static getTimeFromNow(post) {
-    return moment(post.created_utc * 1000).fromNow();
+  static getTimeFromNow(unixTime) {
+    return moment(unixTime * 1000).fromNow();
   }
 
   static getUnixTime() {

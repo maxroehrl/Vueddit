@@ -98,7 +98,7 @@ export default {
     },
 
     getTimeFromNow(post) {
-      return Reddit.getTimeFromNow(post);
+      return Reddit.getTimeFromNow(post.created_utc) + (post.edited ? ' *' : '');
     },
 
     getImage(post) {

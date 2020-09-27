@@ -24,7 +24,7 @@
                   :style="{color: getUserColor(comment)}" />
             <Span :text="comment.ups + ' points '"
                   class="comment-votes" />
-            <Span :text="getTimeFromNow(comment) + ' '"
+            <Span :text="getTimeFromNow(comment)"
                   class="comment-created" />
             <Span :text="isCollapsed(comment) ? '[+] (' + comment.children.length + ` child${comment.children.length !== 1 ? 'ren' : ''}) ` : ''"
                   class="comment-subreddit" />
@@ -166,7 +166,7 @@ export default {
     },
 
     getTimeFromNow(comment) {
-      return Reddit.getTimeFromNow(comment);
+      return Reddit.getTimeFromNow(comment.created_utc) + (comment.edited ? '* ' : ' ');
     },
 
     getUserColor(comment) {
