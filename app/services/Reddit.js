@@ -58,7 +58,7 @@ export default class Reddit {
         if (error === 'access_denied') {
           app.android.foregroundActivity.finish();
         } else {
-          console.log('Login error: ', error);
+          console.error('Login error: ', error);
         }
       }
     }

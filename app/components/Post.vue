@@ -22,7 +22,6 @@
 <script>
 import {Screen} from '@nativescript/core/platform';
 import MarkdownView from './MarkdownView';
-import CustomTabs from '../services/CustomTabs';
 import Reddit from '../services/Reddit';
 import PostHeader from './PostHeader';
 
@@ -134,17 +133,7 @@ export default {
     },
 
     openUrl(post) {
-      if (post.domain === 'reddit.com' && !post.is_gallery) {
-        this.openComments('/' + post.url.split('/').slice(3, 8).join('/') + '/');
-      } else if (/\/r\/\S+\/comments\/\S+\/\S+\//.test(post.url)) {
-        this.openComments(post.url);
-      } else {
-        CustomTabs.openUrl(post.url);
-      }
-    },
-
-    openComments(permalink) {
-      return Reddit.getPostAndComments(permalink).then(({post}) => this.app.openComments(post));
+      this.app.openUrl(post.url, !post.crosspost_parent);
     },
 
     showMoreOptions(post) {

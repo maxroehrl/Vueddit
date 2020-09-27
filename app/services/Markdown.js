@@ -1,9 +1,8 @@
 import * as app from '@nativescript/core/application';
-import CustomTabs from './CustomTabs';
 
 export default class Markdown {
   static markwon;
-  static urlOpenCallback = (link, view) => CustomTabs.openUrl(link);
+  static urlOpenCallback = (link, view) => console.log(link);
 
   static getInstance() {
     if (!this.markwon) {
@@ -19,14 +18,14 @@ export default class Markdown {
   static getUrlPlugin() {
     // https://developer.android.com/reference/android/text/util/Linkify
     const Pattern = java.util.regex.Pattern;
-    // Match users (/u/username) and subreddits (/r/subreddit)
-    const mask = Pattern.compile('(\\/(r|u)\\/[^\\s]+)|((?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)' +
+    // Match users (/u(ser)?/username) and subreddits (/r/subreddit)
+    const mask = Pattern.compile('(\\/(r|u|user)\\/[^\\s]+)|((?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)' +
       '(([\\w\\-]+\\.){1,}?([\\w\\-.~]+\\/?)*' +
       '[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};\']*))',
     Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
     const transformFilter = new android.text.util.Linkify.TransformFilter({
       transformUrl(match, url) {
-        if (url.startsWith('/r/') || url.startsWith('/u/')) {
+        if (url.startsWith('/r/') || url.startsWith('/u/') || url.startsWith('/user/')) {
           return 'https://reddit.com' + url;
         }
         return url;

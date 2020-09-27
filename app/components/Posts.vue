@@ -23,7 +23,7 @@
       <Comment :comment="post"
                :show-subreddit="true"
                :show-more-dialog="app.showMoreDialog"
-               :select-comment="openCommentsByPermalink"
+               :select-comment="openComments"
                width="100%" />
     </v-template>
   </RadListView>
@@ -207,12 +207,8 @@ export default {
       }
     },
 
-    openComments(post) {
-      this.app.openComments(post);
-    },
-
-    openCommentsByPermalink({permalink}) {
-      Reddit.getPostAndComments(permalink).then(({post}) => this.openComments(post));
+    openComments(postOrComment) {
+      this.app.openComments(postOrComment.body ? postOrComment.permalink : postOrComment);
     },
 
     onLongPress(post) {

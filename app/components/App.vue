@@ -58,6 +58,8 @@ import Subreddits from './Subreddits';
 import SidebarDialog from './SidebarDialog';
 import Comments from './Comments';
 import Reddit from '../services/Reddit';
+import CustomTabs from '../services/CustomTabs';
+import Markdown from '../services/Markdown';
 import store from '../store';
 
 export default {
@@ -86,6 +88,7 @@ export default {
     loaded() {
       if (this.refreshAll) {
         store.subscribe(((mutation, state) => ApplicationSettings.setString('store', JSON.stringify(state))));
+        Markdown.setUrlOpenCallback(this.openUrl.bind(this));
         this.login();
       }
       application.android.on(AndroidApplication.activityBackPressedEvent, this.navigateBack, this);
@@ -205,12 +208,38 @@ export default {
       }
     },
 
-    openComments(post) {
-      this.navigationDepth += 1;
-      this.$navigateTo(Comments, {
-        transition: 'slide',
-        props: {app: this, post},
-      });
+    openUrl(url, customTabs=false) {
+      if (!customTabs && url.startsWith('https://www.reddit.com/') && !url.startsWith('https://www.reddit.com/gallery/')) {
+        if (/https:\/\/www.reddit.com\/r\/\S+\/comments\/\S+\/\S+\//.test(url)) {
+          this.openComments('/' + url.split('/').slice(3, 8).join('/') + '/');
+        } else if (/https:\/\/www.reddit.com\/u(ser)?\/\S+\//.test(url)) {
+          this.gotoUserPosts(url.split('/')[4]);
+        } else if (/https:\/\/www.reddit.com\/r\/\S+\//.test(url)) {
+          this.gotoSubreddit(url.split('/')[4]);
+        }
+      } else if (!customTabs && /\/r\/\S+\/comments\/\S+\/\S+\//.test(url)) {
+        this.openComments(url);
+      } else if (!customTabs && url.startsWith('/u/') || url.startsWith('/user/')) {
+        this.gotoUserPosts(url.split('/')[2]);
+      } else if (!customTabs && url.startsWith('/r/')) {
+        this.gotoSubreddit(url.split('/')[2]);
+      } else if (android.util.Patterns.WEB_URL.matcher(url).matches()) {
+        CustomTabs.openUrl(url);
+      } else {
+        console.error('Invalid url: ' + url);
+      }
+    },
+
+    openComments(postOrComment) {
+      if (typeof postOrComment === 'string') {
+        Reddit.getPostAndComments(postOrComment).then(({post}) => this.openComments(post));
+      } else {
+        this.navigationDepth += 1;
+        this.$navigateTo(Comments, {
+          transition: 'slide',
+          props: {app: this, post: postOrComment},
+        });
+      }
     },
 
     gotoUserPosts(user) {
