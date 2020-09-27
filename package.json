@@ -10,7 +10,7 @@
     "url": "git+https://github.com/maxroehrl/Vueddit.git"
   },
   "dependencies": {
-    "@nativescript/core": "7.0.3",
+    "@nativescript/core": "7.0.7",
     "@nativescript/theme": "^2.3.3",
     "@nstudio/nativescript-loading-indicator": "^4.0.0",
     "@vue/devtools": "^5.3.3",
@@ -35,10 +35,10 @@
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.11.5",
     "@nativescript/android": "7.0.0",
-    "@nativescript/webpack": "3.0.4",
+    "@nativescript/webpack": "3.0.5",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
-    "eslint": "^7.9.0",
+    "eslint": "^7.10.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-i-am-meticulous": "^12.0.0",
     "eslint-loader": "^4.0.2",
