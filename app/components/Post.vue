@@ -134,12 +134,17 @@ export default {
     },
 
     openUrl(post) {
-      if (post.domain === 'reddit.com' && !post.url.startsWith('https://www.reddit.com/gallery/')) {
-        const permalink = '/' + post.url.split('/').slice(3, 8).join('/') + '/';
-        Reddit.getPostAndComments(permalink).then(({post}) => this.app.openComments(post));
+      if (post.domain === 'reddit.com' && !post.is_gallery) {
+        this.openComments('/' + post.url.split('/').slice(3, 8).join('/') + '/');
+      } else if (/\/r\/\S+\/comments\/\S+\/\S+\//.test(post.url)) {
+        this.openComments(post.url);
       } else {
         CustomTabs.openUrl(post.url);
       }
+    },
+
+    openComments(permalink) {
+      return Reddit.getPostAndComments(permalink).then(({post}) => this.app.openComments(post));
     },
 
     showMoreOptions(post) {

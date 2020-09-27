@@ -186,7 +186,7 @@ export default class Reddit {
       const resolutions = post.preview.images[0].resolutions;
       const distArr = resolutions.map((resolution) => Math.abs(resolution.width - preferredWidth));
       return resolutions[distArr.indexOf(Math.min(...distArr))];
-    } else if (post.thumbnail && post.thumbnail !== 'self') {
+    } else if (post.thumbnail && !['self', 'default'].includes(post.thumbnail)) {
       return {url: post.thumbnail, height: post.thumbnail_height, width: post.thumbnail_width};
     } else {
       return noPreview;
