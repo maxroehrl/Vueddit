@@ -1,9 +1,7 @@
 <template>
-  <Ripple ref="ripple">
-    <Label ref="label"
-           textWrap="true"
-           @loaded="loaded($event)" />
-  </Ripple>
+  <Label ref="label"
+         textWrap="true"
+         @loaded="loaded($event)" />
 </template>
 
 <script>
@@ -31,7 +29,6 @@ export default {
   methods: {
     loaded(event) {
       if (this.text) {
-        Markdown.setOnTouchListener(event.object.nativeView, (event) => this.$refs.ripple.nativeView.android.onTouchEvent(event));
         this.updateMarkdown(event.object.nativeView, this.text);
       }
     },
