@@ -38,6 +38,9 @@
       <v-template name="more">
         <More :comment="comment" :on-click="loadMore" />
       </v-template>
+      <v-template name="load">
+        <ActivityIndicator busy="true" color="#53ba82" />
+      </v-template>
     </RadListView>
   </Page>
 </template>
@@ -68,7 +71,7 @@ export default {
   },
   data() {
     return {
-      commentList: new ObservableArray([]),
+      commentList: new ObservableArray([{loading: true}]),
       markdownCache: {},
       isShowingSubtree: false,
       selectedComment: null,
@@ -78,7 +81,7 @@ export default {
   },
   methods: {
     templateSelector(item) {
-      return (item && item.body) ? 'comment' : 'more';
+      return (item && item.loading) ? 'load' : (item && item.body) ? 'comment' : 'more';
     },
 
     onPullDown(args) {
@@ -86,7 +89,7 @@ export default {
     },
 
     loaded() {
-      if (!this.commentList.length) {
+      if (this.commentList.getItem(0) && this.commentList.getItem(0).loading) {
         this.getComments();
       }
       application.android.on(AndroidApplication.activityBackPressedEvent, this.navigateBack, this);
@@ -103,18 +106,14 @@ export default {
       }
     },
 
-    getComments() {
-      return this.fetchComments().then((items) => {
-        this.commentList = this.processComments(items);
+    getComments(comment='') {
+      this.commentList = new ObservableArray([{loading: true}]);
+      return Reddit.getPostAndComments(this.post.permalink, comment, this.sorting).then(({comments}) => {
+        this.isShowingSubtree = comment !== '';
         this.selectedComment = null;
-        this.isShowingSubtree = false;
-        this.markdownCache = {};
-        this.refreshCommentList();
+        this.commentList.splice(0, 1, ...this.processComments(comments));
+        this.$refs.commentList.nativeView.refresh();
       });
-    },
-
-    fetchComments(comment) {
-      return Reddit.getPostAndComments(this.post.permalink, comment, this.sorting).then(({comments}) => comments);
     },
 
     refreshCommentList() {
@@ -129,7 +128,7 @@ export default {
       const commentList = [];
       const addAllChildren = (comment) => {
         commentList.push(comment);
-        if (comment.body) {
+        if (comment.body && (comment.edited || !this.markdownCache[comment.name])) {
           this.markdownCache[comment.name] = Markdown.toMarkdown(comment.body);
         }
         if (comment.replies && comment.replies !== '') {
@@ -139,16 +138,12 @@ export default {
       };
       items.forEach(addAllChildren);
       this.post.shown_comments = commentList.length;
-      return new ObservableArray(commentList);
+      return commentList;
     },
 
     loadMore(comment) {
       if (comment.count === 0) {
-        return this.fetchComments(comment.parent_id.split('_')[1]).then((items) => {
-          this.isShowingSubtree = true;
-          this.commentList = this.processComments(items);
-          this.refreshCommentList();
-        });
+        return this.getComments(comment.parent_id.split('_')[1]);
       } else {
         return Reddit.getMoreComments(this.post.name, comment.children).then((r) => {
           if (r && r.json && r.json.data && r.json.data.things) {
