@@ -217,8 +217,11 @@ export default {
         } else if (new RegExp('^/u(ser)?/[^\\s;.]+$').test(path)) {
           return this.gotoUserPosts(path.split('/')[2]);
         } else if (new RegExp('^/r/[^\\s;.]+$').test(path)) {
-          if (this.subreddit.display_name !== path.split('/')[2]) {
-            this.gotoSubreddit(path.split('/')[2]);
+          const name = path.split('/')[2].toLowerCase();
+          if (this.subreddit.display_name.toLowerCase() !== name) {
+            this.gotoSubreddit(name);
+          } else {
+            showSnackbar({snackText: 'Already in subreddit /r/' + this.subreddit.display_name});
           }
           return;
         }
