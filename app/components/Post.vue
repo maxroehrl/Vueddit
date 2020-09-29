@@ -15,7 +15,7 @@
                   :text="post.selftext"
                   class="post-text" />
     <Label class="num-comments"
-           :text="post.num_comments + ' comment' + (post.num_comments === 1 ? '' : 's')" />
+           :text="'Showing ' + post.shown_comments + ' comment' + (post.shown_comments === 1 ? '' : 's')" />
   </StackLayout>
 </template>
 

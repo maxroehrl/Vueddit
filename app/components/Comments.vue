@@ -138,6 +138,7 @@ export default {
         delete comment.replies;
       };
       items.forEach(addAllChildren);
+      this.post.shown_comments = commentList.length;
       return new ObservableArray(commentList);
     },
 

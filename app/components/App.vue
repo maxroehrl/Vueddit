@@ -232,7 +232,10 @@ export default {
 
     openComments(postOrComment) {
       if (typeof postOrComment === 'string') {
-        Reddit.getPostAndComments(postOrComment).then(({post}) => this.openComments(post));
+        Reddit.getPostAndComments(postOrComment).then(({post}) => {
+          post.shown_comments = post.num_comments;
+          this.openComments(post);
+        });
       } else {
         this.navigationDepth += 1;
         this.$navigateTo(Comments, {

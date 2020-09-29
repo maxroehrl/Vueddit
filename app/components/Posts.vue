@@ -190,6 +190,7 @@ export default {
             const items = r.data.children.map((d) => d.data);
             if (items.length) {
               this.lastPostId = items[items.length - 1].name;
+              items.forEach((post) => post.shown_comments = post.num_comments);
               this.postList.push(...items);
               return items;
             } else if (!lastPostId) {
