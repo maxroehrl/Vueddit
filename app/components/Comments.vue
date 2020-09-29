@@ -51,6 +51,7 @@ import Comment from './Comment';
 import Post from './Post';
 import More from './More';
 import SegmentedBar from './SegmentedBar';
+import Markdown from '../services/Markdown';
 
 export default {
   name: 'Comments',
@@ -128,6 +129,9 @@ export default {
       const commentList = [];
       const addAllChildren = (comment) => {
         commentList.push(comment);
+        if (comment.body) {
+          this.markdownCache[comment.name] = Markdown.toMarkdown(comment.body);
+        }
         if (comment.replies && comment.replies !== '') {
           comment.replies.data.children.map((d) => d.data).forEach(addAllChildren);
         }
