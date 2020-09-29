@@ -3,6 +3,7 @@ import * as app from '@nativescript/core/application';
 export default class Markdown {
   static markwon;
   static urlOpenCallback = (url) => console.log(url);
+  static malformedHadingRegex = /^#+(?=[^#\s])/gm;
 
   static getInstance() {
     if (!this.markwon) {
@@ -92,11 +93,20 @@ export default class Markdown {
     this.urlOpenCallback = urlOpenCallback;
   }
 
+  static toMarkdown(text) {
+    return this.getInstance().toMarkdown(this.fixMarkdownHeadings(text));
+  }
+
   static setMarkdown(tv, text) {
-    if (!text) {
-      text = '';
-    }
-    this.getInstance().setMarkdown(tv, text.replace(/^#+(?=[^#\s])/gm, (m) => m + ' '));
+    this.getInstance().setMarkdown(tv, this.fixMarkdownHeadings(text));
+  }
+
+  static setParsedMarkdown(tv, spanned) {
+    this.getInstance().setParsedMarkdown(tv, spanned);
+  }
+
+  static fixMarkdownHeadings(text) {
+    return (text || '').replace(this.malformedHadingRegex, (m) => m + ' ');
   }
 
   static setOnTouchListener(tv, listener) {

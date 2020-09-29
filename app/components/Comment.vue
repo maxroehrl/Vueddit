@@ -90,6 +90,10 @@ export default {
       required: false,
       default: false,
     },
+    markdownCache: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -102,6 +106,7 @@ export default {
         {text: () => this.comment.depth === 0 ? '▲ Prev' : '▲ Parent', tap: () => this.selectOther(0)},
         {text: () => this.comment.depth === 0 ? 'Next ▼' : '▲ Root', tap: () => this.selectOther(1)},
       ],
+      emptySpan: null,
     };
   },
   watch: {
@@ -139,7 +144,15 @@ export default {
 
     refreshLabel(tv, comment) {
       tv.setDepth(comment.depth, 50);
-      Markdown.setMarkdown(tv, this.isCollapsed(comment) ? '' : comment.body);
+      let spanned = this.markdownCache[comment.name];
+      if (!spanned) {
+        spanned = Markdown.toMarkdown(comment.body);
+        this.markdownCache[comment.name] = spanned;
+      }
+      if (!this.emptySpan && this.isCollapsed(comment)) {
+        this.emptySpan = Markdown.toMarkdown('');
+      }
+      Markdown.setParsedMarkdown(tv, this.isCollapsed(comment) ? this.emptySpan : spanned);
     },
 
     isCollapsed(comment) {

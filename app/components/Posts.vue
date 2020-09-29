@@ -24,7 +24,7 @@
                :show-subreddit="true"
                :show-more-dialog="app.showMoreDialog"
                :select-comment="openComments"
-               width="100%" />
+               :markdown-cache="markdownCache" />
     </v-template>
   </RadListView>
 </template>
@@ -73,6 +73,7 @@ export default {
       selectedTemplate: null,
       sorting: this.sortings[0],
       time: 'all',
+      markdownCache: {},
       loadingIndicator: new LoadingIndicator(),
       loadingIndicatorOptions: {
         hideBezel: true,
@@ -163,6 +164,7 @@ export default {
 
     refresh() {
       this.postList = new ObservableArray([]);
+      this.markdownCache = {};
       this.lastPostId = null;
       return this.getPosts().then(() => {
         if (this.$refs.postList) {

@@ -32,7 +32,8 @@
                  :show-more-dialog="app.showMoreDialog"
                  :select-comment="selectComment"
                  :select-neighboring-comment="selectNeighboringComment"
-                 :collapse="collapse" />
+                 :collapse="collapse"
+                 :markdown-cache="markdownCache" />
       </v-template>
       <v-template name="more">
         <More :comment="comment" :on-click="loadMore" />
@@ -67,6 +68,7 @@ export default {
   data() {
     return {
       commentList: new ObservableArray([]),
+      markdownCache: {},
       isShowingSubtree: false,
       selectedComment: null,
       sortings: ['top', 'new', 'controversial', 'old', 'random', 'qa'],
@@ -105,6 +107,7 @@ export default {
         this.commentList = this.processComments(items);
         this.selectedComment = null;
         this.isShowingSubtree = false;
+        this.markdownCache = {};
         this.refreshCommentList();
       });
     },
