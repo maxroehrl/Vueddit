@@ -20,7 +20,7 @@ export default class IndentedLabel extends Label {
           canvas.drawLine(indent, 0, indent, this.super.getHeight(), paint);
         }
       },
-      setDepth(depth, paddingBottom=10) {
+      setDepth(depth, paddingBottom) {
         this.depth = depth;
         this.paddingBottom = paddingBottom;
       },

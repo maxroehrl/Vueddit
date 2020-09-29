@@ -25,7 +25,7 @@ export default {
     $props: {
       handler(props) {
         if (this.$refs.label && props.comment) {
-          this.$refs.label.nativeView.android.setDepth(props.comment.depth);
+          this.$refs.label.nativeView.android.setDepth(props.comment.depth, 50);
         }
       },
       immediate: true,
@@ -35,7 +35,7 @@ export default {
   methods: {
     loaded(event) {
       if (this.comment) {
-        event.object.nativeView.setDepth(this.comment.depth);
+        event.object.nativeView.setDepth(this.comment.depth, 50);
       }
     },
 

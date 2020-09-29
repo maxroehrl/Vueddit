@@ -116,7 +116,7 @@ export default {
           this.refreshLabel(this.$refs.commentBody.nativeView.android, props.comment);
         }
         if (this.$refs.commentHeader && props.comment) {
-          this.$refs.commentHeader.nativeView.android.setDepth(props.comment.depth);
+          this.$refs.commentHeader.nativeView.android.setDepth(props.comment.depth, 10);
         }
       },
       immediate: true,
@@ -138,7 +138,7 @@ export default {
 
     loadedHeader(event) {
       if (this.comment) {
-        event.object.nativeView.setDepth(this.comment.depth);
+        event.object.nativeView.setDepth(this.comment.depth, 10);
       }
     },
 
