@@ -18,10 +18,10 @@ export default class Markdown {
   static getUrlPlugin() {
     // https://developer.android.com/reference/android/text/util/Linkify
     const Pattern = java.util.regex.Pattern;
-    // Match users (/u(ser)?/username) and subreddits (/r/subreddit)
-    const mask = Pattern.compile('(\\/(r|u|user)\\/[^\\s]+)|((?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)' +
-      '(([\\w\\-]+\\.){1,}?([\\w\\-.~]+\\/?)*' +
-      '[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};\']*))',
+    // Match users (/u(ser)?/username) and subreddits (/r/subreddit) and valid urls
+    const mask = Pattern.compile('(\\/(r|u|user)\\/[^\\s;.,:]+)|((?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)' +
+      '(([\\w\\-]+\\.){1,}?([\\w\\-~]+\\/?)*' +
+      '[\\p{Alnum}%_=?&#\\-+()\\[\\]\\*$~@!/{}\']*))',
     Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
     const transformFilter = new android.text.util.Linkify.TransformFilter({
       transformUrl(match, url) {

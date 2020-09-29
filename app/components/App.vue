@@ -209,21 +209,24 @@ export default {
     },
 
     openUrl(url, customTabs=false) {
-      if (!customTabs && url.startsWith('https://www.reddit.com/') && !url.startsWith('https://www.reddit.com/gallery/')) {
-        if (/https:\/\/www.reddit.com\/r\/\S+\/comments\/\S+\/\S+\//.test(url)) {
-          this.openComments('/' + url.split('/').slice(3, 8).join('/') + '/');
-        } else if (/https:\/\/www.reddit.com\/u(ser)?\/\S+\//.test(url)) {
-          this.gotoUserPosts(url.split('/')[4]);
-        } else if (/https:\/\/www.reddit.com\/r\/\S+\//.test(url)) {
-          this.gotoSubreddit(url.split('/')[4]);
+      if (!customTabs) {
+        const redditUrlPrefix = 'https?://(www\\.)?reddit\\.com';
+        let path = url;
+        if (new RegExp(redditUrlPrefix).test(url) && !new RegExp(redditUrlPrefix + '/gallery/').test(url)) {
+          path = url.replace(new RegExp(redditUrlPrefix), '');
         }
-      } else if (!customTabs && /\/r\/\S+\/comments\/\S+\/\S+\//.test(url)) {
-        this.openComments(url);
-      } else if (!customTabs && url.startsWith('/u/') || url.startsWith('/user/')) {
-        this.gotoUserPosts(url.split('/')[2]);
-      } else if (!customTabs && url.startsWith('/r/')) {
-        this.gotoSubreddit(url.split('/')[2]);
-      } else if (android.util.Patterns.WEB_URL.matcher(url).matches()) {
+        if (new RegExp('^/r/[^\\s;.]+/comments/[^\\s;.]+/[^\\s;.]+$').test(path)) {
+          return this.openComments(path);
+        } else if (new RegExp('^/u(ser)?/[^\\s;.]+$').test(path)) {
+          return this.gotoUserPosts(path.split('/')[2]);
+        } else if (new RegExp('^/r/[^\\s;.]+$').test(path)) {
+          if (this.subreddit.display_name !== path.split('/')[2]) {
+            this.gotoSubreddit(path.split('/')[2]);
+          }
+          return;
+        }
+      }
+      if (android.util.Patterns.WEB_URL.matcher(url).matches()) {
         CustomTabs.openUrl(url);
       } else {
         console.error('Invalid url: ' + url);
