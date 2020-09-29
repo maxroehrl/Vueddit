@@ -181,13 +181,8 @@ export default {
     },
 
     showGoBackSnackbar(oldSubreddit, newSubreddit, goBack) {
-      showSnackbar({
-        actionText: 'Go back to ' + (oldSubreddit.subreddits ? '/m/' : '/r/') + oldSubreddit.display_name,
-        actionTextColor: '#53ba82',
-        snackText: '',
-        hideDelay: 8000,
-        backgroundColor: '#3e3e3e',
-      }).then((args) => {
+      const actionText = 'Go back to ' + (oldSubreddit.subreddits ? '/m/' : '/r/') + oldSubreddit.display_name;
+      showSnackbar({actionText}).then((args) => {
         if (args.command === 'Action') {
           this.setSubreddit(oldSubreddit, goBack);
         }
@@ -205,6 +200,8 @@ export default {
                 .finally(() => this.isSidebarDialogOpen = false);
           }
         });
+      } else {
+        showSnackbar({snackText: 'No sidebar is available.'});
       }
     },
 

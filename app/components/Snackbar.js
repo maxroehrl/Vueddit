@@ -4,12 +4,12 @@ import {Color} from '@nativescript/core/color';
 export default function showSnackbar(options) {
   return new Promise((resolve, reject) => {
     options.actionText = options.actionText ? options.actionText : 'Close';
-    options.hideDelay = options.hideDelay ? options.hideDelay : 3000;
+    options.hideDelay = options.hideDelay ? options.hideDelay : 8000;
 
     const activity = app.android.foregroundActivity || app.android.startActivity;
     const view = activity.findViewById(android.R.id.content);
     const attachToView = view.getChildAt(0);
-    const snackbar = com.google.android.material.snackbar.Snackbar.make(attachToView, options.snackText, options.hideDelay);
+    const snackbar = com.google.android.material.snackbar.Snackbar.make(attachToView, options.snackText || '', options.hideDelay);
 
     snackbar.setAction(options.actionText, new android.view.View.OnClickListener({
       onClick: (args) => {
@@ -20,12 +20,8 @@ export default function showSnackbar(options) {
         });
       },
     }));
-    if (options.actionTextColor && Color.isValid(options.actionTextColor)) {
-      snackbar.setActionTextColor(new Color(options.actionTextColor).android);
-    }
-    if (options.backgroundColor && Color.isValid(options.backgroundColor)) {
-      snackbar.getView().setBackgroundColor(new Color(options.backgroundColor).android);
-    }
+    snackbar.setActionTextColor(new Color('#53ba82').android);
+    snackbar.getView().setBackgroundColor(new Color('#3e3e3e').android);
     snackbar.show();
   });
 }

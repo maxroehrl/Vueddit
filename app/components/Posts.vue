@@ -191,13 +191,7 @@ export default {
               this.postList.push(...items);
               return items;
             } else if (!lastPostId) {
-              showSnackbar({
-                actionText: '',
-                actionTextColor: '#53ba82',
-                snackText: 'No items received',
-                hideDelay: 8000,
-                backgroundColor: '#3e3e3e',
-              });
+              showSnackbar({snackText: 'No items received'});
             }
           }
           return [];
