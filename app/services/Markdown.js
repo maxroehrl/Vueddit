@@ -2,7 +2,7 @@ import * as app from '@nativescript/core/application';
 
 export default class Markdown {
   static markwon;
-  static urlOpenCallback = (link, view) => console.log(link);
+  static urlOpenCallback = (url) => console.log(url);
 
   static getInstance() {
     if (!this.markwon) {
@@ -31,6 +31,16 @@ export default class Markdown {
         return url;
       },
     });
+    const onClick = (url) => this.urlOpenCallback(url);
+    const ClickableSpan = android.text.style.ClickableSpan.extend({
+      url: null,
+      setURL(url) {
+        this.url = url;
+      },
+      onClick(view) {
+        onClick(this.url);
+      },
+    });
     const LinkifyTextAddedListener = new io.noties.markwon.core.CorePlugin.OnTextAddedListener({
       builder: new android.text.SpannableStringBuilder(),
       onTextAdded(visitor, text, start) {
@@ -43,8 +53,10 @@ export default class Markdown {
             const spannableBuilder = visitor.builder();
             for (let i = 0; i < spans.length; i++) {
               const span = spans[i];
+              const clickableSpan = new ClickableSpan();
+              clickableSpan.setURL(span.getURL());
               spannableBuilder.setSpan(
-                  span,
+                  clickableSpan,
                   start + this.builder.getSpanStart(span),
                   start + this.builder.getSpanEnd(span),
                   this.builder.getSpanFlags(span));
@@ -66,7 +78,7 @@ export default class Markdown {
   }
 
   static getLinkResolverPlugin() {
-    const resolve = (view, link) => this.urlOpenCallback(link, view);
+    const resolve = (view, link) => this.urlOpenCallback(link);
     const linkResolver = new io.noties.markwon.LinkResolver({resolve});
     const LinkResolverPlugin = io.noties.markwon.AbstractMarkwonPlugin.extend({
       configureConfiguration(builder) {
