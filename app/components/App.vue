@@ -9,7 +9,7 @@
                   @tap="refreshPosts()" />
       <ActionItem text="Show sidebar"
                   android.position="popup"
-                  @tap="showSidebar" />
+                  @tap="showSidebar(subreddit)" />
       <ActionItem text="Remove from visited"
                   android.position="popup"
                   @tap="clearVisited" />
@@ -189,11 +189,11 @@ export default {
       });
     },
 
-    showSidebar() {
-      if (this.subreddit &&
-        ![Reddit.frontpage, 'popular', 'all', 'random'].includes(this.subreddit.display_name) &&
-        !this.subreddit.subreddits) {
-        Reddit.getSidebar(this.subreddit.display_name).then((response) => {
+    showSidebar(subreddit) {
+      if (subreddit &&
+        ![Reddit.frontpage, 'popular', 'all', 'random'].includes(subreddit.display_name) &&
+        !subreddit.subreddits) {
+        Reddit.getSidebar(subreddit.display_name).then((response) => {
           if (response && response.data && response.data.description) {
             this.isSidebarDialogOpen = true;
             this.$showModal(SidebarDialog, {props: {sidebar: response.data.description}})

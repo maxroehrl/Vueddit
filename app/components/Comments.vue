@@ -7,6 +7,9 @@
       <ActionItem text="Refresh"
                   icon="res://ic_menu_refresh"
                   @tap="getComments()" />
+      <ActionItem text="Show sidebar"
+                  android.position="popup"
+                  @tap="app.showSidebar({display_name: post.subreddit})" />
     </ActionBar>
     <RadListView id="comment-list"
                  ref="commentList"
