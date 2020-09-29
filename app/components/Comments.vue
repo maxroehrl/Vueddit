@@ -108,10 +108,12 @@ export default {
 
     getComments(comment='') {
       this.commentList = new ObservableArray([{loading: true}]);
+      this.post.shown_comments = 0;
       return Reddit.getPostAndComments(this.post.permalink, comment, this.sorting).then(({comments}) => {
         this.isShowingSubtree = comment !== '';
         this.selectedComment = null;
         this.commentList.splice(0, 1, ...this.processComments(comments));
+        this.post.shown_comments = this.commentList.length;
         this.$refs.commentList.nativeView.refresh();
       });
     },
@@ -137,7 +139,6 @@ export default {
         delete comment.replies;
       };
       items.forEach(addAllChildren);
-      this.post.shown_comments = commentList.length;
       return commentList;
     },
 
