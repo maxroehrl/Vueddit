@@ -2,6 +2,7 @@
   <Ripple class="more"
           @tap="onClick(comment)">
     <IndentedLabel ref="label"
+                   textWrap="true"
                    :text="getText(comment)"
                    @loaded="loaded($event)" />
   </Ripple>
@@ -39,7 +40,7 @@ export default {
     },
 
     getText(comment) {
-      return comment.count === 0 ? 'continue this thread' : ('load ' + comment.count + ' more comment' + (comment.count === 1 ? '' : 's'));
+      return comment.count === 0 ? 'continue this thread →' : ('load ' + comment.count + ' more comment' + (comment.count === 1 ? ' ↓' : 's ↓'));
     },
   },
 };
