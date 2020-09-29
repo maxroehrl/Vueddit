@@ -1,9 +1,9 @@
 <template>
   <Page @loaded="loaded" @unloaded="unloaded">
-    <ActionBar :title="post.title">
+    <ActionBar :title="isShowingSubtree ? 'Single comment thread' : post.title">
       <NavigationButton text="Back"
                         icon="res://ic_arrow_left"
-                        @tap="$navigateBack" />
+                        @tap="isShowingSubtree ? navigateBack({}) : $navigateBack()" />
       <ActionItem text="Refresh"
                   icon="res://ic_menu_refresh"
                   @tap="getComments()" />
