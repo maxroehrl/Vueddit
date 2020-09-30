@@ -55,6 +55,7 @@ import Post from './Post';
 import More from './More';
 import SegmentedBar from './SegmentedBar';
 import Markdown from '../services/Markdown';
+import showSnackbar from './Snackbar';
 
 export default {
   name: 'Comments',
@@ -115,6 +116,9 @@ export default {
         this.commentList.splice(0, 1, ...this.processComments(comments));
         this.post.shown_comments = this.commentList.length;
         this.$refs.commentList.nativeView.refresh();
+        if (!this.commentList.length) {
+          showSnackbar({snackText: 'No comments'});
+        }
       });
     },
 
