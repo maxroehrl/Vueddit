@@ -110,10 +110,14 @@ export default {
     getComments(comment='') {
       this.commentList = new ObservableArray([{loading: true}]);
       this.post.shown_comments = 0;
-      return Reddit.getPostAndComments(this.post.permalink, comment, this.sorting).then(({comments}) => {
+      return Reddit.getPostAndComments(this.post.permalink, comment, this.sorting).then(({post, comments}) => {
         this.isShowingSubtree = comment !== '';
         this.selectedComment = null;
         this.commentList.splice(0, 1, ...this.processComments(comments));
+        this.post.num_comments = post.num_comments;
+        this.post.gildings = post.gildings;
+        this.post.selftext = post.selftext;
+        this.post.edited = post.edited;
         this.post.shown_comments = this.commentList.length;
         this.$refs.commentList.nativeView.refresh();
         if (!this.commentList.length) {
