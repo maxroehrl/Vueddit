@@ -133,7 +133,7 @@ export default {
     },
 
     openUrl(post) {
-      this.app.openUrl(post.url, !post.crosspost_parent);
+      this.app.openUrl(post.url, post.permalink);
     },
 
     showMoreOptions(post) {

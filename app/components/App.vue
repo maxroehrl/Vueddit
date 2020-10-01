@@ -205,15 +205,15 @@ export default {
       }
     },
 
-    openUrl(url, customTabs=false) {
-      if (!customTabs) {
-        const redditUrlPrefix = 'https?://(www\\.)?reddit\\.com';
-        let path = url;
-        if (new RegExp(redditUrlPrefix).test(url) && !new RegExp(redditUrlPrefix + '/gallery/').test(url)) {
-          path = url.replace(new RegExp(redditUrlPrefix), '');
-        }
+    openUrl(url, permalink=null) {
+      const redditUrlPrefix = '^https?://(www\\.)?(old\\.|new\\.)?reddit\\.com';
+      let path = url;
+      if (new RegExp(redditUrlPrefix + '.+').test(url) && !new RegExp(redditUrlPrefix + '/gallery/').test(url)) {
+        path = url.replace(new RegExp(redditUrlPrefix), '');
+      }
+      if (!permalink || permalink.split('/')[4] !== path.split('/')[4]) {
         if (new RegExp('^/r/[^\\s;.]+/comments/[^\\s;.]+/[^\\s;.]+$').test(path)) {
-          return this.openComments(path);
+          return this.openComments(path.split('?')[0], [], path.split('/')[6]);
         } else if (new RegExp('^/u(ser)?/[^\\s;.]+$').test(path)) {
           return this.gotoUserPosts(path.split('/')[2]);
         } else if (new RegExp('^/r/[^\\s;.]+$').test(path)) {
@@ -233,17 +233,17 @@ export default {
       }
     },
 
-    openComments(postOrComment) {
-      if (typeof postOrComment === 'string') {
-        Reddit.getPostAndComments(postOrComment).then(({post}) => {
+    openComments(post, comments=[], commentName='') {
+      if (typeof post === 'string') { // Post is a permalink
+        Reddit.getPostAndComments(post).then(({post, comments}) => {
           post.shown_comments = post.num_comments;
-          this.openComments(post);
+          this.openComments(post, comments, commentName);
         });
       } else {
         this.navigationDepth += 1;
         this.$navigateTo(Comments, {
           transition: 'slide',
-          props: {app: this, post: postOrComment},
+          props: {app: this, post, comments, commentName},
         });
       }
     },

@@ -1,9 +1,9 @@
 <template>
   <Page @loaded="loaded" @unloaded="unloaded">
-    <ActionBar :title="isShowingSubtree ? 'Single comment thread' : post.title">
+    <ActionBar :title="subtreeCommentName ? 'Single comment thread' : post.title">
       <NavigationButton text="Back"
                         icon="res://ic_arrow_left"
-                        @tap="isShowingSubtree ? navigateBack({}) : $navigateBack()" />
+                        @tap="subtreeCommentName ? navigateBack({}) : $navigateBack()" />
       <ActionItem text="Refresh"
                   icon="res://ic_menu_refresh"
                   @tap="getComments()" />
@@ -69,12 +69,22 @@ export default {
       type: Object,
       required: true,
     },
+    comments: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    commentName: {
+      type: String,
+      required: false,
+      default: () => '',
+    },
   },
   data() {
     return {
       commentList: new ObservableArray([{loading: true}]),
       markdownCache: {},
-      isShowingSubtree: false,
+      subtreeCommentName: this.commentName,
       selectedComment: null,
       sortings: ['top', 'new', 'controversial', 'old', 'random', 'qa'],
       sorting: 'top',
@@ -90,6 +100,9 @@ export default {
     },
 
     loaded() {
+      if (this.comments.length) {
+        this.setCommentsAndUpdatePost(null, this.comments);
+      }
       if (this.commentList.getItem(0) && this.commentList.getItem(0).loading) {
         this.getComments();
       }
@@ -101,29 +114,34 @@ export default {
     },
 
     navigateBack(data) {
-      if (this.isShowingSubtree) {
+      if (this.subtreeCommentName) {
+        this.subtreeCommentName = '';
         this.getComments();
         data.cancel = true;
       }
     },
 
-    getComments(comment='') {
+    getComments() {
       this.commentList = new ObservableArray([{loading: true}]);
       this.post.shown_comments = 0;
-      return Reddit.getPostAndComments(this.post.permalink, comment, this.sorting).then(({post, comments}) => {
-        this.isShowingSubtree = comment !== '';
-        this.selectedComment = null;
-        this.commentList.splice(0, 1, ...this.processComments(comments));
+      return Reddit.getPostAndComments(this.post.permalink + this.subtreeCommentName, this.sorting)
+          .then(({post, comments}) => this.setCommentsAndUpdatePost(post, comments));
+    },
+
+    setCommentsAndUpdatePost(post, comments) {
+      this.selectedComment = null;
+      this.commentList.splice(0, 1, ...this.processComments(comments));
+      if (post) {
         this.post.num_comments = post.num_comments;
         this.post.gildings = post.gildings;
         this.post.selftext = post.selftext;
         this.post.edited = post.edited;
-        this.post.shown_comments = this.commentList.length;
-        this.$refs.commentList.nativeView.refresh();
-        if (!this.commentList.length) {
-          showSnackbar({snackText: 'No comments'});
-        }
-      });
+      }
+      this.post.shown_comments = this.commentList.length;
+      this.$refs.commentList.nativeView.refresh();
+      if (!this.commentList.length) {
+        showSnackbar({snackText: 'No comments'});
+      }
     },
 
     refreshCommentList() {
@@ -152,7 +170,8 @@ export default {
 
     loadMore(comment) {
       if (comment.count === 0) {
-        return this.getComments(comment.parent_id.split('_')[1]);
+        this.subtreeCommentName = comment.parent_id.split('_')[1];
+        return this.getComments();
       } else {
         return Reddit.getMoreComments(this.post.name, comment.children).then((r) => {
           if (r && r.json && r.json.data && r.json.data.things) {
