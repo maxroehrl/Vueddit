@@ -10,7 +10,7 @@
     "url": "git+https://github.com/maxroehrl/Vueddit.git"
   },
   "dependencies": {
-    "@nativescript/core": "7.0.7",
+    "@nativescript/core": "7.0.9",
     "@nativescript/theme": "^3.0.0",
     "@nstudio/nativescript-loading-indicator": "^4.0.0",
     "@vue/devtools": "^5.3.3",
