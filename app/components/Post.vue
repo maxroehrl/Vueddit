@@ -111,9 +111,9 @@ export default {
       if (post.secure_media_embed && post.secure_media_embed.media_domain_url) {
         return this.getVideoObject(post.secure_media_embed, 'media_domain_url');
       } else if (post.secure_media && post.secure_media.reddit_video) {
-        return this.getVideoObject(post.secure_media.reddit_video, 'dash');
+        return this.getVideoObject(post.secure_media.reddit_video, 'hls_url');
       } else if (post.preview && post.preview.reddit_video_preview) {
-        return this.getVideoObject(post.preview.reddit_video_preview, 'dash');
+        return this.getVideoObject(post.preview.reddit_video_preview, 'hls_url');
       } else if (post.preview && post.preview.images && post.preview.images.length &&
           post.preview.images[0].variants && post.preview.images[0].variants.mp4) {
         return this.getVideoObject(post.preview.images[0].variants.mp4.source, 'url');
@@ -123,36 +123,42 @@ export default {
     },
 
     getVideoObject(source, srcProp='src', heightProp='height', widthProp='width') {
+      let src = source[srcProp];
+      if (['hls_url', 'url'].includes(srcProp)) {
+        const type = srcProp === 'hls_url' ? 'application/x-mpegURL' : 'video/mp4';
+        src = this.getRedditDashVideoPlayerHtml(source[srcProp], type);
+      }
       return {
-        src: srcProp === 'dash' ? this.getRedditDashVideoPlayerHtml(source) : source[srcProp],
+        src,
         height: source[heightProp],
         width: source[widthProp],
       };
     },
 
-    getRedditDashVideoPlayerHtml(video) {
+    getRedditDashVideoPlayerHtml(src, type) {
       return `
         <!DOCTYPE html>
           <html lang="en">
           <head>
             <meta charset="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>DashJS Player</title>
+            <title>Video Player</title>
             <style>
               body {
                 margin: 0;
                 background-color: black;
               }
             </style>
+            <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
           </head>
           <body>
-            <script src="https://cdn.dashjs.org/latest/dash.all.min.js"><` + `/script>
-            <video autoplay controls loop width="${Screen.mainScreen.widthDIPs}px"></video>
+            <video-js id="vid1" class="video-js vjs-default-skin" muted autoplay controls loop width="${Screen.mainScreen.widthDIPs}">
+              <source src="${src}" type="${type}" />
+            </video-js>
+            <script src="https://unpkg.com/video.js/dist/video.min.js"><` + `/script>
+            <script src="https://unpkg.com/@videojs/http-streaming/dist/videojs-http-streaming.min.js"><` + `/script>
             <script>
-              document.addEventListener("DOMContentLoaded", function () {
-                const player = dashjs.MediaPlayer().create();
-                player.initialize(document.querySelector("video"), '${video.dash_url}', true);
-            });
+              const player = videojs('vid1');
             <` + `/script>
           </body>
         </html>`;
