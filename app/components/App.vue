@@ -309,6 +309,7 @@ export default {
 
     logout() {
       store.dispatch('logout').then(() => {
+        android.webkit.CookieManager.getInstance().removeAllCookies(null);
         this.refreshAll = true;
         this.login();
       });
