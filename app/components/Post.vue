@@ -51,6 +51,7 @@ export default {
         androidWebView.getSettings().setAllowFileAccessFromFileURLs(true);
         androidWebView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         androidWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+        androidWebView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
       }
     },
 
