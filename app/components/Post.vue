@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import * as app from '@nativescript/core/application';
 import {Screen} from '@nativescript/core/platform';
 import MarkdownView from './MarkdownView';
 import Reddit from '../services/Reddit';
@@ -52,6 +53,34 @@ export default {
         androidWebView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         androidWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
         androidWebView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        const ChromeClient = android.webkit.WebChromeClient.extend({
+          view: null,
+          callback: null,
+          originalSystemUiVisibility: null,
+
+          onHideCustomView() {
+            const decorView = app.android.foregroundActivity.getWindow().getDecorView();
+            decorView.removeView(this.view);
+            this.view = null;
+            decorView.setSystemUiVisibility(this.originalSystemUiVisibility);
+            this.callback.onCustomViewHidden();
+            this.callback = null;
+          },
+
+          onShowCustomView(view, callback) {
+            if (this.view != null) {
+              this.onHideCustomView();
+            } else {
+              this.view = view;
+              const decorView = app.android.foregroundActivity.getWindow().getDecorView();
+              this.originalSystemUiVisibility = decorView.getSystemUiVisibility();
+              decorView.addView(this.view, new android.widget.FrameLayout.LayoutParams(-1, -1));
+              decorView.setSystemUiVisibility(3846 | android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+              this.callback = callback;
+            }
+          },
+        });
+        androidWebView.setWebChromeClient(new ChromeClient());
       }
     },
 
