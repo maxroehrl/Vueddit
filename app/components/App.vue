@@ -206,7 +206,7 @@ export default {
     },
 
     openUrl(url, permalink=null) {
-      const redditUrlPrefix = '^https?://(www\\.)?(old\\.|new\\.)?reddit\\.com';
+      const redditUrlPrefix = '^https?://(www\\.)?(old\\.|new\\.|m\\.)?reddit\\.com';
       let path = url;
       if (new RegExp(redditUrlPrefix + '.+').test(url) && !new RegExp(redditUrlPrefix + '/gallery/').test(url)) {
         path = url.replace(new RegExp(redditUrlPrefix), '');
