@@ -19,9 +19,10 @@ export default class CachedImage extends CachedImageBase {
       isInitialized = true;
     }
     this._android = new com.facebook.drawee.view.SimpleDraweeView(this._context);
-    // const placeholderImageId = ad.resources.getDrawableId('ic_comment_text_multiple_outline_white_48dp');
-    // const placeholderImage = ad.getApplicationContext().getResources().getDrawable(placeholderImageId);
-    // this._android.getHierarchy().setPlaceholderImage(placeholderImage, com.facebook.drawee.drawable.ScalingUtils.ScaleType.CENTER);
+    const progressBarDrawable = new com.facebook.drawee.drawable.ProgressBarDrawable();
+    progressBarDrawable.setBackgroundColor(0x30FFFFFF);
+    progressBarDrawable.setColor(0x8053ba82);
+    this._android.getHierarchy().setProgressBarImage(progressBarDrawable);
     return this._android;
   }
 
