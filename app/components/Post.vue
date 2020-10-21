@@ -89,8 +89,7 @@ export default {
     },
 
     getPreview(post) {
-      const preview = Reddit.getPreview(post);
-      return preview ? preview.url: '';
+      return Reddit.getPreview(post)?.url ?? '';
     },
 
     shouldShowBigPreview(post) {
@@ -98,8 +97,7 @@ export default {
     },
 
     getImage(post) {
-      const preview = Reddit.getImage(post);
-      return preview ? preview.url: '';
+      return Reddit.getImage(post)?.url ?? '';
     },
 
     getImageHeight(post) {
