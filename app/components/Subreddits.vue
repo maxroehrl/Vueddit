@@ -1,16 +1,14 @@
 <template>
   <StackLayout @loaded="loaded($event)">
+    <SearchBar ref="searchbar"
+               v-model="searchText"
+               hint="Search for subreddit"
+               class="searchbar"
+               @loaded="searchbarLoaded"
+               @textChange="onSearchTextChanged"
+               @submit="onSubmit"
+               @clear="onClear" />
     <RadListView ref="subredditList" for="subreddit in subredditList">
-      <v-template name="header">
-        <SearchBar ref="searchbar"
-                   v-model="searchText"
-                   hint="Search for subreddit"
-                   class="searchbar"
-                   @loaded="searchbarLoaded"
-                   @textChange="onSearchTextChanged"
-                   @submit="onSubmit"
-                   @clear="onClear" />
-      </v-template>
       <v-template>
         <StackLayout orientation="horizontal"
                      padding="0"
@@ -31,7 +29,6 @@
 import Reddit from '../services/Reddit';
 import {ObservableArray} from '@nativescript/core/data/observable-array';
 import store from '../store';
-import {ad} from '@nativescript/core/utils/utils';
 
 export default {
   name: 'Subreddits',
@@ -115,7 +112,6 @@ export default {
           if (result?.names) {
             this.subredditList = new ObservableArray(result.names.map((s) => ({display_name: s})));
             this.refreshList();
-            setTimeout(() => this.$refs.searchbar.nativeView.focus(), 500);
           }
         });
       }
@@ -127,7 +123,6 @@ export default {
 
     onClear() {
       this.displaySubscriptions();
-      setTimeout(() => ad.dismissSoftInput(), 50);
     },
 
     searchbarLoaded(event) {
