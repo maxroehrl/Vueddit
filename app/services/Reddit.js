@@ -11,7 +11,8 @@ export default class Reddit {
   static userAgent;
   static randomState = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 10);
   static clientId = 'm_gI8cFDcqC7uA';
-  static redirectUri = encodeURIComponent('http://localhost:8080');
+  static redirectUri = 'http://localhost:8080';
+  static redirectUriEncoded = encodeURIComponent(Reddit.redirectUri);
   static scope = encodeURIComponent('mysubreddits read vote save subscribe wikiread identity history flair');
   static frontpage = 'reddit front page';
 
@@ -26,7 +27,7 @@ export default class Reddit {
   }
 
   static authorize(page) {
-    const url = `${this.api}/api/v1/authorize.compact?client_id=${this.clientId}&response_type=code&state=${this.randomState}&redirect_uri=${this.redirectUri}&scope=${this.scope}&duration=permanent`;
+    const url = `${this.api}/api/v1/authorize.compact?client_id=${this.clientId}&response_type=code&state=${this.randomState}&redirect_uri=${this.redirectUriEncoded}&scope=${this.scope}&duration=permanent`;
     page.$navigateTo(Login, {
       transition: 'slide',
       props: {
@@ -44,7 +45,7 @@ export default class Reddit {
         return getJSON({
           url: `${this.api}/api/v1/access_token`,
           method: 'POST',
-          content: `grant_type=authorization_code&code=${code}&redirect_uri=${this.redirectUri}`,
+          content: `grant_type=authorization_code&code=${code}&redirect_uri=${this.redirectUriEncoded}`,
           headers: {'Authorization': `Basic ${btoa(this.clientId + ':')}`},
         }).then(this.updateToken.bind(this)).then(() => {
           if (page) {

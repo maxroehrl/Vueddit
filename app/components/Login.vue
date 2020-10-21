@@ -3,9 +3,10 @@
         @loaded="loaded($event)"
         @unloaded="unloaded($event)">
     <StackLayout>
-      <WebView :src="url"
-               @loadFinished="onLoadFinished"
-               @loadStarted="onLoadStarted" />
+      <LoginWebView :src="url"
+                    :shouldOverrideUrlLoading="onShouldOverrideUrlLoading"
+                    @loadFinished="onLoadFinished"
+                    @loadStarted="onLoadStarted" />
     </StackLayout>
   </Page>
 </template>
@@ -13,6 +14,7 @@
 <script>
 import * as application from '@nativescript/core/application';
 import {AndroidApplication} from '@nativescript/core/application';
+import Reddit from '../services/Reddit';
 
 export default {
   name: 'Login',
@@ -37,12 +39,17 @@ export default {
       application.android.off(AndroidApplication.activityBackPressedEvent);
     },
 
+    onShouldOverrideUrlLoading(url) {
+      const redirectUri = Reddit.redirectUri;
+      return !!(url?.startsWith?.(redirectUri) || url?.getUrl?.().toString?.().startsWith?.(redirectUri));
+    },
+
     onLoadStarted(args) {
       const androidWebView = args.object.android;
       if (androidWebView) {
         androidWebView.getSettings().setDisplayZoomControls(false);
-        // androidWebView.getSettings().setDomStorageEnabled(true);
         androidWebView.getSettings().setLoadWithOverviewMode(true);
+        androidWebView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
       }
     },
 

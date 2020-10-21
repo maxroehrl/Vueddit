@@ -8,6 +8,7 @@ import App from './components/App';
 import Ripple from './components/Ripple';
 import IndentedLabel from './components/IndentedLabel';
 import CachedImage from './components/CachedImage';
+import LoginWebView from './components/LoginWebView';
 
 if (!global.btoa) {
   global.btoa = encode;
@@ -29,6 +30,7 @@ RadListViewPlugin.install(Vue, {});
 Vue.registerElement('Ripple', () => Ripple);
 Vue.registerElement('IndentedLabel', () => IndentedLabel);
 Vue.registerElement('CachedImage', () => CachedImage);
+Vue.registerElement('LoginWebView', () => LoginWebView);
 
 new Vue({
   store,
