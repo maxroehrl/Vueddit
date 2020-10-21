@@ -6,7 +6,7 @@ export default class CustomTabs {
   static slideOutLeft = ad.resources.getId(':anim/slide_out_left');
   static slideInLeft = ad.resources.getId(':anim/slide_in_left');
   static slideOutRight = ad.resources.getId(':anim/slide_out_right');
-  static backArrowId = ad.resources.getDrawableId('ic_arrow_left_white_48dp');
+  static backArrowId = ad.resources.getDrawableId('ic_arrow_left_white_24dp');
   static fallback = new saschpe.android.customtabs.WebViewFallback();
   static customTabsHelper = saschpe.android.customtabs.CustomTabsHelper.Companion;
 
