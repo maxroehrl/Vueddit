@@ -147,6 +147,7 @@ export default {
       let spanned = this.markdownCache[comment.name];
       if (!spanned) {
         spanned = Markdown.toMarkdown(comment.body);
+        // eslint-disable-next-line vue/no-mutating-props
         this.markdownCache[comment.name] = spanned;
       }
       if (!this.emptySpan && this.isCollapsed(comment)) {
