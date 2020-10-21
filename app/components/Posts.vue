@@ -84,7 +84,7 @@ export default {
   },
   methods: {
     templateSelector(item) {
-      return (item && item.body) ? 'comment' : 'post';
+      return item?.body ? 'comment' : 'post';
     },
 
     shouldShowBigPreview(post) {
@@ -94,7 +94,7 @@ export default {
     getDefaultTemplate() {
       const subHasMoreThanHalfPictures = this.postList
           .slice(2, 10)
-          .map((post) => Boolean(post && post.preview && post.preview.images && post.preview.images.length))
+          .map((post) => Boolean(post?.preview?.images?.length))
           .reduce((a, b) => a + b, 0) > 4;
       const isNotFrontPage = this.subreddit.display_name !== Reddit.frontpage;
       return this.selectedTemplate ? this.selectedTemplate : (subHasMoreThanHalfPictures && isNotFrontPage ? 'big' : 'small');
@@ -185,8 +185,8 @@ export default {
       if (sub && sub !== '') {
         const request = this.isUserReddit() ? Reddit.getUserPosts : Reddit.getSubredditPosts;
         const args = [sub, lastPostId, this.sorting, this.group, this.time, this.type];
-        return request.apply(Reddit, args.map((s) => s && s.toLowerCase())).then((r) => {
-          if (r && r.data && r.data.children) {
+        return request.apply(Reddit, args.map((s) => s?.toLowerCase())).then((r) => {
+          if (r?.data?.children?.map) {
             const items = r.data.children.map((d) => d.data);
             if (items.length) {
               this.lastPostId = items[items.length - 1].name;

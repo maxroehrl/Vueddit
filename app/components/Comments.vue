@@ -92,7 +92,7 @@ export default {
   },
   methods: {
     templateSelector(item) {
-      return (item && item.loading) ? 'load' : (item && item.body) ? 'comment' : 'more';
+      return item?.loading ? 'load' : item?.body ? 'comment' : 'more';
     },
 
     onPullDown(args) {
@@ -103,7 +103,7 @@ export default {
       if (this.comments.length) {
         this.setCommentsAndUpdatePost(null, this.comments);
       }
-      if (this.commentList.getItem(0) && this.commentList.getItem(0).loading) {
+      if (this.commentList.getItem(0)?.loading) {
         this.getComments();
       }
       application.android.on(AndroidApplication.activityBackPressedEvent, this.navigateBack, this);
@@ -174,7 +174,7 @@ export default {
         return this.getComments();
       } else {
         return Reddit.getMoreComments(this.post.name, comment.children).then((r) => {
-          if (r && r.json && r.json.data && r.json.data.things) {
+          if (r?.json?.data?.things?.map) {
             const items = r.json.data.things.map((r) => r.data);
             const index = this.commentList.indexOf(comment);
             this.commentList.splice(index, 1, ...items);

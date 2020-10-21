@@ -111,9 +111,7 @@ export default class Reddit {
 
   static getPostAndComments(permalink, sort='top') {
     return this.get(`${permalink}.json?raw_json=1&sort=${sort}`).then((r) => {
-      if (r && r.length === 2 &&
-        r[0].data && r[0].data.children && r[0].data.children.length === 1 &&
-        r[1].data && r[1].data.children) {
+      if (r?.[0]?.data?.children?.length === 1 && r?.[1]?.data?.children?.map) {
         return {
           post: r[0].data.children[0].data,
           comments: r[1].data.children.map((d) => d.data),
@@ -183,7 +181,7 @@ export default class Reddit {
   }
 
   static getPreview(post, preferredWidth=300, noPreview={url: 'res://ic_comment_text_multiple_outline_white_48dp'}) {
-    if (post && post.preview && post.preview.images && post.preview.images[0] && post.preview.images[0].resolutions) {
+    if (post?.preview?.images?.[0]?.resolutions) {
       const resolutions = post.preview.images[0].resolutions;
       const distArr = resolutions.map((resolution) => Math.abs(resolution.width - preferredWidth));
       return resolutions[distArr.indexOf(Math.min(...distArr))];

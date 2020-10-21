@@ -101,7 +101,7 @@ export default {
     login() {
       this.loadingIndicator.show(this.loadingIndicatorOptions);
       Reddit.getUser().then((result) => {
-        if (result && result.name) {
+        if (result?.name) {
           store.dispatch('setRedditUser', {user: result.name}).then(() => {
             this.$refs.subredditList.refresh();
             this.refreshPosts();
@@ -194,7 +194,7 @@ export default {
         ![Reddit.frontpage, 'popular', 'all', 'random'].includes(subreddit.display_name) &&
         !subreddit.subreddits) {
         Reddit.getSidebar(subreddit.display_name).then((response) => {
-          if (response && response.data && response.data.description) {
+          if (response?.data?.description) {
             this.isSidebarDialogOpen = true;
             this.$showModal(SidebarDialog, {props: {sidebar: response.data.description}})
                 .finally(() => this.isSidebarDialogOpen = false);
@@ -300,7 +300,7 @@ export default {
     },
 
     getCurrentUserName() {
-      return store.state.reddit && store.state.reddit.user ? store.state.reddit.user : '';
+      return store.state?.reddit?.user ?? '';
     },
 
     gotoMyProfile() {

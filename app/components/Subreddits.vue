@@ -72,7 +72,7 @@ export default {
 
     fetchSubscriptions() {
       return Reddit.getSubscriptions().then((r) => {
-        if (r && r.data && r.data.children) {
+        if (r?.data?.children?.map) {
           const items = r.data.children.map((d) => d.data);
           items.sort(this.sortSubredditByStarred);
           this.subscriptions = items;
@@ -112,7 +112,7 @@ export default {
     onSearchTextChanged(event) {
       if (event.value) {
         Reddit.searchForSubreddit(this.searchText).then((result) => {
-          if (result && result.names) {
+          if (result?.names) {
             this.subredditList = new ObservableArray(result.names.map((s) => ({display_name: s})));
             this.refreshList();
             setTimeout(() => this.$refs.searchbar.nativeView.focus(), 500);

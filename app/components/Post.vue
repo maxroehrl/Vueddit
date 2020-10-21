@@ -108,14 +108,13 @@ export default {
     },
 
     getVideo(post) {
-      if (post.secure_media && post.secure_media.reddit_video) {
+      if (post.secure_media?.reddit_video) {
         return this.getVideoObject(post.secure_media.reddit_video, 'hls_url');
-      } else if (post.preview && post.preview.reddit_video_preview) {
+      } else if (post.preview?.reddit_video_preview) {
         return this.getVideoObject(post.preview.reddit_video_preview, 'hls_url');
-      } else if (post.preview && post.preview.images && post.preview.images.length &&
-          post.preview.images[0].variants && post.preview.images[0].variants.mp4) {
+      } else if (post.preview?.images?.[0]?.variants?.mp4) {
         return this.getVideoObject(post.preview.images[0].variants.mp4.source, 'url');
-      } else if (post.secure_media_embed && post.secure_media_embed.media_domain_url) {
+      } else if (post.secure_media_embed?.media_domain_url) {
         return this.getVideoObject(post.secure_media_embed, 'media_domain_url');
       } else {
         return null;
