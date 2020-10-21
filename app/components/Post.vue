@@ -145,6 +145,14 @@ export default {
                 margin: 0;
                 background-color: black;
               }
+
+              .vjs-default-skin .vjs-control-bar {
+                background-color: rgba(62, 62, 62, 0.5) !important;
+              }
+
+              .vjs-default-skin .vjs-progress-control .vjs-load-progress > div {
+                background: rgba(0, 0, 0, 0.2);
+              }
             </style>
             <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
           </head>
