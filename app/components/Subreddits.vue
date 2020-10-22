@@ -133,7 +133,7 @@ export default {
 
     star(subreddit) {
       if (this.isSubscribedTo(subreddit)) {
-        store.dispatch(this.isStarred(subreddit) ? 'unStarSubreddit' : 'starSubreddit', {subreddit}).then((r) => {
+        store.dispatch(this.isStarred(subreddit) ? 'unStarSubreddit' : 'starSubreddit', {subreddit}).then(() => {
           this.subscriptions.sort(this.sortSubredditByStarred);
           this.displaySubscriptions();
         });
