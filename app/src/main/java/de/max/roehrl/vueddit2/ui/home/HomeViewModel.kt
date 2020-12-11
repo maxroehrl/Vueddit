@@ -7,7 +7,7 @@ import org.json.JSONObject
 
 class HomeViewModel : ViewModel() {
 
-    val posts = MutableLiveData<List<JSONObject>>().apply {
+    val posts = MutableLiveData<MutableList<JSONObject>>().apply {
         val after = ""
         Reddit.getSubredditPosts(Reddit.frontpage, after, "best") {
             val g = it.getJSONObject("data").getJSONArray("children")
