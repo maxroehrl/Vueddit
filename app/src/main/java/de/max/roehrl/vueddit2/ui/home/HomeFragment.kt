@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -17,9 +16,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import coil.load
-import coil.request.Disposable
-import coil.size.ViewSizeResolver
+import com.facebook.drawee.drawable.ProgressBarDrawable
+import com.facebook.drawee.view.SimpleDraweeView
 import de.max.roehrl.vueddit2.Post
 import de.max.roehrl.vueddit2.PostDetailFragment
 import de.max.roehrl.vueddit2.R
@@ -102,9 +100,8 @@ class PostAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val postHeader: RelativeLayout = view.findViewById(R.id.post_header)
         private val title: TextView = view.findViewById(R.id.title)
         private val meta: TextView = view.findViewById(R.id.meta)
-        private val imageView: ImageView = view.findViewById(R.id.preview)
+        private val imageView: SimpleDraweeView = view.findViewById(R.id.preview)
         private val votes: TextView = view.findViewById(R.id.votes)
-        private var disposable: Disposable? = null
         private lateinit var post: Post
 
         @SuppressLint("SetTextI18n")
@@ -125,16 +122,15 @@ class PostAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
             meta.text = "(${post.domain})\n${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n${post.created_utc} by /u/${post.author}\n"
             votes.text = if (post.score >= 10000) (post.score / 1000).toString() + 'k' else post.score.toString()
-            disposable?.dispose()
             val preview = post.previewUrl
             if (preview != null) {
-                disposable = imageView.load(preview) {
-                    placeholder(R.drawable.ic_comment_text_multiple_outline)
-                    size(ViewSizeResolver(imageView))
-                    error(R.drawable.ic_comment_text_multiple_outline)
-                }
+                imageView.setImageURI(preview)
+                val progress = ProgressBarDrawable()
+                progress.backgroundColor = 0x30FFFFFF
+                progress.color = 0x8053BA82.toInt()
+                imageView.hierarchy.setProgressBarImage(progress)
             } else {
-                imageView.load(R.drawable.ic_comment_text_multiple_outline)
+                imageView.setActualImageResource(R.drawable.ic_comment_text_multiple_outline)
             }
         }
     }

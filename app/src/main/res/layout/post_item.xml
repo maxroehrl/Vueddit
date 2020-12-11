@@ -37,11 +37,9 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/preview"
         android:layout_width="100dp"
         android:layout_height="90dp"
-        android:contentDescription="PostPreview"
-        android:src="@drawable/ic_comment_text_multiple_outline"
         android:layout_alignParentEnd="true" />
 </RelativeLayout>
