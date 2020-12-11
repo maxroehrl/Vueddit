@@ -14,10 +14,11 @@
         android:text="▲" />
 
     <TextView
+        android:id="@+id/votes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="15sp"
-        android:text="100k" />
+        android:text="0" />
 
     <TextView
         android:id="@+id/down"

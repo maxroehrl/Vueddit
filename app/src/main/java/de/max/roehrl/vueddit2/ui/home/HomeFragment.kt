@@ -1,5 +1,6 @@
 package de.max.roehrl.vueddit2.ui.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,9 +20,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import coil.load
 import coil.request.Disposable
 import coil.size.ViewSizeResolver
+import de.max.roehrl.vueddit2.Post
 import de.max.roehrl.vueddit2.PostDetailFragment
 import de.max.roehrl.vueddit2.R
-import de.max.roehrl.vueddit2.service.Reddit
 import org.json.JSONObject
 
 
@@ -35,9 +36,9 @@ class HomeFragment : Fragment() {
     private var isLoading: Boolean = true
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         postponeEnterTransition()
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
@@ -79,19 +80,19 @@ class HomeFragment : Fragment() {
 }
 
 class PostAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var loading: JSONObject = JSONObject("{loading: true}")
-    private var posts : MutableList<JSONObject> = mutableListOf(loading)
+    private var loading: Post = Post(JSONObject("{loading: true}"))
+    private var posts : MutableList<Post> = mutableListOf(loading)
 
     companion object {
         private const val VIEW_TYPE_DATA = 0
         private const val VIEW_TYPE_PROGRESS = 1
     }
 
-    fun setPosts(posts: MutableList<JSONObject>) {
+    fun setPosts(posts: MutableList<Post>) {
         this.posts = posts
     }
 
-    fun addPosts(posts: MutableList<JSONObject>) {
+    fun addPosts(posts: MutableList<Post>) {
         this.posts.addAll(posts)
     }
 
@@ -100,15 +101,18 @@ class PostAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     inner class PostViewHolder(view: View): RecyclerView.ViewHolder(view) {
         private val postHeader: RelativeLayout = view.findViewById(R.id.post_header)
         private val title: TextView = view.findViewById(R.id.title)
+        private val meta: TextView = view.findViewById(R.id.meta)
         private val imageView: ImageView = view.findViewById(R.id.preview)
+        private val votes: TextView = view.findViewById(R.id.votes)
         private var disposable: Disposable? = null
-        private lateinit var post: JSONObject
+        private lateinit var post: Post
 
-        fun bind(post: JSONObject) {
+        @SuppressLint("SetTextI18n")
+        fun bind(post: Post) {
             this.post = post
-            val transitionName = post.getString("name")
+            val transitionName = post.name
             ViewCompat.setTransitionName(postHeader, transitionName)
-            title.text = post.getString("title")
+            title.text = post.title
             title.setOnClickListener {
                 val detailFragment = PostDetailFragment(post)
                 (it.context as AppCompatActivity).supportFragmentManager.commit {
@@ -119,10 +123,12 @@ class PostAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     addToBackStack(null)
                 }
             }
+            meta.text = "(${post.domain})\n${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n${post.created_utc} by /u/${post.author}\n"
+            votes.text = if (post.score >= 10000) (post.score / 1000).toString() + 'k' else post.score.toString()
             disposable?.dispose()
-            val preview = Reddit.getPreview(post)
+            val preview = post.previewUrl
             if (preview != null) {
-                disposable = imageView.load(preview.getString("url")) {
+                disposable = imageView.load(preview) {
                     placeholder(R.drawable.ic_comment_text_multiple_outline)
                     size(ViewSizeResolver(imageView))
                     error(R.drawable.ic_comment_text_multiple_outline)
@@ -136,10 +142,22 @@ class PostAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when(viewType) {
             VIEW_TYPE_PROGRESS -> {
-                ProgressViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.loading_item, parent, false))
+                ProgressViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.loading_item,
+                        parent,
+                        false
+                    )
+                )
             }
             VIEW_TYPE_DATA -> {
-                PostViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.post_item, parent, false))
+                PostViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.post_item,
+                        parent,
+                        false
+                    )
+                )
             }
             else -> throw IllegalArgumentException("viewType not found")
         }

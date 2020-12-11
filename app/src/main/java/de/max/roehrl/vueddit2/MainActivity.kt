@@ -11,6 +11,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.Navigation
+import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.android.material.appbar.MaterialToolbar
 
 class MainActivity : AppCompatActivity() {

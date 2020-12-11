@@ -13,11 +13,9 @@ import androidx.transition.TransitionInflater
 import coil.load
 import coil.request.Disposable
 import coil.size.ViewSizeResolver
-import de.max.roehrl.vueddit2.service.Reddit
-import org.json.JSONObject
 
 
-class PostDetailFragment(private val post: JSONObject) : Fragment() {
+class PostDetailFragment(private val post: Post) : Fragment() {
     private var disposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,12 +36,12 @@ class PostDetailFragment(private val post: JSONObject) : Fragment() {
         ViewCompat.setTransitionName(postHeader, "header")
 
         val title: TextView = view.findViewById(R.id.title)
-        title.text = post.getString("title")
+        title.text = post.title
 
         val imageView: ImageView = view.findViewById(R.id.preview)
-        val preview = Reddit.getPreview(post)
+        val preview = post.previewUrl
         if (preview != null) {
-            disposable = imageView.load(preview.getString("url")) {
+            disposable = imageView.load(preview) {
                 placeholder(R.drawable.ic_comment_text_multiple_outline)
                 size(ViewSizeResolver(imageView))
                 error(R.drawable.ic_comment_text_multiple_outline)

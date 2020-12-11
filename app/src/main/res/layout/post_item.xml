@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/post_header"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center">
 
@@ -26,13 +26,14 @@
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15sp" />
+            android:textColor="@color/post_title"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/meta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="10 comments"
+            android:textColor="@color/post_meta"
             android:textSize="12sp" />
     </LinearLayout>
 
