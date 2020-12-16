@@ -10,8 +10,8 @@
     "url": "git+https://github.com/maxroehrl/Vueddit.git"
   },
   "dependencies": {
-    "@nativescript/core": "7.0.12",
-    "@nativescript/theme": "^3.0.0",
+    "@nativescript/core": "7.0.13",
+    "@nativescript/theme": "^3.0.1",
     "@nstudio/nativescript-loading-indicator": "^4.0.0",
     "@vue/devtools": "^5.3.3",
     "base-64": "^1.0.0",
@@ -22,31 +22,31 @@
     "nativescript-toasty": "^3.0.0-alpha.2",
     "nativescript-ui-listview": "^9.0.4",
     "nativescript-ui-sidedrawer": "^9.0.3",
-    "nativescript-vue": "^2.8.1",
+    "nativescript-vue": "^2.8.3",
     "nativescript-vue-devtools": "^1.4.0",
     "path": "^0.12.7",
     "stream": "0.0.2",
     "url": "^0.11.0",
     "util": "^0.12.3",
-    "vuex": "^3.5.1"
+    "vuex": "^3.6.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.3",
+    "@babel/core": "^7.12.10",
     "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
     "@nativescript/android": "7.0.1",
     "@nativescript/webpack": "3.0.8",
     "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.1.0",
-    "eslint": "^7.11.0",
+    "babel-loader": "^8.2.2",
+    "eslint": "^7.15.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-i-am-meticulous": "^12.0.0",
     "eslint-loader": "^4.0.2",
     "eslint-plugin-babel": "^5.3.1",
-    "eslint-plugin-vue": "^7.1.0",
-    "nativescript-vue-template-compiler": "^2.8.1",
+    "eslint-plugin-vue": "^7.3.0",
+    "nativescript-vue-template-compiler": "^2.8.3",
     "nativescript-worker-loader": "~0.12.1",
     "node-sass": "^4.14.1",
-    "vue-loader": "^15.9.3"
+    "vue-loader": "^15.9.5"
   }
 }
