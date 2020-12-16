@@ -1,0 +1,5 @@
+ext {
+  androidXRecyclerView = "1.2.0-beta01"
+  androidXAppCompat = "1.2.0"
+  androidXMaterial = "1.2.1"
+}
