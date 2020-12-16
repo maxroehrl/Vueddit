@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- theme to use FOR launch screen-->
+    <style name="LaunchScreenTheme" parent="LaunchScreenThemeBase">
+      <item name="android:statusBarColor">@color/ns_accent</item>
+      <item name="android:navigationBarColor">@color/ns_accent</item>
+    </style>
 
     <!-- Application theme -->
     <style name="AppTheme" parent="AppThemeBase">
