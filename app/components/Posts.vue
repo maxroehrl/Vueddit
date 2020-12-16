@@ -5,6 +5,7 @@
                loadOnDemandMode="Auto"
                pullToRefresh="true"
                :itemTemplateSelector="templateSelector"
+               @loaded="loaded"
                @loadMoreDataRequested="onLoadMorePostsRequested"
                @pullToRefreshInitiated="onPullDown">
     <v-template name="header">
@@ -83,6 +84,13 @@ export default {
     };
   },
   methods: {
+    loaded() {
+      if (this.$refs?.postList?.nativeView?._listViewAdapter) {
+        this.$refs.postList.nativeView._listViewAdapter.stateRestorationPolicy =
+          androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY;
+      }
+    },
+
     templateSelector(item) {
       return item?.body ? 'comment' : 'post';
     },
