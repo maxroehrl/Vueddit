@@ -82,8 +82,10 @@ export default {
       }
     },
 
-    refresh() {
-      setTimeout(() => this.$refs.posts.refreshWithLoadingIndicator());
+    refresh(args) {
+      if (!args || !this.$refs.posts.postList.length) {
+        setTimeout(() => this.$refs.posts.refreshWithLoadingIndicator());
+      }
     },
 
     toggleTemplate() {
