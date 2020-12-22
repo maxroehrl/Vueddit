@@ -1,5 +1,6 @@
 package de.max.roehrl.vueddit2
 
+import android.graphics.drawable.Animatable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,9 +9,13 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionInflater
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.drawable.ProgressBarDrawable
 import com.facebook.drawee.view.SimpleDraweeView
+import com.facebook.imagepipeline.image.ImageInfo
 
 
 class PostDetailFragment(private val post: Post) : Fragment() {
@@ -35,6 +40,11 @@ class PostDetailFragment(private val post: Post) : Fragment() {
         title.text = post.title
 
         val imageView: SimpleDraweeView = view.findViewById(R.id.preview)
+        imageView.controller = Fresco.newDraweeControllerBuilder().setControllerListener(object : BaseControllerListener<ImageInfo>() {
+            override fun onFinalImageSet(id: String?, imageInfo: ImageInfo?, animatable: Animatable?) {
+                startPostponedEnterTransition()
+            }
+        }).build()
         val preview = post.previewUrl
         if (preview != null) {
             imageView.setImageURI(preview)
@@ -42,10 +52,8 @@ class PostDetailFragment(private val post: Post) : Fragment() {
             progress.backgroundColor = 0x30FFFFFF
             progress.color = 0x8053BA82.toInt()
             imageView.hierarchy.setProgressBarImage(progress)
-            startPostponedEnterTransition()
         } else {
             imageView.setActualImageResource(R.drawable.ic_comment_text_multiple_outline)
-            startPostponedEnterTransition()
         }
     }
 }
