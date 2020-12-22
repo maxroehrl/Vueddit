@@ -32,6 +32,7 @@ class PostDetailFragment(private val post: Post) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         postponeEnterTransition()
+        RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         val postHeader = view.findViewById<RelativeLayout>(R.id.header)
         ViewCompat.setTransitionName(postHeader, "header")
