@@ -94,22 +94,21 @@ class PostAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         this.posts.addAll(posts)
     }
 
-    inner class ProgressViewHolder(view: View) : RecyclerView.ViewHolder(view)
+    inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    inner class PostViewHolder(view: View): RecyclerView.ViewHolder(view) {
-        private val postHeader: RelativeLayout = view.findViewById(R.id.post_header)
-        private val title: TextView = view.findViewById(R.id.title)
-        private val meta: TextView = view.findViewById(R.id.meta)
-        private val imageView: SimpleDraweeView = view.findViewById(R.id.preview)
-        private val votes: TextView = view.findViewById(R.id.votes)
+    inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val postHeader: RelativeLayout = itemView.findViewById(R.id.post_header)
+        private val title: TextView = itemView.findViewById(R.id.title)
+        private val meta: TextView = itemView.findViewById(R.id.meta)
+        private val imageView: SimpleDraweeView = itemView.findViewById(R.id.preview)
+        private val votes: TextView = itemView.findViewById(R.id.votes)
         private lateinit var post: Post
 
-        @SuppressLint("SetTextI18n")
-        fun bind(post: Post) {
-            this.post = post
-            val transitionName = post.name
-            ViewCompat.setTransitionName(postHeader, transitionName)
-            title.text = post.title
+        init {
+            val progress = ProgressBarDrawable()
+            progress.backgroundColor = 0x30FFFFFF
+            progress.color = 0x8053BA82.toInt()
+            imageView.hierarchy.setProgressBarImage(progress)
             title.setOnClickListener {
                 val detailFragment = PostDetailFragment(post)
                 (it.context as AppCompatActivity).supportFragmentManager.commit {
@@ -120,15 +119,18 @@ class PostAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     addToBackStack(null)
                 }
             }
+        }
+
+        @SuppressLint("SetTextI18n")
+        fun bind(post: Post) {
+            this.post = post
+            ViewCompat.setTransitionName(postHeader, post.name)
+            title.text = post.title
             meta.text = "(${post.domain})\n${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n${post.created_utc} by /u/${post.author}\n"
             votes.text = if (post.score >= 10000) (post.score / 1000).toString() + 'k' else post.score.toString()
             val preview = post.previewUrl
             if (preview != null) {
                 imageView.setImageURI(preview)
-                val progress = ProgressBarDrawable()
-                progress.backgroundColor = 0x30FFFFFF
-                progress.color = 0x8053BA82.toInt()
-                imageView.hierarchy.setProgressBarImage(progress)
             } else {
                 imageView.setActualImageResource(R.drawable.ic_comment_text_multiple_outline)
             }
@@ -181,8 +183,10 @@ class PostAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             posts.add(loading)
             notifyItemInserted(itemCount - 1)
         } else {
-            posts.remove(loading)
-            notifyItemRemoved(itemCount)
+            val index = posts.indexOf(loading)
+            if (posts.remove(loading)) {
+                notifyItemRemoved(index)
+            }
         }
     }
 }

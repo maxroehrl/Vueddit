@@ -6,6 +6,7 @@ import com.android.volley.toolbox.BasicNetwork
 import com.android.volley.toolbox.NoCache
 import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.JsonObjectRequest
+import de.max.roehrl.vueddit2.Post
 import org.json.JSONObject
 import kotlin.math.absoluteValue
 
@@ -23,13 +24,22 @@ object Reddit {
         subreddit: String = frontpage,
         after: String = "",
         sorting: String = "best",
-        cb: (JSONObject) -> Unit
+        cb: (MutableList<Post>) -> Unit
     ) {
         val url = "https://reddit.com/$sorting.json?raw_json=1"
         requestQueue.add(JsonObjectRequest(
             Request.Method.GET, url, null,
             { response ->
-                cb.invoke(response)
+                val g = response.getJSONObject("data").getJSONArray("children")
+                val list = mutableListOf<Post>()
+                for (i in 0 until g.length()) {
+                    list.add(Post(g.getJSONObject(i).getJSONObject("data")))
+                }
+                cb.invoke(if (after == "") {
+                    list
+                } else {
+                    list
+                })
             },
             { error ->
             }
