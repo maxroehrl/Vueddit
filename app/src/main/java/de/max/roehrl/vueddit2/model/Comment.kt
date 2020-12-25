@@ -1,9 +1,10 @@
-package de.max.roehrl.vueddit2
+package de.max.roehrl.vueddit2.model
 
+import de.max.roehrl.vueddit2.service.Reddit
 import org.json.JSONObject
 
-data class Comment(val json: JSONObject) {
-    val name = json.optString("name")
+data class Comment(val json: JSONObject) : NamedItem(json.optString("name")) {
+    val name = id
     val author = json.optString("author")
     val body = json.optString("body")
     val subreddit = json.optString("subreddit")
@@ -20,4 +21,8 @@ data class Comment(val json: JSONObject) {
     val gid_1 = json.optJSONObject("gildings")?.optInt("gid_1", 0) ?: 0
     val gid_2 = json.optJSONObject("gildings")?.optInt("gid_2", 0) ?: 0
     val gid_3 = json.optJSONObject("gildings")?.optInt("gid_3", 0) ?: 0
+
+    fun getScore() : String {
+        return Reddit.getFormattedScore(likes)
+    }
 }

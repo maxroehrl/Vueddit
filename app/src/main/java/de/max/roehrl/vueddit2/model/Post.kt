@@ -1,15 +1,17 @@
-package de.max.roehrl.vueddit2
+package de.max.roehrl.vueddit2.model
 
 import de.max.roehrl.vueddit2.service.Reddit
 import org.json.JSONObject
 
-data class Post(val json : JSONObject) {
-    val name = json.optString("name")
+data class Post(var json : JSONObject) : NamedItem(json.optString("name")) {
+    val name = id
     val title = json.optString("title")
+    val permalink = json.optString("permalink")
     val link_flair_text = json.optString("link_flair_text")
     val link_flair_background_color = json.optString("link_flair_background_color")
     val stickied = json.optBoolean("stickied", false)
     val domain = json.optString("domain")
+    val url = json.optString("url")
     val over18 = json.optBoolean("over_18", false)
     val spoiler = json.optBoolean("spoiler", false)
     val num_comments = json.optInt("num_comments")
@@ -29,4 +31,16 @@ data class Post(val json : JSONObject) {
     val comments = listOf<JSONObject>()
     val previewUrl : String? = Reddit.getPreview(json)?.optString("url")
     val bigPreview : String? = null
+
+    init {
+        json = JSONObject()
+    }
+
+    fun getScore() : String {
+        return Reddit.getFormattedScore(score)
+    }
+
+    override fun toString(): String {
+        return "Post '$title'"
+    }
 }
