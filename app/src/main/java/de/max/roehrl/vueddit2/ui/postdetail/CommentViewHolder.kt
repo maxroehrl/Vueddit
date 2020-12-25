@@ -7,6 +7,7 @@ import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.ui.view.IndentedLabel
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
+import de.max.roehrl.vueddit2.service.Markdown
 
 class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val header: IndentedLabel = itemView.findViewById(R.id.comment_header)
@@ -18,7 +19,7 @@ class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         this.comment = comment as Comment
         header.text = "${comment.author} ${comment.ups} points"
         header.setDepth(comment.depth, 10)
-        body.text = comment.body
+        Markdown.getInstance(body.context).setMarkdown(body, comment.getSpannedBody(body.context))
         body.setDepth(comment.depth, 10)
     }
 }

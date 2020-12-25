@@ -3,15 +3,10 @@ package de.max.roehrl.vueddit2.ui.postdetail
 import android.annotation.SuppressLint
 import android.view.View
 import android.widget.TextView
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.controller.BaseControllerListener
-import com.facebook.drawee.drawable.ProgressBarDrawable
-import com.facebook.drawee.view.SimpleDraweeView
-import com.facebook.imagepipeline.image.ImageInfo
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
-import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.service.CustomTabs
+import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.ui.postlist.PostViewHolder
 
 class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
@@ -22,11 +17,11 @@ class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
     override fun bind(post: NamedItem) {
         super.bind(post)
         if (this.post.selftext.isEmpty()) {
-            selfText.visibility = View.VISIBLE
-            selfText.text = this.post.selftext
-        } else {
             selfText.visibility = View.GONE
             selfText.text = ""
+        } else {
+            selfText.visibility = View.VISIBLE
+            Markdown.getInstance(selfText.context).setMarkdown(selfText, this.post.getSpannedSelftext(selfText.context))
         }
         numComments.text = "Showing ${this.post.num_comments} comment${if (this.post.num_comments != 1) "s" else ""}"
 

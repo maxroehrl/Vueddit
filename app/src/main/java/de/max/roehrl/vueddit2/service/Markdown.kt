@@ -2,17 +2,21 @@ package de.max.roehrl.vueddit2.service
 
 import android.content.Context
 import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.view.View
+import android.widget.TextView
+import de.max.roehrl.vueddit2.model.SingletonHolder
 import io.noties.markwon.*
 import io.noties.markwon.core.CorePlugin
 import java.util.regex.Pattern
 
-class Markdown(context: Context) {
+class Markdown private constructor(context: Context) {
     private val markwon: Markwon
     private var urlOpenCallback = { url : String -> CustomTabs.openUrl(context, url) }
+    private val malformedHadingRegex = Regex("^#+(?=[^#\\s])", RegexOption.MULTILINE)
 
     init {
         markwon = Markwon.builder(context)
@@ -20,6 +24,8 @@ class Markdown(context: Context) {
             .usePlugin(getLinkResolverPlugin())
             .build()
     }
+
+    companion object : SingletonHolder<Markdown, Context>(::Markdown)
 
     private fun getUrlPlugin() : MarkwonPlugin {
         // https://developer.android.com/reference/android/text/util/Linkify
@@ -89,5 +95,21 @@ class Markdown(context: Context) {
             }
         }
         return LinkResolverPlugin()
+    }
+
+    fun setMarkdown(tv: TextView, text: String) {
+        markwon.setMarkdown(tv, fixMarkdownHeadings(text))
+    }
+
+    fun toMarkDown(text: String) : Spanned {
+        return markwon.toMarkdown(fixMarkdownHeadings(text))
+    }
+
+    fun setMarkdown(tv: TextView, markdown: Spanned?) {
+        markwon.setParsedMarkdown(tv, markdown!!)
+    }
+
+    private fun fixMarkdownHeadings(text: String) : String {
+        return text.replace(malformedHadingRegex) { it.value + " " }
     }
 }

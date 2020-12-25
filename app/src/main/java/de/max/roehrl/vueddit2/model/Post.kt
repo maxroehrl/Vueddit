@@ -1,9 +1,12 @@
 package de.max.roehrl.vueddit2.model
 
+import android.content.Context
+import android.text.Spanned
+import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
 import org.json.JSONObject
 
-class Post(json : JSONObject) : NamedItem(json.optString("name")) {
+class Post(json: JSONObject) : NamedItem(json.optString("name")) {
     val name = id
     val title = json.optString("title")
     val permalink = json.optString("permalink")
@@ -25,18 +28,26 @@ class Post(json : JSONObject) : NamedItem(json.optString("name")) {
     val edited = json.optBoolean("edited")
     val created_utc = json.optInt("created_utc")
     val selftext = json.optString("selftext")
+    var spannedSelftext: Spanned? = null
     val score = json.optInt("score", 0)
     val likes = json.optBoolean("likes", false)
     val shown_comments = 0
     val comments = listOf<JSONObject>()
-    val previewUrl : String? = Reddit.getPreview(json)?.optString("url")
-    val bigPreview : String? = null
+    val previewUrl: String? = Reddit.getPreview(json)?.optString("url")
+    val bigPreview: String? = null
 
-    fun getScore() : String {
+    fun getSpannedSelftext(context: Context): Spanned? {
+        if (spannedSelftext == null) {
+            spannedSelftext = Markdown.getInstance(context).toMarkDown(selftext)
+        }
+        return spannedSelftext
+    }
+
+    fun getScore(): String {
         return Reddit.getFormattedScore(score)
     }
 
     override fun toString(): String {
-        return "Post '$title'"
+        return "Post $name ('$title') by $author"
     }
 }
