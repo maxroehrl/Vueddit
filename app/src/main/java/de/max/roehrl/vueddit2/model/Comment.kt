@@ -9,15 +9,16 @@ import org.json.JSONObject
 class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
     val name = id
     val author = json.optString("author")
-    val body = json.optString("body")
+    val body = json.optString("body", "")
     var spannedBody: Spanned? = null
     val subreddit = json.optString("subreddit")
-    val likes = json.optInt("likes")
-    val ups = json.optInt("ups")
-    val depth = json.optInt("depth")
+    val likes = json.optInt("likes", 0)
+    val count = json.optInt("count", 0)
+    val ups = json.optInt("ups", 0)
+    val depth = json.optInt("depth", 0)
     val children = mutableListOf<Comment>()
     val created_utc = json.optInt("created_utc")
-    val edited = json.optBoolean("edited")
+    val edited = json.optBoolean("edited", false)
     val is_submitter = json.optBoolean("is_submitter", false)
     val distinguished = json.optString("distinguished", "")
     val author_flair_text = json.optString("author_flair_text")

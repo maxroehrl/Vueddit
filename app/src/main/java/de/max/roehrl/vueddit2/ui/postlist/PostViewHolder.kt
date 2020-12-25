@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.commit
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.drawable.ProgressBarDrawable
@@ -38,7 +37,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         (view.context as AppCompatActivity).supportFragmentManager.commit {
             setReorderingAllowed(true)
             setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
-            addSharedElement(postHeader, "header")
+            // addSharedElement(postHeader, "header")
             replace(R.id.nav_host_fragment, detailFragment)
             addToBackStack(null)
         }
@@ -47,7 +46,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     @SuppressLint("SetTextI18n")
     open fun bind(post: NamedItem) {
         this.post = post as Post
-        ViewCompat.setTransitionName(postHeader, post.name)
+        // ViewCompat.setTransitionName(postHeader, post.name)
         title.text = post.title
         meta.text = "(${post.domain})\n${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n${post.created_utc} by /u/${post.author}\n"
         votes.text = post.getScore()

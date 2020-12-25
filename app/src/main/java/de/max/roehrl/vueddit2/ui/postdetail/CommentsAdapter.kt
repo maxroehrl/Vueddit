@@ -17,6 +17,7 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
         private const val VIEW_TYPE_DATA = 0
         private const val VIEW_TYPE_PROGRESS = 1
         private const val VIEW_TYPE_HEADER = 2
+        private const val VIEW_TYPE_MORE = 3
     }
 
     fun setComments(comments: MutableList<NamedItem>) {
@@ -46,22 +47,31 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
                             false
                     )
             )
+            VIEW_TYPE_MORE -> MoreCommentsViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                            R.layout.more_comments_item,
+                            parent,
+                            false
+                    )
+            )
             else -> throw IllegalArgumentException("viewType not found")
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when {
-            position == 0 -> VIEW_TYPE_HEADER
-            comments[position - 1] == NamedItem.Loading -> VIEW_TYPE_PROGRESS
-            else -> VIEW_TYPE_DATA
+            position == 0                                  -> VIEW_TYPE_HEADER
+            comments[position - 1] == NamedItem.Loading    -> VIEW_TYPE_PROGRESS
+            (comments[position - 1] as Comment).body == "" -> VIEW_TYPE_MORE
+            else                                           -> VIEW_TYPE_DATA
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is PostHeaderViewHolder -> holder.bind(post)
-            is CommentViewHolder    -> holder.bind(comments[position - 1] as Comment)
+            is PostHeaderViewHolder   -> holder.bind(post)
+            is MoreCommentsViewHolder -> holder.bind(comments[position - 1] as Comment)
+            is CommentViewHolder      -> holder.bind(comments[position - 1] as Comment)
         }
     }
 

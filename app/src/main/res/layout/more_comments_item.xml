@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <de.max.roehrl.vueddit2.ui.view.IndentedLabel
+        android:id="@+id/more"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/more_comments_text"
+        android:textSize="@dimen/more_comments_text_size"
+        android:paddingLeft="6px" />
+
+</LinearLayout>
