@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="de.max.roehrl.vueddit2.ui.home.HomeFragment"
+        android:name="de.max.roehrl.vueddit2.ui.postlist.PostListFragment"
         android:label="@string/posts_list"
         tools:layout="@layout/fragment_posts" />
 </navigation>
