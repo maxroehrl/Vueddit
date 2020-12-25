@@ -3,7 +3,7 @@ package de.max.roehrl.vueddit2.model
 import de.max.roehrl.vueddit2.service.Reddit
 import org.json.JSONObject
 
-data class Comment(val json: JSONObject) : NamedItem(json.optString("name")) {
+class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
     val name = id
     val author = json.optString("author")
     val body = json.optString("body")

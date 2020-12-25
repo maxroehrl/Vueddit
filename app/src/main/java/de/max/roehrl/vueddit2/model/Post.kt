@@ -3,7 +3,7 @@ package de.max.roehrl.vueddit2.model
 import de.max.roehrl.vueddit2.service.Reddit
 import org.json.JSONObject
 
-data class Post(var json : JSONObject) : NamedItem(json.optString("name")) {
+class Post(json : JSONObject) : NamedItem(json.optString("name")) {
     val name = id
     val title = json.optString("title")
     val permalink = json.optString("permalink")
@@ -31,10 +31,6 @@ data class Post(var json : JSONObject) : NamedItem(json.optString("name")) {
     val comments = listOf<JSONObject>()
     val previewUrl : String? = Reddit.getPreview(json)?.optString("url")
     val bigPreview : String? = null
-
-    init {
-        json = JSONObject()
-    }
 
     fun getScore() : String {
         return Reddit.getFormattedScore(score)
