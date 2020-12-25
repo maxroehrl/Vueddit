@@ -50,7 +50,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         title.text = post.title
         meta.text = "(${post.domain})\n${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n${post.created_utc} by /u/${post.author}\n"
         votes.text = post.getScore()
-        val preview = post.previewUrl
+        val preview = post.preview.url
         if (preview != null) {
             imageView.setImageURI(preview)
         } else {

@@ -101,21 +101,6 @@ object Reddit {
         }
     }
 
-    fun getPreview(post: JSONObject, preferredWidth: Int = 300): JSONObject? {
-        val images = post.optJSONObject("preview")?.optJSONArray("images")
-        if (images != null && images.length() > 0) {
-            val resolutions = images.getJSONObject(0).getJSONArray("resolutions")
-            val dists = mutableListOf<Int>()
-            for (i in 0 until resolutions.length()) {
-                dists.add(resolutions.getJSONObject(i).getInt("width") - preferredWidth)
-            }
-            val min = dists.minByOrNull { it.absoluteValue }
-            val index = dists.indexOf(min)
-            return resolutions.getJSONObject(index)
-        }
-        return null
-    }
-
     fun getFormattedScore(score : Int) : String {
         return if (score >= 10000) (score / 1000).toString() + 'k' else score.toString()
     }

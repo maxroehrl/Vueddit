@@ -33,8 +33,8 @@ class Post(json: JSONObject) : NamedItem(json.optString("name")) {
     val likes = json.optBoolean("likes", false)
     val shown_comments = 0
     val comments = listOf<JSONObject>()
-    val previewUrl: String? = Reddit.getPreview(json)?.optString("url")
-    val bigPreview: String? = null
+    val preview: Image = Image(json, 300)
+    val image: Image = Image(json)
     val video: Video = Video(json)
 
     fun getSpannedSelftext(context: Context): Spanned? {
