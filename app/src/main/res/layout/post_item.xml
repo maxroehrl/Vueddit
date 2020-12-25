@@ -27,14 +27,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/post_title"
-            android:textSize="14sp" />
+            android:textSize="@dimen/post_text_size_title" />
 
         <TextView
             android:id="@+id/meta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/post_meta"
-            android:textSize="12sp" />
+            android:textSize="@dimen/post_text_size_meta" />
     </LinearLayout>
 
     <com.facebook.drawee.view.SimpleDraweeView

@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/post_meta"
-        android:textSize="12sp" />
+        android:textSize="@dimen/comment_text_size" />
 
     <de.max.roehrl.vueddit2.ui.view.IndentedLabel
         android:id="@+id/comment_body"
@@ -17,6 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/comment_header"
         android:textColor="@color/post_title"
-        android:textSize="12sp" />
+        android:textSize="@dimen/comment_text_size" />
 
 </RelativeLayout>
