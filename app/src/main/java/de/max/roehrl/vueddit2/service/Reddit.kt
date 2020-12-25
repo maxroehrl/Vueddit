@@ -79,9 +79,22 @@ object Reddit {
                 ?.optJSONObject("data")
                 ?.optJSONArray("children")
             val comments = mutableListOf<Comment>()
+
+            fun addAllChildren(item: JSONObject) {
+                comments.add(Comment(item))
+                val children = item
+                        .optJSONObject("replies")
+                        ?.optJSONObject("data")
+                        ?.optJSONArray("children")
+                if (children != null) {
+                    for (i in 0 until children.length()) {
+                        addAllChildren(children.getJSONObject(i).getJSONObject("data"))
+                    }
+                }
+            }
             if (commentsData != null) {
                 for (i in 0 until commentsData.length()) {
-                    comments.add(Comment(commentsData.getJSONObject(i).getJSONObject("data")))
+                    addAllChildren(commentsData.getJSONObject(i).getJSONObject("data"))
                 }
             }
             cb.invoke(post, comments)
