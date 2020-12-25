@@ -6,13 +6,27 @@
     <include
         layout="@layout/post_item" />
 
+    <LinearLayout
+        android:id="@+id/video_preview_layout"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_below="@id/post_header">
+
+        <WebView
+            android:id="@+id/video_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"/>
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/self_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:padding="10dp"
-        android:layout_below="@id/post_header" />
+        android:layout_below="@id/video_preview_layout" />
 
     <LinearLayout
         android:layout_width="match_parent"
