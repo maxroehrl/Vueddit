@@ -21,5 +21,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.login.LoginActivity"
+            android:parentActivityName=".MainActivity" />
+
     </application>
 </manifest>

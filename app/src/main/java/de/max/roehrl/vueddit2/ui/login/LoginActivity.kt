@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Reddit
 
-class LoginWebView : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
     private inner class Client : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
             return request?.url.toString().startsWith(Reddit.redirectUri)
@@ -16,7 +16,7 @@ class LoginWebView : AppCompatActivity() {
 
         override fun onPageFinished(view: WebView?, url: String?) {
             if (url != null && (url.contains("code=") || url.contains("error="))) {
-                Reddit.onAuthorizationSuccessful(url)
+                Reddit.onAuthorizationSuccessful(view!!.context, url)
             }
         }
     }
@@ -24,10 +24,13 @@ class LoginWebView : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
         val webView: WebView = findViewById(R.id.web_view)
         webView.webViewClient = Client()
         webView.settings.displayZoomControls = false
         webView.settings.loadWithOverviewMode = true
+        webView.loadUrl(Reddit.oAuthLoginUrl)
+
         // TODO Prevent back action
     }
 }
