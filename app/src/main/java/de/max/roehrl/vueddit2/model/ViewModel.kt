@@ -40,7 +40,7 @@ class AppViewModel: ViewModel() {
     fun loadMorePosts(cb: () -> Unit) {
         var lastPost : NamedItem? = null
         try {
-            lastPost = posts.value?.last { post -> post == NamedItem.Loading }
+            lastPost = posts.value?.last { post -> post != NamedItem.Loading }
         } catch (e: NoSuchElementException) {
 
         }
