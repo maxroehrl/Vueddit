@@ -2,7 +2,10 @@ package de.max.roehrl.vueddit2.model
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import de.max.roehrl.vueddit2.service.Reddit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AppViewModel: ViewModel() {
     val subreddit: MutableLiveData<Subreddit> by lazy {
@@ -30,24 +33,26 @@ class AppViewModel: ViewModel() {
     }
 
     fun loadComments(cb: () -> Unit) {
-        Reddit.getPostAndComments(selectedPost.value!!.permalink, "top") { post, c ->
-            selectedPost.postValue(post)
-            comments.postValue(c.toMutableList())
+        viewModelScope.launch(Dispatchers.IO) {
+            val pair = Reddit.getPostAndComments(selectedPost.value!!.permalink, "top")
+            selectedPost.postValue(pair.first)
+            comments.postValue(pair.second.toMutableList())
             cb()
         }
     }
 
     fun loadMorePosts(cb: () -> Unit) {
-        var lastPost : NamedItem? = null
-        try {
-            lastPost = posts.value?.last { post -> post != NamedItem.Loading }
-        } catch (e: NoSuchElementException) {
+        viewModelScope.launch(Dispatchers.IO) {
+            var lastPost: NamedItem? = null
+            try {
+                lastPost = posts.value?.last { post -> post != NamedItem.Loading }
+            } catch (e: NoSuchElementException) {
 
-        }
-        posts.value?.add(NamedItem.Loading)
-        posts.postValue(posts.value)
-        val after = lastPost?.id ?: ""
-        Reddit.getSubredditPosts(Reddit.frontpage, after, "best") { p ->
+            }
+            posts.value?.add(NamedItem.Loading)
+            posts.postValue(posts.value)
+            val after = lastPost?.id ?: ""
+            val p = Reddit.getSubredditPosts(Reddit.frontpage, after, "best")
             posts.value?.remove(NamedItem.Loading)
             posts.value?.addAll(p)
             posts.postValue(posts.value)
@@ -57,8 +62,6 @@ class AppViewModel: ViewModel() {
 
     fun refreshPosts(cb: () -> Unit) {
         posts.value?.clear()
-        this.loadMorePosts {
-            cb()
-        }
+        this.loadMorePosts(cb)
     }
 }

@@ -1,5 +1,6 @@
 package de.max.roehrl.vueddit2.model
 
+import android.util.Log
 import de.max.roehrl.vueddit2.service.Util
 import org.json.JSONObject
 import kotlin.math.absoluteValue
@@ -19,10 +20,14 @@ class Image(post: JSONObject, preferredWidth: Int = Util.getScreenWidth()) {
             }
             val min = dists.minByOrNull { it.absoluteValue }
             val index = dists.indexOf(min)
-            val jsonObject = resolutions.getJSONObject(index)
-            url = jsonObject.optString("url")
-            height = jsonObject.optInt("height")
-            width = jsonObject.optInt("width")
+            if (index >= 0) {
+                val jsonObject = resolutions.getJSONObject(index)
+                url = jsonObject.optString("url")
+                height = jsonObject.optInt("height")
+                width = jsonObject.optInt("width")
+            } else {
+                Log.d("Image", "Failed to load image for post: '${post.optString("title")}'")
+            }
         }
     }
 }

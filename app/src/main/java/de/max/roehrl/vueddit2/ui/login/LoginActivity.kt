@@ -5,8 +5,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Reddit
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
     private inner class Client : WebViewClient() {
@@ -16,7 +18,9 @@ class LoginActivity : AppCompatActivity() {
 
         override fun onPageFinished(view: WebView?, url: String?) {
             if (url != null && (url.contains("code=") || url.contains("error="))) {
-                Reddit.onAuthorizationSuccessful(view!!.context, url)
+                lifecycleScope.launch {
+                    Reddit.onAuthorizationSuccessful(view!!.context, url)
+                }
             }
         }
     }

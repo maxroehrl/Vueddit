@@ -1,32 +1,32 @@
 package de.max.roehrl.vueddit2
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
-import com.google.android.material.navigation.NavigationView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.android.material.appbar.MaterialToolbar
-import de.max.roehrl.vueddit2.service.Store
-import de.max.roehrl.vueddit2.ui.login.LoginActivity
-import kotlinx.coroutines.flow.collect
+import com.google.android.material.navigation.NavigationView
+import de.max.roehrl.vueddit2.service.Reddit
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+    private val TAG = "MainActivity"
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Fresco.initialize(this)
+        lifecycleScope.launch {
+            Reddit.init(this@MainActivity)
+        }
         setContentView(R.layout.activity_main)
         val toolbar: MaterialToolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -34,15 +34,6 @@ class MainActivity : AppCompatActivity() {
         toolbar.setTitle(R.string.app_name)
         //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
         //        .setAction("Action", null).show()
-        val context = this
-        lifecycleScope.launch {
-            Store.getInstance(context).refreshToken.collect { refreshToken -> if (refreshToken == null) context.login() }
-        }
-    }
-
-    fun login() {
-        Log.d("Main", "Not logged in. Goto login screen")
-        startActivity(Intent(this, LoginActivity::class.java))
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
