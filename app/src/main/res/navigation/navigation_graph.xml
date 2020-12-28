@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/postListFragment">
+
+    <fragment
+        android:id="@+id/postListFragment"
+        android:name="de.max.roehrl.vueddit2.ui.postlist.PostListFragment"
+        android:label="@string/posts_list"
+        tools:layout="@layout/fragment_posts">
+        <action
+            android:id="@+id/action_postListFragment_to_postDetailFragment"
+            app:destination="@id/postDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/postListFragment" />
+        <action
+            android:id="@+id/action_postListFragment_to_loginActivity"
+            app:destination="@id/loginActivity"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/postListFragment" />
+        <deepLink
+            android:id="@+id/deepLink"
+            app:uri="https://reddit.com/r/{subreddit}" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/postDetailFragment"
+        android:name="de.max.roehrl.vueddit2.ui.postdetail.PostDetailFragment"
+        android:label="Post Title"
+        tools:layout="@layout/fragment_post_detail" />
+
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="de.max.roehrl.vueddit2.ui.login.LoginActivity"
+        android:label="Login"
+        tools:layout="@layout/activity_login" />
+</navigation>

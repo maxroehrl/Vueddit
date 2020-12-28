@@ -7,6 +7,7 @@ import de.max.roehrl.vueddit2.service.Reddit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+// https://developer.android.com/topic/libraries/architecture/coroutines
 class AppViewModel: ViewModel() {
     val subreddit: MutableLiveData<Subreddit> by lazy {
         MutableLiveData<Subreddit>().also {

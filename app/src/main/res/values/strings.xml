@@ -7,4 +7,5 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_refresh">Refresh</string>
     <string name="posts_list">Posts</string>
+    <string name="search_hint">Search for subreddit</string>
 </resources>

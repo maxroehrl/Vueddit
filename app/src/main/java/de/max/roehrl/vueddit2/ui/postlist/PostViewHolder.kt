@@ -4,15 +4,17 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.commit
+import androidx.activity.viewModels
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.drawable.ProgressBarDrawable
 import com.facebook.drawee.view.SimpleDraweeView
-import de.max.roehrl.vueddit2.model.Post
+import de.max.roehrl.vueddit2.MainActivity
 import de.max.roehrl.vueddit2.R
+import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.NamedItem
-import de.max.roehrl.vueddit2.ui.postdetail.PostDetailFragment
+import de.max.roehrl.vueddit2.model.Post
 
 open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val postHeader: RelativeLayout = itemView.findViewById(R.id.post_header)
@@ -33,14 +35,13 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     open fun onClick(view: View) {
-        val detailFragment = PostDetailFragment(post)
-        (view.context as AppCompatActivity).supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
-            // addSharedElement(postHeader, "header")
-            replace(R.id.nav_host_fragment, detailFragment)
-            addToBackStack(null)
-        }
+        val viewModel: AppViewModel by (view.context as MainActivity).viewModels()
+        viewModel.selectedPost.value = post
+        view.findNavController().navigate(R.id.action_postListFragment_to_postDetailFragment,
+                //null,
+                //null,
+                //FragmentNavigatorExtras(postHeader to "header")
+        )
     }
 
     @SuppressLint("SetTextI18n")
