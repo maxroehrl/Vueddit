@@ -20,4 +20,8 @@ class Subreddit(json: JSONObject) : NamedItem("subreddit") {
     val isMultiReddit = !subreddits.isNullOrEmpty()
     val isStarred = false
     var isVisited = true
+
+    override fun toString(): String {
+        return "$name (${if (isMultiReddit) subreddits else "isStarred: $isStarred"})"
+    }
 }

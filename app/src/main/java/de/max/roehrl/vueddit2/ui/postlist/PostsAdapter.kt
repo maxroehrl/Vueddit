@@ -4,21 +4,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
 
-class PostAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-    private var posts: MutableList<NamedItem> = mutableListOf()
+    var posts: List<NamedItem> = emptyList()
 
     companion object {
         private const val VIEW_TYPE_DATA = 0
         private const val VIEW_TYPE_PROGRESS = 1
-    }
-
-    fun setPosts(posts: MutableList<NamedItem>) {
-        this.posts = posts
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

@@ -18,10 +18,10 @@ import java.io.IOException
 // https://developer.android.com/topic/libraries/architecture/datastore
 class Store private constructor(context: Context) {
     private val preferenceDataStore: DataStore<Preferences> = context.createDataStore(PREFERENCE_NAME)
-    val username : Flow<String?> = getFlow(USERNAME)
-    val authToken : Flow<String?> = getFlow(AUTH_TOKEN)
-    val validUntil : Flow<Long?> = getFlow(VALID_UNTIL)
-    val refreshToken : Flow<String?> = getFlow(REFRESH_TOKEN)
+    private val username : Flow<String?> = getFlow(USERNAME)
+    private val authToken : Flow<String?> = getFlow(AUTH_TOKEN)
+    private val validUntil : Flow<Long?> = getFlow(VALID_UNTIL)
+    private val refreshToken : Flow<String?> = getFlow(REFRESH_TOKEN)
 
     companion object : SingletonHolder<Store, Context>(::Store) {
         private const val PREFERENCE_NAME = "reddit"

@@ -31,9 +31,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         return posts.value?.last() == NamedItem.Loading
     }
 
-    val posts: MutableLiveData<MutableList<NamedItem>> by lazy {
-        MutableLiveData<MutableList<NamedItem>>().also {
-            it.value = mutableListOf()
+    val posts: MutableLiveData<List<NamedItem>> by lazy {
+        MutableLiveData<List<NamedItem>>().also {
+            it.value = listOf(NamedItem.Loading)
         }
     }
 
@@ -62,14 +62,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: NoSuchElementException) {
 
             }
-            posts.value?.add(NamedItem.Loading)
-            posts.postValue(posts.value)
+            val oldPosts = posts.value?.toMutableList() ?: mutableListOf()
+            if (!isPostListLoading()) {
+                posts.postValue(oldPosts + NamedItem)
+            } else {
+                oldPosts.removeLast()
+            }
             val after = lastPost?.id ?: ""
             val subredditName = subreddit.value?.name ?: Subreddit.frontPage.name
-            val p = Reddit.getSubredditPosts(subredditName, after, "best")
-            posts.value?.remove(NamedItem.Loading)
-            posts.value?.addAll(p)
-            posts.postValue(posts.value)
+            val sorting = "best"
+            val p = Reddit.getSubredditPosts(subredditName, after, sorting)
+            posts.postValue(oldPosts + p)
+
             cb()
         }
     }
@@ -77,14 +81,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun loadSubscriptions() {
         viewModelScope.launch(Dispatchers.IO) {
             val subscriptions = Reddit.getSubscriptions()
-            val multis = Reddit.getMultis()
+            val multiReddits = Reddit.getMultis()
             //.sortedWith(compareBy { sub: Subreddit -> !sub.isMultiReddit }.thenBy { it.isVisited })
-            subreddits.postValue(listOf(Subreddit.defaultSubreddits, subscriptions).flatten().toMutableList())
+            subreddits.postValue(listOf(Subreddit.defaultSubreddits, subscriptions, multiReddits).flatten().toMutableList())
         }
     }
 
     fun refreshPosts(cb: () -> Unit) {
-        posts.value?.clear()
+        posts.postValue(emptyList())
         this.loadMorePosts(cb)
     }
 
