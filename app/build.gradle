@@ -5,7 +5,7 @@ plugins {
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "de.max.roehrl.vueddit2"
@@ -45,7 +45,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.0-beta01'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
     implementation 'androidx.datastore:datastore-preferences:1.0.0-alpha05'
-    implementation 'io.noties.markwon:core:4.6.0'
+    implementation 'io.noties.markwon:core:4.6.1'
     implementation 'saschpe.android:customtabs:3.0.2'
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.facebook.fresco:fresco:2.3.0'
