@@ -22,13 +22,12 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val meta: TextView = itemView.findViewById(R.id.meta)
     private val imageView: SimpleDraweeView = itemView.findViewById(R.id.preview)
     private val votes: TextView = itemView.findViewById(R.id.votes)
+    private val progress = ProgressBarDrawable()
     protected lateinit var post: Post
 
     init {
-        val progress = ProgressBarDrawable()
         progress.backgroundColor = 0x30FFFFFF
         progress.color = 0x8053BA82.toInt()
-        imageView.hierarchy.setProgressBarImage(progress)
         title.setOnClickListener { view -> onClick(view) }
         meta.setOnClickListener { view -> onClick(view) }
         imageView.setOnClickListener { view -> onClick(view) }
@@ -53,8 +52,10 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         votes.text = post.getScore()
         val preview = post.preview.url
         if (preview != null) {
+            imageView.hierarchy.setProgressBarImage(progress)
             imageView.setImageURI(preview)
         } else {
+            imageView.hierarchy.setProgressBarImage(null)
             imageView.setActualImageResource(R.drawable.ic_comment_text_multiple_outline)
         }
     }

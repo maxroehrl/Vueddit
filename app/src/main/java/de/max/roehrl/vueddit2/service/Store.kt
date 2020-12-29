@@ -1,7 +1,6 @@
 package de.max.roehrl.vueddit2.service
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -11,7 +10,7 @@ import androidx.datastore.preferences.createDataStore
 import de.max.roehrl.vueddit2.model.SingletonHolder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
@@ -21,14 +20,14 @@ class Store private constructor(context: Context) {
     private val preferenceDataStore: DataStore<Preferences> = context.createDataStore(PREFERENCE_NAME)
     val username : Flow<String?> = getFlow(USERNAME)
     val authToken : Flow<String?> = getFlow(AUTH_TOKEN)
-    val validUntil : Flow<Int?> = getFlow(VALID_UNTIL)
+    val validUntil : Flow<Long?> = getFlow(VALID_UNTIL)
     val refreshToken : Flow<String?> = getFlow(REFRESH_TOKEN)
 
     companion object : SingletonHolder<Store, Context>(::Store) {
         private const val PREFERENCE_NAME = "reddit"
         private val USERNAME = preferencesKey<String>("username")
         private val AUTH_TOKEN = preferencesKey<String>("authToken")
-        private val VALID_UNTIL = preferencesKey<Int>("validUntil")
+        private val VALID_UNTIL = preferencesKey<Long>("validUntil")
         private val REFRESH_TOKEN = preferencesKey<String>("refreshToken")
     }
 
@@ -46,36 +45,29 @@ class Store private constructor(context: Context) {
             }
     }
 
-    private suspend fun <T> get(key: Preferences.Key<T>) : T? {
-        var value : T? = null
-        getFlow(key).collect { token ->
-            value = token
-        }
-        Log.e("Store", value.toString())
-        return value
-    }
-
     suspend fun getUsername() : String? {
-        return get(USERNAME)
+        return username.first()
     }
 
     suspend fun getRefreshToken() : String? {
-        return get(REFRESH_TOKEN)
+        return refreshToken.first()
     }
 
-    suspend fun getValidUntil() : Int? {
-        return get(VALID_UNTIL)
+    suspend fun getValidUntil() : Long? {
+        return validUntil.first()
     }
 
     suspend fun getAuthToken() : String? {
-        return get(AUTH_TOKEN)
+        return authToken.first()
     }
 
-    suspend fun updateTokens(authToken: String, validUntil: Int, refreshToken: String) {
+    suspend fun updateTokens(authToken: String, validUntil: Long, refreshToken: String?) {
         preferenceDataStore.edit { preferences ->
             preferences[AUTH_TOKEN] = authToken
             preferences[VALID_UNTIL] = validUntil
-            preferences[REFRESH_TOKEN] = refreshToken
+            if (refreshToken != null) {
+                preferences[REFRESH_TOKEN] = refreshToken
+            }
         }
     }
 

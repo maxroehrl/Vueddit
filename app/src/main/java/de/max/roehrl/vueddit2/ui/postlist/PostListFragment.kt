@@ -3,6 +3,7 @@ package de.max.roehrl.vueddit2.ui.postlist
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.doOnPreDraw
@@ -22,6 +23,8 @@ import de.max.roehrl.vueddit2.R
 
 
 class PostListFragment : Fragment() {
+    private val TAG = "PostListFragment"
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -44,7 +47,7 @@ class PostListFragment : Fragment() {
         recyclerView.adapter = myAdapter
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (!viewModel.isLoading() && layoutManager.findLastCompletelyVisibleItemPosition() + 1 == recyclerView.adapter?.itemCount) {
+                if (!viewModel.isPostListLoading() && layoutManager.findLastCompletelyVisibleItemPosition() + 1 == recyclerView.adapter?.itemCount) {
                     viewModel.loadMorePosts {}
                 }
             }
@@ -59,7 +62,14 @@ class PostListFragment : Fragment() {
                 }
             }
         }
-        viewModel.loadMorePosts {}
+        (activity as MainActivity).navView.setNavigationItemSelectedListener { item: MenuItem ->
+            Log.d(TAG, "Selecting subreddit: '${item.title}'")
+            false
+        }
+        viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
+            if (isLoggedIn)
+                viewModel.loadMorePosts{}
+        }
         return root
     }
 
@@ -72,7 +82,7 @@ class PostListFragment : Fragment() {
         val appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
         collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
         toolbar.setOnMenuItemClickListener {
-            Log.d("PostListFragment", it.title.toString())
+            Log.d(TAG, it.title.toString())
             true
         }
     }

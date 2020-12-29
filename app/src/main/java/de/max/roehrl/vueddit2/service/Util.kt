@@ -8,8 +8,8 @@ object Util {
         return "2 minutes ago"
     }
 
-    fun getUnixTime() : Int {
-        return System.currentTimeMillis().toInt()
+    fun getUnixTime() : Long {
+        return System.currentTimeMillis()
     }
 
     fun getAspectFixHeight(video: Video) : Int {

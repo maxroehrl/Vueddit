@@ -1,8 +1,6 @@
 package de.max.roehrl.vueddit2.service
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
@@ -17,8 +15,7 @@ import com.android.volley.toolbox.StringRequest
 import de.max.roehrl.vueddit2.BuildConfig
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.Post
-import de.max.roehrl.vueddit2.ui.login.LoginActivity
-import kotlinx.coroutines.flow.collect
+import de.max.roehrl.vueddit2.model.Subreddit
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -30,7 +27,7 @@ import kotlin.random.Random
 
 
 object Reddit {
-    private val TAG = "Reddit"
+    private const val TAG = "Reddit"
     const val api = "https://www.reddit.com"
     private const val oauthApi = "https://oauth.reddit.com"
     private const val userAgent = "${BuildConfig.APPLICATION_ID}:${BuildConfig.VERSION_NAME} (by /u/MaxRoehrl)"
@@ -51,30 +48,28 @@ object Reddit {
         start()
     }
     val oAuthLoginUrl = "${api}/api/v1/authorize.compact?client_id=${clientId}&response_type=code&state=${randomState}&redirect_uri=${redirectUriEncoded}&scope=${scope}&duration=permanent"
-    @Volatile
-    var authToken: String = ""
+    @Volatile private lateinit var store: Store
+    @Volatile private var authToken: String = ""
+    @Volatile private var refreshToken: String? = ""
+    @Volatile private var validUntil: Long? = null
 
-    suspend fun init(context: Context) {
-        fun login() {
-            Log.d(TAG, "Start login activity")
-            context.startActivity(Intent(context, LoginActivity::class.java))
-        }
-        val store = Store.getInstance(context)
-        store.authToken.collect { token ->
-            if (token != null) {
-                authToken = token
-                try {
-                    val username = getUser()
-                    store.updateUserName(username)
-                    Log.i(TAG, "User $username is logged in")
-                } catch (error: VolleyError) {
-                    Log.i(TAG, "User is logged out")
-                    login()
-                }
-            } else {
-                login()
+    suspend fun login(context: Context) : Boolean {
+        store = Store.getInstance(context)
+        val token = store.getAuthToken()
+        if (token != null) {
+            authToken = token
+            refreshToken = store.getRefreshToken()
+            validUntil = store.getValidUntil()
+            try {
+                val username = getUser()
+                store.updateUserName(username)
+                Log.i(TAG, "User $username is logged in")
+                return true
+            } catch (error: VolleyError) {
+                Log.i(TAG, "User is logged out")
             }
         }
+        return false
     }
 
     private class TokenRequest(
@@ -200,28 +195,65 @@ object Reddit {
         return Pair(post, comments)
     }
 
-    suspend fun getMoreComments(link: String, children: List<String>): String {
-        return post("/api/morechildren", "api_type=json&link_id=$link&children=${children.joinToString(",")}")
+    suspend fun getMoreComments(link: String, children: List<String>): List<Comment> {
+        val response = post("/api/morechildren", "api_type=json&link_id=$link&children=${children.joinToString(",")}")
+        val commentsData = JSONObject(response).getJSONObject("json").getJSONObject("data").getJSONArray("things")
+        val comments = mutableListOf<Comment>()
+        for (i in 0 until commentsData.length()) {
+            comments.add(Comment(commentsData.getJSONObject(i).getJSONObject("data")))
+        }
+        return comments
     }
 
-    suspend fun getSubscriptions() : String {
-        return get("/subreddits/mine/subscriber?raw_json=1&limit=100")
+    suspend fun getSubscriptions() : List<Subreddit> {
+        val response = get("/subreddits/mine/subscriber?raw_json=1&limit=100")
+        val subscriptions = mutableListOf<Subreddit>()
+        try {
+            // TODO This is called to early
+            val subs = JSONObject(response)
+                    .getJSONObject("data")
+                    .getJSONArray("children")
+            for (i in 0 until subs.length()) {
+                val sub = subs.getJSONObject(i).getJSONObject("data")
+                subscriptions.add(Subreddit(sub))
+            }
+        } catch (error: JSONException) {
+            Log.e(TAG, "Failed to parse subscriptions", error)
+        }
+        return subscriptions
     }
 
     suspend fun subscribe(subreddit: String, unsub:Boolean=false) : String {
         return post("/api/subscribe?action=${if (unsub) "un" else ""}sub&sr_name=$subreddit")
     }
 
-    suspend fun getMultis() : String {
-        return get("/api/multi/mine?raw_json=1")
+    suspend fun getMultis() : List<Subreddit> {
+        val response = get("/api/multi/mine?raw_json=1")
+        val list = mutableListOf<Subreddit>()
+        if (response != "[]") {
+            val data = JSONObject(response).getJSONArray("data")
+            for (i in 0 until data.length()) {
+                list.add(Subreddit(data.getJSONObject(i)))
+            }
+        }
+        return list
     }
 
-    suspend fun searchForSubreddit(query: String) : String {
-        return get("/api/search_reddit_names?raw_json=1&include_over_18=true&include_unadvertisable=true&query=$query")
+    suspend fun searchForSubreddit(query: String) : List<Subreddit> {
+        val response = get("/api/search_reddit_names?raw_json=1&include_over_18=true&include_unadvertisable=true&query=$query")
+        val list = mutableListOf<Subreddit>()
+        if (response != "[]") {
+            val data = JSONObject(response).getJSONArray("data")
+            for (i in 0 until data.length()) {
+                list.add(Subreddit(data.getJSONObject(i)))
+            }
+        }
+        return list
     }
 
     suspend fun getSidebar(subreddit: String) : String {
-        return get("/r/$subreddit/about.json?raw_json=1")
+        val response = get("/r/$subreddit/about.json?raw_json=1")
+        return JSONObject(response).getJSONObject("data").getString("description")
     }
 
     suspend fun vote(id: String, dir: String) : String {
@@ -238,6 +270,7 @@ object Reddit {
     }
 
     private suspend fun post(url: String, bodyText: String? = null) : String {
+        refreshAuthToken()
         return suspendCoroutine { continuation ->
             makeOAuthRequest("$oauthApi$url", Request.Method.POST, bodyText, { response ->
                 continuation.resume(response)
@@ -248,6 +281,7 @@ object Reddit {
     }
 
     private suspend fun get(url: String): String {
+        refreshAuthToken()
         return suspendCoroutine { continuation ->
             makeOAuthRequest("$oauthApi$url", Request.Method.GET, null, { response ->
                 continuation.resume(response)
@@ -276,68 +310,52 @@ object Reddit {
         }
     }
 
-    suspend fun onAuthorizationSuccessful(context: Context, responseUrl: String) {
-        val uri = Uri.parse(responseUrl)
-        try {
-            if (uri.getQueryParameter("state") == randomState) {
-                val code = uri.getQueryParameter("code")
-                val url = "$api/api/v1/access_token"
-                val bodyText = "grant_type=authorization_code&code=$code&redirect_uri=$redirectUriEncoded"
-                try {
-                    val response = makeTokenRequest(url, bodyText)
-                    updateToken(context, JSONObject(response))
-                    (context as Activity).onBackPressed()
-                } catch (error: VolleyError) {
-                    Log.e(TAG, "Refreshing auth token failed", error)
-                }
-            }
-        } catch (e: NullPointerException) {
+    suspend fun onAuthorizationSuccessful(uri: Uri) : Boolean {
+        if (uri.getQueryParameter("state") == randomState) {
+            val code = uri.getQueryParameter("code")
+            val url = "$api/api/v1/access_token"
+            val bodyText = "grant_type=authorization_code&code=$code&redirect_uri=$redirectUriEncoded"
             try {
-                val error = uri.getQueryParameter("error")
-                if (error == "access_denied") {
-                    (context as Activity).finish()
-                } else {
-                    Log.e(TAG, "Login error: $error")
-                }
-            } catch (e: NullPointerException) {
-                (context as Activity).finish()
+                val response = makeTokenRequest(url, bodyText)
+                updateToken(JSONObject(response))
+                Log.i(TAG, "User was successfully logged in")
+                return true
+            } catch (error: VolleyError) {
+                Log.e(TAG, "Refreshing auth token failed", error)
             }
+        } else {
+            Log.e(TAG, "Random state mismatch")
         }
+        return false
     }
 
-    private suspend fun updateToken(context: Context, response: JSONObject) {
+    private suspend fun updateToken(response: JSONObject) {
         try {
             authToken = response.getString("access_token")
-            val validUntil = response.getInt("expires_in") + Util.getUnixTime()
-            val refreshToken = response.getString("refresh_token")
-            Store.getInstance(context).updateTokens(authToken, validUntil, refreshToken)
+            validUntil = response.getLong("expires_in") + Util.getUnixTime()
+            val optRefreshToken = response.optString("refresh_token")
+            refreshToken = optRefreshToken ?: refreshToken
+            store.updateTokens(authToken, validUntil!!, refreshToken)
         } catch (error: JSONException) {
             Log.e(TAG, "Failed to get auth token", error)
         }
     }
 
-    private suspend fun refreshAuthToken(context: Context) {
-        var refreshToken: String? = null
-        Store.getInstance(context).refreshToken.collect { token ->
-            refreshToken = token
-        }
-        if (refreshToken != null) {
-            val url = "${api}/api/v1/access_token"
-            val bodyText = "grant_type=refresh_token&refresh_token=$refreshToken"
-            try {
-                val response = makeTokenRequest(url, bodyText)
-                updateToken(context, JSONObject(response))
-            } catch (error: VolleyError) {
-                Log.e("Reddit", "Refreshing auth token failed", error)
+    private suspend fun refreshAuthToken() {
+        val unixTime = Util.getUnixTime()
+        if (validUntil != null && validUntil!! <= unixTime) {
+            if (refreshToken != null && refreshToken != "") {
+                val url = "${api}/api/v1/access_token"
+                val bodyText = "grant_type=refresh_token&refresh_token=$refreshToken"
+                try {
+                    val response = makeTokenRequest(url, bodyText)
+                    updateToken(JSONObject(response))
+                } catch (error: VolleyError) {
+                    Log.e(TAG, "Refreshing auth token failed", error)
+                }
+            } else {
+                Log.w(TAG, "No refresh token")
             }
-        } else {
-            Log.e(TAG, "No refresh token")
         }
-    }
-
-    private suspend fun refreshTokenIfNecessary(context: Context) {
-        val validUntil = Store.getInstance(context).getValidUntil()
-        if (validUntil != null && validUntil <= Util.getUnixTime())
-            refreshAuthToken(context)
     }
 }

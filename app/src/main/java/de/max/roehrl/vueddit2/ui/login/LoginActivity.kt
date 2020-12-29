@@ -1,20 +1,27 @@
 package de.max.roehrl.vueddit2.ui.login
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.addCallback
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import de.max.roehrl.vueddit2.R
+import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.service.Reddit
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
+    private val TAG = "LoginActivity"
+    private val viewModel: AppViewModel by viewModels()
+
     private val onBackCallback = onBackPressedDispatcher.addCallback(this) {
-        Log.d("LoginActivity", "On back pressed")
+        Log.d(TAG, "On back pressed")
     }
 
     private inner class Client : WebViewClient() {
@@ -22,11 +29,25 @@ class LoginActivity : AppCompatActivity() {
             return request?.url.toString().startsWith(Reddit.redirectUri)
         }
 
-        override fun onPageFinished(view: WebView?, url: String?) {
-            if (url != null && (url.contains("code=") || url.contains("error="))) {
-                onBackCallback.isEnabled = false
+        override fun onPageFinished(webView: WebView?, url: String?) {
+            val uri = Uri.parse(url)
+            if (url != null && url.contains("code=") && url.contains("state=")) {
                 lifecycleScope.launch {
-                    Reddit.onAuthorizationSuccessful(view!!.context, url)
+                    val success = Reddit.onAuthorizationSuccessful(uri)
+                    if (success) {
+                        onBackCallback.isEnabled = false
+                        (viewModel.isLoggedIn as MutableLiveData).postValue(true)
+                        onBackPressed()
+                    } else {
+                        webView?.goBack()
+                    }
+                }
+            } else if (url != null && url.contains("error=")) {
+                val error = uri.getQueryParameter("error")
+                if (error == "access_denied") {
+                    webView?.goBack()
+                } else {
+                    Log.e(TAG, "Login error: $error")
                 }
             }
         }
