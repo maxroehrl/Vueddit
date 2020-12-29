@@ -29,7 +29,7 @@ class PostListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        postponeEnterTransition()
+        // postponeEnterTransition()
         val viewModel: AppViewModel by activityViewModels()
         val root = inflater.inflate(R.layout.fragment_posts, container, false)
         val postsAdapter = PostsAdapter()
@@ -55,7 +55,7 @@ class PostListFragment : Fragment() {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (!viewModel.isPostListLoading() && layoutManager.findLastCompletelyVisibleItemPosition() + 1 == recyclerView.adapter?.itemCount) {
-                    viewModel.loadMorePosts {}
+                    viewModel.loadMorePosts()
                 }
             }
         })
@@ -63,7 +63,7 @@ class PostListFragment : Fragment() {
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.post {
                 if (swipeRefreshLayout.isRefreshing) {
-                    viewModel.refreshPosts {
+                    viewModel.refreshPosts(false) {
                         swipeRefreshLayout.isRefreshing = false
                     }
                 }
@@ -75,7 +75,7 @@ class PostListFragment : Fragment() {
         }
         viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
             if (isLoggedIn)
-                viewModel.loadMorePosts{}
+                viewModel.loadMorePosts()
         }
         return root
     }

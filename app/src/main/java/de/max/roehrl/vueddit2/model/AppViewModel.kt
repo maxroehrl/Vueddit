@@ -28,7 +28,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun isPostListLoading() : Boolean {
-        return posts.value?.last() == NamedItem.Loading
+        return try {
+            posts.value?.last() == NamedItem.Loading
+        } catch (error: NoSuchElementException) {
+            false
+        }
     }
 
     val posts: MutableLiveData<List<NamedItem>> by lazy {
@@ -54,7 +58,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun loadMorePosts(cb: () -> Unit) {
+    fun loadMorePosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             var lastPost: NamedItem? = null
             try {
@@ -63,10 +67,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
             }
             val oldPosts = posts.value?.toMutableList() ?: mutableListOf()
-            if (!isPostListLoading()) {
-                posts.postValue(oldPosts + NamedItem)
-            } else {
-                oldPosts.removeLast()
+            if (showLoadingIndicator) {
+                if (!isPostListLoading()) {
+                    posts.postValue(oldPosts + NamedItem)
+                } else {
+                    oldPosts.removeLast()
+                }
             }
             val after = lastPost?.id ?: ""
             val subredditName = subreddit.value?.name ?: Subreddit.frontPage.name
@@ -74,7 +80,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val p = Reddit.getSubredditPosts(subredditName, after, sorting)
             posts.postValue(oldPosts + p)
 
-            cb()
+            cb?.invoke()
         }
     }
 
@@ -87,9 +93,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun refreshPosts(cb: () -> Unit) {
-        posts.postValue(emptyList())
-        this.loadMorePosts(cb)
+    fun refreshPosts(showLoadingIndicator: Boolean, cb: () -> Unit) {
+        posts.value = emptyList()
+        loadMorePosts(showLoadingIndicator, cb)
     }
 
     fun updateSearchText(text: String) {
