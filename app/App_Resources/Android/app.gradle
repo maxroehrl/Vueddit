@@ -4,7 +4,7 @@ dependencies {
   // https://github.com/saschpe/android-customtabs/releases
   implementation 'saschpe.android:customtabs:3.0.2'
   // https://github.com/noties/Markwon/releases
-  implementation 'io.noties.markwon:core:4.6.0'
+  implementation 'io.noties.markwon:core:4.6.1'
   // https://github.com/balysv/material-ripple/releases
   implementation 'com.balysv:material-ripple:1.0.2'
   // https://github.com/facebook/fresco/releases
