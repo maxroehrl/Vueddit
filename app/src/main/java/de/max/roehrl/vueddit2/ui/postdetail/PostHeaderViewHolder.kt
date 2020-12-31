@@ -12,12 +12,14 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
+import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.service.CustomTabs
 import de.max.roehrl.vueddit2.service.Markdown
+import de.max.roehrl.vueddit2.service.Util
 import de.max.roehrl.vueddit2.ui.postlist.PostViewHolder
 
 @SuppressLint("SetJavaScriptEnabled")
-class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
+open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
     private val selfText: TextView = itemView.findViewById(R.id.self_text)
     private val numComments: TextView = itemView.findViewById(R.id.num_comments)
     private val videoPreview: WebView = itemView.findViewById(R.id.video_preview)
@@ -81,31 +83,35 @@ class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
             Markdown.getInstance(selfText.context).setMarkdown(selfText, this.post.getSpannedSelftext(selfText.context))
         }
         numComments.text = "Showing ${this.post.num_comments} comment${if (this.post.num_comments != 1) "s" else ""}"
-        // TODO videoPreviewLayout.height
+        updateVideoPreview(post as Post)
+    }
 
+    private fun updateVideoPreview(post: Post) {
         videoPreview.stopLoading()
         if (this.post.video.height == 0) {
             videoPreviewLayout.visibility = View.GONE
         } else {
             videoPreviewLayout.visibility = View.VISIBLE
+            videoPreviewLayout.layoutParams.height = Util.getAspectFixHeight(post.video.width, post.video.height)
             if (this.post.video.src.startsWith("http")) {
                 videoPreview.loadUrl(this.post.video.src)
             } else {
                 videoPreview.loadData(this.post.video.src, "text/html", "UTF-8")
             }
         }
+    }
 
-        // val postHeader = view.findViewById<RelativeLayout>(R.id.header)
-        // ViewCompat.setTransitionName(postHeader, "header")
+    /*private fun addTransitionSupport() {
+        val postHeader = view.findViewById<RelativeLayout>(R.id.header)
+        ViewCompat.setTransitionName(postHeader, "header")
 
-        /*
         val imageView: SimpleDraweeView = itemView.findViewById(R.id.preview)
         imageView.controller = Fresco.newDraweeControllerBuilder().setControllerListener(object : BaseControllerListener<ImageInfo>() {
             override fun onFinalImageSet(id: String?, imageInfo: ImageInfo?, animatable: Animatable?) {
                 startPostponedEnterTransition()
             }
-        }).build() */
-    }
+        }).build()
+    }*/
 
     override fun onClick(view: View) {
         CustomTabs.openUrl(selfText.context, post.url)

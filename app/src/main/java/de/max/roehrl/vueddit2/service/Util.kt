@@ -1,7 +1,6 @@
 package de.max.roehrl.vueddit2.service
 
-import android.util.DisplayMetrics
-import de.max.roehrl.vueddit2.model.Video
+import android.content.res.Resources
 
 object Util {
     fun getTimeFromNow() : String {
@@ -12,13 +11,13 @@ object Util {
         return System.currentTimeMillis()
     }
 
-    fun getAspectFixHeight(video: Video) : Int {
-        return if (video.height != 0 && video.width != 0) {
-            video.height * getScreenWidth() / video.width
+    fun getAspectFixHeight(width: Int, height: Int) : Int {
+        return if (height != 0 && width != 0) {
+            height * getScreenWidth() / width
         } else {
             0
         }
     }
 
-    fun getScreenWidth() : Int = DisplayMetrics().widthPixels
+    fun getScreenWidth() : Int = Resources.getSystem().displayMetrics.widthPixels
 }

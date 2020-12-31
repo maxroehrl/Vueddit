@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <include layout="@layout/post_item" />
+    <include layout="@layout/post_item_big" />
 
     <include layout="@layout/video_preview" />
 

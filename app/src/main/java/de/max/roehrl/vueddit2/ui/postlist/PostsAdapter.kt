@@ -6,14 +6,17 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
+import de.max.roehrl.vueddit2.model.Post
 
 class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     var posts: List<NamedItem> = emptyList()
+    var showBigPreview = false
 
     companion object {
-        private const val VIEW_TYPE_DATA = 0
-        private const val VIEW_TYPE_PROGRESS = 1
+        private const val VIEW_TYPE_PROGRESS = 0
+        private const val VIEW_TYPE_POST_SMALL = 1
+        private const val VIEW_TYPE_POST_BIG = 2
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -27,7 +30,7 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     )
                 )
             }
-            VIEW_TYPE_DATA -> {
+            VIEW_TYPE_POST_SMALL -> {
                 PostViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.post_item,
@@ -36,15 +39,24 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                     )
                 )
             }
+            VIEW_TYPE_POST_BIG -> {
+                PostBigViewHolder(
+                        LayoutInflater.from(parent.context).inflate(
+                                R.layout.post_item_big,
+                                parent,
+                                false
+                        )
+                )
+            }
             else -> throw IllegalArgumentException("viewType not found")
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (posts[position] == NamedItem.Loading) {
-            VIEW_TYPE_PROGRESS
-        } else {
-            VIEW_TYPE_DATA
+        return when {
+            posts[position] == NamedItem.Loading                          -> VIEW_TYPE_PROGRESS
+            showBigPreview && (posts[position] as Post).image.url != null -> VIEW_TYPE_POST_BIG
+            else                                                          -> VIEW_TYPE_POST_SMALL
         }
     }
 

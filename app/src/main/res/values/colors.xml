@@ -14,4 +14,5 @@
     <color name="nav_bar_background">#000</color>
     <color name="post_title">#fff</color>
     <color name="post_meta">#767676</color>
+    <color name="border_color">#767676</color>
 </resources>
