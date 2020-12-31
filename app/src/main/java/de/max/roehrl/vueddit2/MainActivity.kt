@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.Navigation
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity() {
             navView.menu.clear()
             for (sub in subreddits) {
                 val item = navView.menu.add(sub.name)
+                item.icon = ResourcesCompat.getDrawable(this@MainActivity.resources, sub.getIconId(), null)
                 if (sub.name == viewModel.subreddit.value?.name) {
                     navView.setCheckedItem(item.itemId)
                 }
