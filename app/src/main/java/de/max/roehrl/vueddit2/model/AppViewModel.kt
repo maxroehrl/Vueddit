@@ -44,6 +44,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val selectedPost = MutableLiveData<Post>()
 
+    val isBigTemplatePreferred: LiveData<Boolean?> = liveData {
+        emit(null)
+    }
+
     val comments: MutableLiveData<MutableList<NamedItem>> by lazy {
         MutableLiveData<MutableList<NamedItem>>().also {
             it.value = mutableListOf(NamedItem.Loading)

@@ -18,13 +18,16 @@ import com.google.android.material.appbar.MaterialToolbar
 import de.max.roehrl.vueddit2.MainActivity
 import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.R
+import de.max.roehrl.vueddit2.model.NamedItem
+import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.model.Subreddit
+import kotlin.math.min
 
 
 class PostListFragment : Fragment() {
     private val TAG = "PostListFragment"
-    val viewModel: AppViewModel by activityViewModels()
-    var currentSubreddit : Subreddit? = null
+    private val viewModel: AppViewModel by activityViewModels()
+    private var currentSubreddit : Subreddit? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,12 +38,12 @@ class PostListFragment : Fragment() {
 
         val root = inflater.inflate(R.layout.fragment_posts, container, false)
         val postsAdapter = PostsAdapter()
-        postsAdapter.showBigPreview = true
         val layoutManager = LinearLayoutManager(this.context)
         viewModel.posts.observe(viewLifecycleOwner, { posts ->
             val oldSize = postsAdapter.posts.size
             val newSize = posts.size
             postsAdapter.posts = posts
+            postsAdapter.showBigPreview = shouldShowBigTemplate(posts)
             if (newSize > oldSize) {
                 if (oldSize > 0)
                     postsAdapter.notifyItemChanged(oldSize - 1)
@@ -97,6 +100,19 @@ class PostListFragment : Fragment() {
         toolbar.setOnMenuItemClickListener {
             Log.d(TAG, it.title.toString())
             true
+        }
+    }
+
+    private fun shouldShowBigTemplate(postList: List<NamedItem>): Boolean {
+        return if (viewModel.isBigTemplatePreferred.value != null) {
+            viewModel.isBigTemplatePreferred.value!!
+        } else {
+            val subHasMoreThanHalfPictures = postList
+                    .subList(min(2, postList.size), min(10, postList.size))
+                    .map {post -> if ((post as Post).image.url != null) 1 else 0 }
+                    .fold(0) { acc, it -> acc + it } > 4
+            val isNotFrontPage = currentSubreddit != Subreddit.frontPage
+            subHasMoreThanHalfPictures && isNotFrontPage
         }
     }
 
