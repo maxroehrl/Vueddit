@@ -76,4 +76,9 @@ class Store private constructor(context: Context) {
             preferences[USERNAME] = username
         }
     }
+
+    suspend fun logoutUser() {
+        updateTokens("", 0, "")
+        updateUserName("")
+    }
 }

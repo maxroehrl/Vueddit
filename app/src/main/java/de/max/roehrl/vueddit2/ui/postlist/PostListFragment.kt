@@ -3,7 +3,6 @@ package de.max.roehrl.vueddit2.ui.postlist
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -19,10 +18,13 @@ import com.google.android.material.appbar.MaterialToolbar
 import de.max.roehrl.vueddit2.MainActivity
 import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.R
+import de.max.roehrl.vueddit2.model.Subreddit
 
 
 class PostListFragment : Fragment() {
     private val TAG = "PostListFragment"
+    val viewModel: AppViewModel by activityViewModels()
+    var currentSubreddit : Subreddit? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,9 +32,10 @@ class PostListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // postponeEnterTransition()
-        val viewModel: AppViewModel by activityViewModels()
+
         val root = inflater.inflate(R.layout.fragment_posts, container, false)
         val postsAdapter = PostsAdapter()
+        postsAdapter.showBigPreview = true
         val layoutManager = LinearLayoutManager(this.context)
         viewModel.posts.observe(viewLifecycleOwner, { posts ->
             val oldSize = postsAdapter.posts.size
@@ -69,13 +72,16 @@ class PostListFragment : Fragment() {
                 }
             }
         }
-        (activity as MainActivity).navView.setNavigationItemSelectedListener { item: MenuItem ->
-            Log.d(TAG, "Selecting subreddit: '${item.title}'")
-            false
-        }
         viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
             if (isLoggedIn)
                 viewModel.loadMorePosts()
+        }
+
+        viewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
+            if (viewModel.isLoggedIn.value == true && subreddit != currentSubreddit) {
+                currentSubreddit = subreddit
+                viewModel.refreshPosts(true)
+            }
         }
         return root
     }
@@ -92,5 +98,9 @@ class PostListFragment : Fragment() {
             Log.d(TAG, it.title.toString())
             true
         }
+    }
+
+    fun logout() {
+        viewModel.logoutUser()
     }
 }

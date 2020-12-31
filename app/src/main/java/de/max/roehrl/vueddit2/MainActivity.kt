@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -43,7 +44,10 @@ class MainActivity : AppCompatActivity() {
         viewModel.subreddits.observe(this) { subreddits ->
             navView.menu.clear()
             for (sub in subreddits) {
-                navView.menu.add(sub.name)
+                val item = navView.menu.add(sub.name)
+                if (sub.name == viewModel.subreddit.value?.name) {
+                    navView.setCheckedItem(item.itemId)
+                }
             }
         }
     }
@@ -56,6 +60,14 @@ class MainActivity : AppCompatActivity() {
         val searchText = navView.getHeaderView(0).findViewById<EditText>(R.id.search_text)
         searchText.doOnTextChanged { text, _, _, _ ->
             viewModel.updateSearchText(text.toString())
+        }
+
+        navView.setNavigationItemSelectedListener { item: MenuItem ->
+            Log.d(TAG, "Selecting subreddit: '${item.title}'")
+            val isMultiReddit = item.icon != null
+            viewModel.selectSubreddit(item.title.toString(), isMultiReddit)
+            drawerLayout.close()
+            true
         }
     }
 

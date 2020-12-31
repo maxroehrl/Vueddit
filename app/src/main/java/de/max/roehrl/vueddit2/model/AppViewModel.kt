@@ -1,6 +1,7 @@
 package de.max.roehrl.vueddit2.model
 
 import android.app.Application
+import android.webkit.CookieManager
 import androidx.lifecycle.*
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Store
@@ -93,15 +94,31 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun refreshPosts(showLoadingIndicator: Boolean, cb: () -> Unit) {
+    fun refreshPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
         posts.value = emptyList()
         loadMorePosts(showLoadingIndicator, cb)
     }
 
     fun updateSearchText(text: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val searchResults = Reddit.searchForSubreddit(text)
             subreddits.postValue(searchResults.toMutableList())
+        }
+    }
+
+    fun selectSubreddit(name: String, isMultiReddit: Boolean) {
+         val sub = subreddits.value?.find {
+            subreddit -> subreddit.name == name && subreddit.isMultiReddit == isMultiReddit
+        }
+        (subreddit as MutableLiveData).value = sub
+    }
+
+    fun logoutUser() {
+        CookieManager.getInstance().removeAllCookies(null)
+        viewModelScope.launch(Dispatchers.IO) {
+            Store.getInstance(getApplication()).logoutUser()
+            (username as MutableLiveData).postValue(null)
+            Reddit.login(getApplication())
         }
     }
 }
