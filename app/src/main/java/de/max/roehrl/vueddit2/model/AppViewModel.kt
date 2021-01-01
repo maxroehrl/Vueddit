@@ -80,7 +80,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
             val after = lastPost?.id ?: ""
-            val subredditName = subreddit.value?.name ?: Subreddit.frontPage.name
+            val subredditName = if (subreddit.value?.isMultiReddit == true) {
+                subreddit.value!!.subreddits
+            } else {
+                subreddit.value?.name ?: Subreddit.frontPage.name
+            }
             val sorting = "best"
             val p = Reddit.getSubredditPosts(subredditName, after, sorting)
             posts.postValue(oldPosts + p)

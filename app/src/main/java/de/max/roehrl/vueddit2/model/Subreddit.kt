@@ -17,14 +17,25 @@ class Subreddit(json: JSONObject) : NamedItem("subreddit") {
     }
 
     val name = json.optString("display_name")
-    val subreddits = json.optJSONArray("subreddits")?.join("")
-    val isMultiReddit = !subreddits.isNullOrEmpty()
-    val isSubscribedTo = false
+    val subreddits = getSubreddits(json)
+    val isMultiReddit = subreddits.isNotEmpty()
+    val isSubscribedTo = true
     val isStarred = false
     var isVisited = true
 
     override fun toString(): String {
         return "$name (${if (isMultiReddit) subreddits else "isStarred: $isStarred"})"
+    }
+
+    private fun getSubreddits(json: JSONObject) : String {
+        val subreddits = json.optJSONArray("subreddits")
+        val list = mutableListOf<String>()
+        if (subreddits != null) {
+            for (i in 0 until subreddits.length()) {
+                list.add(subreddits.getJSONObject(i).getString("name"))
+            }
+        }
+        return list.joinToString("+")
     }
 
     fun getIconId(): Int {

@@ -231,9 +231,9 @@ object Reddit {
         val response = get("/api/multi/mine?raw_json=1")
         val list = mutableListOf<Subreddit>()
         if (response != "[]") {
-            val data = JSONObject(response).getJSONArray("data")
+            val data = JSONArray(response)
             for (i in 0 until data.length()) {
-                list.add(Subreddit(data.getJSONObject(i)))
+                list.add(Subreddit(data.getJSONObject(i).getJSONObject("data")))
             }
         }
         return list

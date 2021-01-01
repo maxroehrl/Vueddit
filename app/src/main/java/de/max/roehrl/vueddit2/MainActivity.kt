@@ -3,7 +3,6 @@ package de.max.roehrl.vueddit2
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import android.widget.EditText
 import androidx.activity.viewModels
@@ -24,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var navView: NavigationView
     private val viewModel: AppViewModel by viewModels()
     private val TAG = "MainActivity"
+    private val multiReddits = mutableListOf<MenuItem>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,10 +43,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
         viewModel.subreddits.observe(this) { subreddits ->
+            multiReddits.clear()
             navView.menu.clear()
             for (sub in subreddits) {
                 val item = navView.menu.add(sub.name)
                 item.icon = ResourcesCompat.getDrawable(this@MainActivity.resources, sub.getIconId(), null)
+                if (sub.isMultiReddit) {
+                    multiReddits.add(item)
+                }
                 if (sub.name == viewModel.subreddit.value?.name) {
                     navView.setCheckedItem(item.itemId)
                 }
@@ -66,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
         navView.setNavigationItemSelectedListener { item: MenuItem ->
             Log.d(TAG, "Selecting subreddit: '${item.title}'")
-            val isMultiReddit = item.icon != null
+            val isMultiReddit = multiReddits.contains(item)
             viewModel.selectSubreddit(item.title.toString(), isMultiReddit)
             drawerLayout.close()
             true
