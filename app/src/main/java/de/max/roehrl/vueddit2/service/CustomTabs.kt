@@ -1,8 +1,10 @@
 package de.max.roehrl.vueddit2.service
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent.Builder
 import androidx.browser.customtabs.CustomTabsIntent.SHARE_STATE_ON
 import androidx.core.content.ContextCompat
@@ -24,6 +26,10 @@ object CustomTabs {
                 .build()
         CustomTabsHelper.addKeepAliveExtra(context, customTabsIntent.intent)
         val uri = Uri.parse(url)
-        CustomTabsHelper.openCustomTab(context, customTabsIntent, uri, WebViewFallback())
+        try {
+            CustomTabsHelper.openCustomTab(context, customTabsIntent, uri, WebViewFallback())
+        } catch (error: ActivityNotFoundException) {
+            Log.e("CustomTabs", "Failed to open custom tab", error)
+        }
     }
 }
