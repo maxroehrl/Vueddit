@@ -8,4 +8,8 @@
     <string name="action_refresh">Refresh</string>
     <string name="posts_list">Posts</string>
     <string name="search_hint">Search for subreddit</string>
+    <string name="menu_show_sidebar">Show sidebar</string>
+    <string name="menu_logout">Logout</string>
+    <string name="menu_user_profile">Goto user profile</string>
+    <string name="menu_toggle_big_post_preview">Toggle post preview size</string>
 </resources>
