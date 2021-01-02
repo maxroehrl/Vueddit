@@ -1,11 +1,12 @@
 package de.max.roehrl.vueddit2.model
 
 import de.max.roehrl.vueddit2.R
+import de.max.roehrl.vueddit2.service.Reddit
 import org.json.JSONObject
 
 class Subreddit(json: JSONObject) : NamedItem("subreddit") {
     companion object {
-        val frontPage = fromName("reddit front page")
+        val frontPage = fromName(Reddit.frontpage)
         val all = fromName("all")
         val popular = fromName("popular")
         val random = fromName("random")
