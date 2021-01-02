@@ -96,9 +96,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun loadSubscriptions() {
         viewModelScope.launch(Dispatchers.IO) {
             val subscriptions = Reddit.getSubscriptions()
+                    .sortedWith(compareBy { sub: Subreddit -> sub.isStarred }.thenBy { it.isVisited })
             val multiReddits = Reddit.getMultis()
-            //.sortedWith(compareBy { sub: Subreddit -> !sub.isMultiReddit }.thenBy { it.isVisited })
-            subreddits.postValue(listOf(Subreddit.defaultSubreddits, subscriptions, multiReddits).flatten().toMutableList())
+            val all = listOf(Subreddit.defaultSubreddits, subscriptions, multiReddits).flatten().toMutableList()
+            subreddits.postValue(all)
         }
     }
 
