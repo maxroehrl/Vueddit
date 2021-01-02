@@ -59,7 +59,6 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
         }
     }
 
-
     init {
         videoPreview.webViewClient = Client()
         videoPreview.webChromeClient = ChromeClient()

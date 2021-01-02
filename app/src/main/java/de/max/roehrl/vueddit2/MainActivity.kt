@@ -16,6 +16,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.android.material.navigation.NavigationView
 import de.max.roehrl.vueddit2.model.AppViewModel
 
+
 // https://developer.android.com/guide/navigation/navigation-ui
 class MainActivity : AppCompatActivity() {
     lateinit var drawerLayout: DrawerLayout
