@@ -45,32 +45,32 @@ class Video(json: JSONObject) {
         <!DOCTYPE html>
         <html lang="en">
         <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Video Player</title>
-        <style>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>Video Player</title>
+            <style>
                 body {
                     margin: 0;
                     background-color: black;
                 }
-                        .vjs-default-skin .vjs-control-bar {
-            background-color: rgba(62, 62, 62, 0.5) !important;
-        }
+                .vjs-default-skin .vjs-control-bar {
+                    background-color: rgba(62, 62, 62, 0.5) !important;
+                }
                 .vjs-default-skin .vjs-progress-control .vjs-load-progress > div {
-            background: rgba(0, 0, 0, 0.2);
-        }
-        </style>
-        <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
+                    background: rgba(0, 0, 0, 0.2);
+                }
+            </style>
+            <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
         </head>
         <body>
-        <video-js id="vid1" class="video-js vjs-default-skin" muted autoplay controls loop width="${Util.getScreenWidth()}px">
-        <source src="$src" type="$type" />
-        </video-js>
-        <script src="https://unpkg.com/video.js/dist/video.min.js"><` + `/script>
-        <script src="https://unpkg.com/@videojs/http-streaming/dist/videojs-http-streaming.min.js"><` + `/script>
+            <video-js id="vid1" class="video-js vjs-default-skin" muted autoplay controls loop width="${Util.getScreenWidth()}px">
+                <source src="$src" type="$type" />
+            </video-js>
+            <script src="https://unpkg.com/video.js/dist/video.min.js"></script>
+            <script src="https://unpkg.com/@videojs/http-streaming/dist/videojs-http-streaming.min.js"></script>
         <script>
-                const player = videojs('vid1');
-        <` + `/script>
+            const player = videojs('vid1');
+        </script>
         </body>
         </html>
         """.trimIndent()
