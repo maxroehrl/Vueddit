@@ -110,8 +110,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateSearchText(text: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val searchResults = Reddit.searchForSubreddit(text)
-            subreddits.postValue(searchResults.toMutableList())
+            if (text.isEmpty()) {
+                loadSubscriptions()
+            } else {
+                val searchResults = Reddit.searchForSubreddit(text)
+                subreddits.postValue(searchResults.toMutableList())
+            }
         }
     }
 
