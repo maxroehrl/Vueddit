@@ -1,6 +1,7 @@
 package de.max.roehrl.vueddit2.service
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -24,6 +25,7 @@ class Store private constructor(context: Context) {
     private val refreshToken : Flow<String?> = getFlow(REFRESH_TOKEN)
 
     companion object : SingletonHolder<Store, Context>(::Store) {
+        private const val TAG = "Store"
         private const val PREFERENCE_NAME = "reddit"
         private val USERNAME = preferencesKey<String>("username")
         private val AUTH_TOKEN = preferencesKey<String>("authToken")
@@ -66,6 +68,9 @@ class Store private constructor(context: Context) {
             preferences[AUTH_TOKEN] = authToken
             preferences[VALID_UNTIL] = validUntil
             if (refreshToken != null) {
+                if (refreshToken.isEmpty()) {
+                    Log.w(TAG, "Resetting refresh token")
+                }
                 preferences[REFRESH_TOKEN] = refreshToken
             }
         }
