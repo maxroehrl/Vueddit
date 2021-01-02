@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 // https://developer.android.com/topic/libraries/architecture/coroutines
 class AppViewModel(application: Application) : AndroidViewModel(application) {
-    val isLoggedIn: LiveData<Boolean> = liveData {
+    val isLoggedIn: LiveData<Boolean> = liveData(Dispatchers.IO) {
         emit(Reddit.login(application))
     }
 
