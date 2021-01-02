@@ -21,35 +21,15 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_PROGRESS -> {
-                ProgressViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                        R.layout.loading_item,
-                        parent,
-                        false
-                    )
-                )
-            }
-            VIEW_TYPE_POST_SMALL -> {
-                PostViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                        R.layout.post_item,
-                        parent,
-                        false
-                    )
-                )
-            }
-            VIEW_TYPE_POST_BIG -> {
-                PostBigViewHolder(
-                        LayoutInflater.from(parent.context).inflate(
-                                R.layout.post_item_big,
-                                parent,
-                                false
-                        )
-                )
-            }
-            else -> throw IllegalArgumentException("viewType not found")
+            VIEW_TYPE_PROGRESS   -> ProgressViewHolder(inflate(parent, R.layout.loading_item))
+            VIEW_TYPE_POST_SMALL -> PostViewHolder(inflate(parent, R.layout.post_item))
+            VIEW_TYPE_POST_BIG   -> PostBigViewHolder(inflate(parent, R.layout.post_item_big))
+            else                 -> throw IllegalArgumentException("viewType not found")
         }
+    }
+
+    private fun inflate(parent: ViewGroup, viewId: Int): View {
+        return LayoutInflater.from(parent.context).inflate(viewId, parent, false)
     }
 
     override fun getItemViewType(position: Int): Int {

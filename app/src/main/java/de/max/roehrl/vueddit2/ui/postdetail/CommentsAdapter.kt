@@ -11,7 +11,7 @@ import de.max.roehrl.vueddit2.model.Post
 
 class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-    private var comments : MutableList<NamedItem> = mutableListOf()
+    var comments : MutableList<NamedItem> = mutableListOf()
 
     companion object {
         private const val VIEW_TYPE_PROGRESS_BIG = 0
@@ -22,56 +22,20 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
         private const val VIEW_TYPE_MORE = 5
     }
 
-    fun setComments(comments: MutableList<NamedItem>) {
-        this.comments = comments
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_PROGRESS_BIG -> ProgressViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                            R.layout.loading_item,
-                            parent,
-                            false
-                    )
-            )
-            VIEW_TYPE_PROGRESS -> ProgressViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                            R.layout.loading_item_small,
-                            parent,
-                            false
-                    )
-            )
-            VIEW_TYPE_COMMENT -> CommentViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                            R.layout.comment_item,
-                            parent,
-                            false
-                    )
-            )
-            VIEW_TYPE_HEADER -> PostHeaderViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                            R.layout.post_detail_header,
-                            parent,
-                            false
-                    )
-            )
-            VIEW_TYPE_HEADER_BIG -> PostBigHeaderViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                            R.layout.post_detail_header_big,
-                            parent,
-                            false
-                    )
-            )
-            VIEW_TYPE_MORE -> MoreCommentsViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                            R.layout.more_comments_item,
-                            parent,
-                            false
-                    )
-            )
-            else -> throw IllegalArgumentException("viewType not found")
+            VIEW_TYPE_PROGRESS_BIG -> ProgressViewHolder(inflate(parent, R.layout.loading_item))
+            VIEW_TYPE_PROGRESS     -> ProgressViewHolder(inflate(parent, R.layout.loading_item_small))
+            VIEW_TYPE_COMMENT      -> CommentViewHolder(inflate(parent, R.layout.comment_item))
+            VIEW_TYPE_HEADER       -> PostHeaderViewHolder(inflate(parent, R.layout.post_detail_header))
+            VIEW_TYPE_HEADER_BIG   -> PostBigHeaderViewHolder(inflate(parent, R.layout.post_detail_header_big))
+            VIEW_TYPE_MORE         -> MoreCommentsViewHolder(inflate(parent, R.layout.more_comments_item))
+            else                   -> throw IllegalArgumentException("viewType not found")
         }
+    }
+
+    private fun inflate(parent: ViewGroup, viewId: Int): View {
+        return LayoutInflater.from(parent.context).inflate(viewId, parent, false)
     }
 
     override fun getItemViewType(position: Int): Int {
