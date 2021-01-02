@@ -3,13 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/postListFragment">
+    app:startDestination="@id/postListFragment">
 
     <fragment
         android:id="@+id/postListFragment"
         android:name="de.max.roehrl.vueddit2.ui.postlist.PostListFragment"
         android:label="@string/posts_list"
         tools:layout="@layout/fragment_posts">
+        <argument
+            android:name="subreddit_name"
+            app:argType="string"/>
         <action
             android:id="@+id/action_postListFragment_to_postDetailFragment"
             app:destination="@id/postDetailFragment"
@@ -27,15 +30,25 @@
             app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@id/postListFragment" />
         <deepLink
-            android:id="@+id/deepLink"
-            app:uri="https://reddit.com/r/{subreddit}" />
+            android:id="@+id/subreddit_deep_link"
+            app:uri="https://reddit.com/r/{subreddit_name}" />
     </fragment>
 
     <fragment
         android:id="@+id/postDetailFragment"
         android:name="de.max.roehrl.vueddit2.ui.postdetail.PostDetailFragment"
         android:label="Post Title"
-        tools:layout="@layout/fragment_post_detail" />
+        tools:layout="@layout/fragment_post_detail">
+        <argument
+            android:name="subreddit_name"
+            app:argType="string"/>
+        <argument
+            android:name="post_name"
+            app:argType="string" />
+        <deepLink
+            android:id="@+id/post_deep_link"
+            app:uri="https://reddit.com/r/{subreddit_name}/comments/{post_name}" />
+    </fragment>
 
     <activity
         android:id="@+id/loginActivity"
