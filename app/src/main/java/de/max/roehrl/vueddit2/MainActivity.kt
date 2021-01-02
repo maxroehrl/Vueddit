@@ -1,6 +1,5 @@
 package de.max.roehrl.vueddit2
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -10,17 +9,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.android.material.navigation.NavigationView
 import de.max.roehrl.vueddit2.model.AppViewModel
-import de.max.roehrl.vueddit2.ui.login.LoginActivity
 
 // https://developer.android.com/guide/navigation/navigation-ui
 class MainActivity : AppCompatActivity() {
     lateinit var drawerLayout: DrawerLayout
     lateinit var navView: NavigationView
+    lateinit var navController: NavController
     private val viewModel: AppViewModel by viewModels()
     private val TAG = "MainActivity"
     private val multiReddits = mutableListOf<MenuItem>()
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.loadSubscriptions()
             } else {
                 Log.d(TAG, "Start login activity")
-                startActivity(Intent(this, LoginActivity::class.java))
+                navController.navigate(R.id.action_postListFragment_to_loginActivity)
             }
         }
         viewModel.subreddits.observe(this) { subreddits ->
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         navView.setupWithNavController(navController)
 
         val searchText = navView.getHeaderView(0).findViewById<EditText>(R.id.search_text)
