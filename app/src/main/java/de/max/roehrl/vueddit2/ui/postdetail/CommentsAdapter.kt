@@ -14,11 +14,12 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
     private var comments : MutableList<NamedItem> = mutableListOf()
 
     companion object {
-        private const val VIEW_TYPE_PROGRESS = 0
-        private const val VIEW_TYPE_COMMENT = 1
-        private const val VIEW_TYPE_HEADER = 2
-        private const val VIEW_TYPE_HEADER_BIG = 3
-        private const val VIEW_TYPE_MORE = 4
+        private const val VIEW_TYPE_PROGRESS_BIG = 0
+        private const val VIEW_TYPE_PROGRESS = 1
+        private const val VIEW_TYPE_COMMENT = 2
+        private const val VIEW_TYPE_HEADER = 3
+        private const val VIEW_TYPE_HEADER_BIG = 4
+        private const val VIEW_TYPE_MORE = 5
     }
 
     fun setComments(comments: MutableList<NamedItem>) {
@@ -27,9 +28,16 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEW_TYPE_PROGRESS -> ProgressViewHolder(
+            VIEW_TYPE_PROGRESS_BIG -> ProgressViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                             R.layout.loading_item,
+                            parent,
+                            false
+                    )
+            )
+            VIEW_TYPE_PROGRESS -> ProgressViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                            R.layout.loading_item_small,
                             parent,
                             false
                     )
@@ -69,10 +77,11 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
     override fun getItemViewType(position: Int): Int {
         return when {
             position == 0 && post.preview.url != null && post.video.src == "" -> VIEW_TYPE_HEADER_BIG
-            position == 0                                  -> VIEW_TYPE_HEADER
-            comments[position - 1] == NamedItem.Loading    -> VIEW_TYPE_PROGRESS
-            (comments[position - 1] as Comment).body == "" -> VIEW_TYPE_MORE
-            else                                           -> VIEW_TYPE_COMMENT
+            position == 0                                                     -> VIEW_TYPE_HEADER
+            position == 1 && comments[0] == NamedItem.Loading                 -> VIEW_TYPE_PROGRESS_BIG
+            comments[position - 1] == NamedItem.Loading                       -> VIEW_TYPE_PROGRESS
+            (comments[position - 1] as Comment).body == ""                    -> VIEW_TYPE_MORE
+            else                                                              -> VIEW_TYPE_COMMENT
         }
     }
 

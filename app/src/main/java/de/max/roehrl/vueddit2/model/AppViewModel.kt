@@ -129,4 +129,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             Reddit.login(getApplication())
         }
     }
+
+    fun resetComments() {
+        comments.value = mutableListOf(NamedItem.Loading)
+    }
 }
