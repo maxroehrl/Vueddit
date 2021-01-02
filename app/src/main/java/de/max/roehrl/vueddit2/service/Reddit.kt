@@ -334,7 +334,7 @@ object Reddit {
             authToken = response.getString("access_token")
             validUntil = response.getLong("expires_in") + Util.getUnixTime()
             val optRefreshToken = response.optString("refresh_token")
-            refreshToken = optRefreshToken ?: refreshToken
+            refreshToken = if (optRefreshToken.isNullOrEmpty()) refreshToken else optRefreshToken
             store.updateTokens(authToken, validUntil!!, refreshToken)
         } catch (error: JSONException) {
             Log.e(TAG, "Failed to get auth token", error)
