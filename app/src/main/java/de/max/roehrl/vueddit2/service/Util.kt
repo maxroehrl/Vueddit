@@ -1,13 +1,14 @@
 package de.max.roehrl.vueddit2.service
 
 import android.content.res.Resources
+import android.text.format.DateUtils
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable
 import com.google.android.material.appbar.MaterialToolbar
 import de.max.roehrl.vueddit2.R
 
 object Util {
-    fun getTimeFromNow() : String {
-        return "2 minutes ago"
+    fun getTimeFromNow(time: Long) : String {
+        return DateUtils.getRelativeTimeSpanString(time * 1000).toString()
     }
 
     fun getUnixTime() : Long {

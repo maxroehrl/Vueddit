@@ -16,6 +16,7 @@ import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
+import de.max.roehrl.vueddit2.service.Util
 
 open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val postHeader: RelativeLayout = itemView.findViewById(R.id.post_header)
@@ -51,7 +52,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         this.post = post as Post
         // ViewCompat.setTransitionName(postHeader, post.name)
         title.text = post.title
-        meta.text = "(${post.domain})\n${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n${post.created_utc} by /u/${post.author}\n"
+        meta.text = "(${post.domain})\n${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n${Util.getTimeFromNow(post.created_utc.toLong())} by /u/${post.author}\n"
         votes.text = post.getScore()
         updatePreviewImage(post)
     }
