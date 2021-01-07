@@ -10,7 +10,7 @@
     <color name="highlight">#53ba82</color>
     <color name="more_comments_text">@color/highlight</color>
     <color name="action_bar_background">#3e3e3e</color>
-    <color name="action_bar_background2">#000</color>
+    <color name="action_bar_background2">#303030</color>
     <color name="nav_bar_background">#000</color>
     <color name="post_title">#fff</color>
     <color name="post_meta">#767676</color>
