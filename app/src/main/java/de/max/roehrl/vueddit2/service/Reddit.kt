@@ -243,9 +243,13 @@ object Reddit {
         val response = get("/api/search_reddit_names?raw_json=1&include_over_18=true&include_unadvertisable=true&query=$query")
         val list = mutableListOf<Subreddit>()
         if (response != "[]") {
-            val data = JSONObject(response).getJSONArray("data")
-            for (i in 0 until data.length()) {
-                list.add(Subreddit(data.getJSONObject(i)))
+            try {
+                val data = JSONObject(response).getJSONArray("names")
+                for (i in 0 until data.length()) {
+                    list.add(Subreddit(JSONObject("{display_name: \"${data.getString(i)}\"}")))
+                }
+            } catch (error: JSONException) {
+                Log.e(TAG, "Error", error)
             }
         }
         return list
