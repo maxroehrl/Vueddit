@@ -54,9 +54,23 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    val subtreeCommentName: LiveData<String> = liveData {
+        emit("")
+    }
+
+    val postSorting: LiveData<String> = liveData {
+        emit("best")
+    }
+
+    val commentSorting: LiveData<String> = liveData {
+        emit("top")
+    }
+
     fun loadComments(cb: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val pair = Reddit.getPostAndComments(selectedPost.value!!.permalink, "top")
+            val sorting = commentSorting.value ?: "top"
+            val permalink = selectedPost.value!!.permalink + subtreeCommentName.value
+            val pair = Reddit.getPostAndComments(permalink, sorting)
             selectedPost.postValue(pair.first)
             comments.postValue(pair.second.toMutableList())
             cb()
@@ -85,7 +99,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             } else {
                 subreddit.value?.name ?: Subreddit.frontPage.name
             }
-            val sorting = "best"
+            val sorting = postSorting.value ?: "best"
             val p = Reddit.getSubredditPosts(subredditName, after, sorting)
             posts.postValue(oldPosts + p)
 
@@ -101,6 +115,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val all = listOf(Subreddit.defaultSubreddits, subscriptions, multiReddits).flatten().toMutableList()
             subreddits.postValue(all)
         }
+    }
+
+    fun setPostSorting(sorting: String) {
+        (postSorting as MutableLiveData).value = sorting
+        refreshPosts()
     }
 
     fun refreshPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
@@ -137,5 +156,21 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun resetComments() {
         comments.value = mutableListOf(NamedItem.Loading)
+    }
+
+    fun loadMoreComments(comment: Comment) {
+        if (comment.count == 0) {
+            (subtreeCommentName as MutableLiveData).value = comment.parent_id.split("_")[1]
+            loadComments {}
+        } else {
+            viewModelScope.launch(Dispatchers.IO) {
+                val newComments = Reddit.getMoreComments(selectedPost.value!!.name, comment.children)
+                val index = comments.value?.indexOf(comment)
+                val oldComments = comments.value!!
+                oldComments.remove(comment)
+                oldComments.addAll(index!!, newComments)
+                comments.postValue(oldComments)
+            }
+        }
     }
 }

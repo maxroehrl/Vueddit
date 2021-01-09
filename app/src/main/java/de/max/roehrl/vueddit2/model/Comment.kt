@@ -16,16 +16,28 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
     val count = json.optInt("count", 0)
     val ups = json.optInt("ups", 0)
     val depth = json.optInt("depth", 0)
-    val children = mutableListOf<Comment>()
+    val children: List<String>
     val created_utc = json.optInt("created_utc")
     val edited = json.optBoolean("edited", false)
     val is_submitter = json.optBoolean("is_submitter", false)
     val distinguished = json.optString("distinguished", "")
+    val parent_id = json.optString("parent_id", "")
     val author_flair_text = json.optString("author_flair_text")
     val author_flair_background_color = json.optString("author_flair_background_color")
     val gid_1 = json.optJSONObject("gildings")?.optInt("gid_1", 0)
     val gid_2 = json.optJSONObject("gildings")?.optInt("gid_2", 0)
     val gid_3 = json.optJSONObject("gildings")?.optInt("gid_3", 0)
+    
+    init {
+        val mutableChildren = mutableListOf<String>()
+        val childrenData = json.optJSONArray("children")
+        if (childrenData != null) {
+            for (i in 0 until childrenData.length()) {
+                mutableChildren.add(childrenData.getString(i))
+            }
+        }
+        children = mutableChildren.toList()
+    }
 
     fun getSpannedBody(context: Context) : Spanned? {
         if (spannedBody == null) {

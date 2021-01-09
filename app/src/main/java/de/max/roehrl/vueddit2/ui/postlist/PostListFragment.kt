@@ -74,7 +74,7 @@ class PostListFragment : Fragment() {
             tabLayout!!.getTabAt(0)!!.select()
             tabLayout!!.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
-                    // viewModel.
+                    viewModel.setPostSorting(tab?.text.toString())
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
                 override fun onTabReselected(tab: TabLayout.Tab?) {}
