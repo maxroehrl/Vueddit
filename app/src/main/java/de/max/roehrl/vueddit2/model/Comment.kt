@@ -23,9 +23,9 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
     val distinguished = json.optString("distinguished", "")
     val author_flair_text = json.optString("author_flair_text")
     val author_flair_background_color = json.optString("author_flair_background_color")
-    val gid_1 = json.optJSONObject("gildings")?.optInt("gid_1", 0) ?: 0
-    val gid_2 = json.optJSONObject("gildings")?.optInt("gid_2", 0) ?: 0
-    val gid_3 = json.optJSONObject("gildings")?.optInt("gid_3", 0) ?: 0
+    val gid_1 = json.optJSONObject("gildings")?.optInt("gid_1", 0)
+    val gid_2 = json.optJSONObject("gildings")?.optInt("gid_2", 0)
+    val gid_3 = json.optJSONObject("gildings")?.optInt("gid_3", 0)
 
     fun getSpannedBody(context: Context) : Spanned? {
         if (spannedBody == null) {
