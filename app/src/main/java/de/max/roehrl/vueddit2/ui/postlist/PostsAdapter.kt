@@ -5,8 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import de.max.roehrl.vueddit2.R
+import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
+import de.max.roehrl.vueddit2.ui.postdetail.CommentViewHolder
 
 class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -17,6 +19,7 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private const val VIEW_TYPE_PROGRESS = 0
         private const val VIEW_TYPE_POST_SMALL = 1
         private const val VIEW_TYPE_POST_BIG = 2
+        private const val VIEW_TYPE_COMMENT = 3
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -24,6 +27,7 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             VIEW_TYPE_PROGRESS   -> ProgressViewHolder(inflate(parent, R.layout.loading_item))
             VIEW_TYPE_POST_SMALL -> PostViewHolder(inflate(parent, R.layout.post_item))
             VIEW_TYPE_POST_BIG   -> PostBigViewHolder(inflate(parent, R.layout.post_item_big))
+            VIEW_TYPE_COMMENT    -> CommentViewHolder(inflate(parent, R.layout.comment_item))
             else                 -> throw IllegalArgumentException("viewType not found")
         }
     }
@@ -33,10 +37,12 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
+        val item = posts[position]
         return when {
-            posts[position] == NamedItem.Loading                          -> VIEW_TYPE_PROGRESS
-            showBigPreview && (posts[position] as Post).image.url != null -> VIEW_TYPE_POST_BIG
-            else                                                          -> VIEW_TYPE_POST_SMALL
+            item == NamedItem.Loading                                -> VIEW_TYPE_PROGRESS
+            showBigPreview && item is Post && item.image.url != null -> VIEW_TYPE_POST_BIG
+            item is Comment                                          -> VIEW_TYPE_COMMENT
+            else                                                     -> VIEW_TYPE_POST_SMALL
         }
     }
 
