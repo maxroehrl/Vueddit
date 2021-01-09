@@ -9,8 +9,8 @@ import androidx.appcompat.widget.AppCompatTextView
 
 class IndentedLabel(context: Context, attrs: AttributeSet) : AppCompatTextView(context, attrs) {
     private var depth = 0
-    private var paddingBottom2 = 10
-    private val factor = 60f
+    private var paddingTop2 = 10
+    private val factor = 40f
     private val paint: Paint = Paint()
 
     init {
@@ -20,7 +20,7 @@ class IndentedLabel(context: Context, attrs: AttributeSet) : AppCompatTextView(c
     }
 
     override fun onDraw(canvas: Canvas?) {
-        super.setPadding((factor * this.depth + 20).toInt(), 0, 10, this.paddingBottom2)
+        super.setPadding((factor * this.depth + 20).toInt(), this.paddingTop2, 10, 10)
         super.onDraw(canvas)
         for (i in 0..depth) {
             val indent = i * factor
@@ -28,8 +28,8 @@ class IndentedLabel(context: Context, attrs: AttributeSet) : AppCompatTextView(c
         }
     }
 
-    fun setDepth(depth: Int, paddingBottom: Int) {
+    fun setDepth(depth: Int, paddingTop: Int) {
         this.depth = depth
-        this.paddingBottom2 = paddingBottom
+        this.paddingTop2 = paddingTop
     }
 }

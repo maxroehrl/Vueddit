@@ -53,7 +53,8 @@ class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         if (comment.gid_3 != null && comment.gid_3 > 0) {
             builder.append("\uD83E\uDD49x${comment.gid_3} ")
         }
-        if (comment.author_flair_text != "null") {
+        if (comment.author_flair_text != "" && comment.author_flair_text != "null") {
+            builder.append(" ")
             val flairString = SpannableString(comment.author_flair_text)
             val color = if (comment.author_flair_background_color != "" && comment.author_flair_background_color != "null") comment.author_flair_background_color else "#767676"
             try {
@@ -66,7 +67,7 @@ class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             builder.append(" ")
         }
         header.setText(builder, TextView.BufferType.SPANNABLE)
-        header.setDepth(comment.depth, 10)
+        header.setDepth(comment.depth, 30)
 
         Markdown.getInstance(body.context).setMarkdown(body, comment.getSpannedBody(body.context))
         body.setDepth(comment.depth, 10)

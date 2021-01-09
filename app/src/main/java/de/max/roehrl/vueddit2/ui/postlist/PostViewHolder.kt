@@ -60,7 +60,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // ViewCompat.setTransitionName(postHeader, post.name)
         val builder = SpannableStringBuilder()
 
-        if (post.link_flair_text != "null") {
+        if (post.link_flair_text != "" && post.link_flair_text != "null") {
             val flairString = SpannableString(post.link_flair_text)
             val color = if (post.link_flair_background_color != "" && post.link_flair_background_color != "null") post.link_flair_background_color else "#767676"
             flairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, flairString.length, 0)
@@ -107,13 +107,15 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         metaBuilder.append(authorString)
         metaBuilder.append(" ")
 
-        if (highlightAuthor && post.author_flair_text != "null") {
+        if (highlightAuthor && post.author_flair_text != "" && post.author_flair_text != "null") {
             val authorFlairString = SpannableString(post.author_flair_text)
             val color = if (post.author_flair_background_color != "" && post.author_flair_background_color != "null") post.author_flair_background_color else "#767676"
             authorFlairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, authorFlairString.length, 0)
             metaBuilder.append(authorFlairString)
         }
-        metaBuilder.append("\n")
+        if ((post.gid_1 != null && post.gid_1 > 0) || (post.gid_2 != null && post.gid_2 > 0) || (post.gid_3 != null && post.gid_3 > 0)) {
+            metaBuilder.append("\n")
+        }
 
         if (post.gid_1 != null && post.gid_1 > 0) {
             metaBuilder.append("\uD83E\uDD48x${post.gid_1} ")
