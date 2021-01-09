@@ -4,7 +4,8 @@
     android:id="@+id/post_header"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center">
+    android:gravity="center"
+    android:paddingBottom="4dp">
 
     <include
         android:id="@+id/vote_buttons"
@@ -20,7 +21,9 @@
         android:layout_height="wrap_content"
         android:layout_toStartOf="@id/preview"
         android:layout_toEndOf="@id/vote_buttons"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp">
 
         <TextView
             android:id="@+id/title"
