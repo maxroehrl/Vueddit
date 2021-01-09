@@ -270,7 +270,7 @@ object Reddit {
     }
 
     fun getFormattedScore(score: Int): String {
-        return if (score >= 10000) (score / 1000).toString() + 'k' else score.toString()
+        return if (score >= 10000) String.format("%.1fk", score.toFloat() / 1000f) else score.toString()
     }
 
     private suspend fun post(url: String, bodyText: String? = null) : String {
