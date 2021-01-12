@@ -14,7 +14,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         emit(Reddit.login(application))
     }
 
-    val username: LiveData<String?> = liveData {
+    val username: LiveData<String?> = liveData(Dispatchers.IO) {
         emit(Store.getInstance(application).getUsername())
     }
 
@@ -28,9 +28,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         emit(Subreddit.frontPage)
     }
 
-    fun isPostListLoading() : Boolean {
+    fun isPostListLoading(): Boolean {
         return try {
             posts.value?.last() == NamedItem.Loading
+        } catch (error: NoSuchElementException) {
+            false
+        }
+    }
+
+    fun isUserPostListLoading(): Boolean {
+        return try {
+            userPostsAndComments.value?.last() == NamedItem.Loading
         } catch (error: NoSuchElementException) {
             false
         }
@@ -43,6 +51,26 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     val selectedPost = MutableLiveData<Post>()
+
+    val userPostsAndComments: LiveData<List<NamedItem>> = liveData(Dispatchers.IO) {
+        emit(listOf(NamedItem.Loading))
+    }
+
+    val selectedUser: LiveData<String> = liveData {
+        emit("")
+    }
+
+    val selectedGroup: LiveData<String> = liveData {
+        emit("overview")
+    }
+
+    val userSorting: LiveData<String> = liveData {
+        emit("new")
+    }
+
+    val selectedType: LiveData<String> = liveData {
+        emit("all")
+    }
 
     val isBigTemplatePreferred: LiveData<Boolean?> = liveData {
         emit(null)
@@ -66,6 +94,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         emit("top")
     }
 
+    val userPostGroup: LiveData<String> = liveData {
+        emit("overview")
+    }
+
     fun loadComments(cb: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val sorting = commentSorting.value ?: "top"
@@ -74,6 +106,33 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             selectedPost.postValue(pair.first)
             comments.postValue(pair.second.toMutableList())
             cb()
+        }
+    }
+
+    fun loadMoreUserPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            var lastPost: NamedItem? = null
+            try {
+                lastPost = userPostsAndComments.value?.last { post -> post != NamedItem.Loading }
+            } catch (e: NoSuchElementException) {
+
+            }
+            val oldPosts = userPostsAndComments.value?.toMutableList() ?: mutableListOf()
+            if (showLoadingIndicator) {
+                if (!isPostListLoading()) {
+                    (userPostsAndComments as MutableLiveData).postValue(oldPosts + NamedItem)
+                } else {
+                    oldPosts.removeLast()
+                }
+            }
+            val after = lastPost?.id ?: ""
+            val userName = selectedUser.value!!
+            val sorting = userSorting.value ?: "new"
+            val group = userPostGroup.value ?: "overview"
+            val p = Reddit.getUserPosts(userName, after, sorting, group)
+            (userPostsAndComments as MutableLiveData).postValue(oldPosts + p)
+
+            cb?.invoke()
         }
     }
 
@@ -119,12 +178,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setPostSorting(sorting: String) {
         (postSorting as MutableLiveData).value = sorting
-        refreshPosts()
     }
 
     fun refreshPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
         posts.value = emptyList()
         loadMorePosts(showLoadingIndicator, cb)
+    }
+
+    fun setUserPostSorting(sorting: String) {
+        (userSorting as MutableLiveData).value = sorting
+    }
+
+    fun refreshUserPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
+        (userPostsAndComments as MutableLiveData).value = emptyList()
+        loadMoreUserPosts(showLoadingIndicator, cb)
     }
 
     fun updateSearchText(text: String) {
@@ -139,10 +206,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun selectSubreddit(name: String, isMultiReddit: Boolean) {
-         val sub = subreddits.value?.find {
-            subreddit -> subreddit.name == name && subreddit.isMultiReddit == isMultiReddit
+        var sub = subreddits.value?.find { subreddit ->
+            subreddit.name == name && subreddit.isMultiReddit == isMultiReddit
+        }
+        if (sub == null) {
+            sub = Subreddit.fromName(name)
         }
         (subreddit as MutableLiveData).value = sub
+    }
+
+    fun setSelectedUser(username: String) {
+        (selectedUser as MutableLiveData).value = username
     }
 
     fun logoutUser() {
@@ -172,5 +246,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 comments.postValue(oldComments)
             }
         }
+    }
+
+    fun setUserPostGroup(group: String) {
+        (userPostGroup as MutableLiveData).value = group
     }
 }

@@ -1,13 +1,18 @@
 package de.max.roehrl.vueddit2.ui.postlist
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.appcompat.view.SupportMenuInflater
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -21,24 +26,23 @@ import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.model.Subreddit
 import de.max.roehrl.vueddit2.service.Reddit
-import de.max.roehrl.vueddit2.service.Util.setActionBarUpIndicator
+import de.max.roehrl.vueddit2.service.Store
+import kotlinx.coroutines.launch
 import kotlin.math.min
 
 
-class PostListFragment : Fragment() {
+open class PostListFragment : Fragment() {
     private val TAG = "PostListFragment"
-    private val viewModel: AppViewModel by activityViewModels()
-    private var currentSubreddit : Subreddit? = null
-    private var toolbar: MaterialToolbar? = null
+    protected val viewModel: AppViewModel by activityViewModels()
+    private var currentSubreddit: Subreddit? = null
+    protected var toolbar: MaterialToolbar? = null
     private var collapsingToolbar: CollapsingToolbarLayout? = null
-    private var tabLayout: TabLayout? = null
-    private var init = false
-    private var sortings = listOf("best", "hot", "top", "new", "controversial", "rising")
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
+    private var sortingTabLayout: TabLayout? = null
+    protected open val isGroupTabLayoutVisible = false
+    protected open val sortings = listOf("best", "hot", "top", "new", "controversial", "rising")
+    private val safeArgs: PostListFragmentArgs by navArgs()
+    protected open val layoutId = R.layout.fragment_posts
+    protected open lateinit var sortingLiveData: LiveData<String>
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -46,10 +50,55 @@ class PostListFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         // postponeEnterTransition()
-
-        val root = inflater.inflate(R.layout.fragment_posts, container, false)
+        val root = inflater.inflate(layoutId, container, false)
         val postsAdapter = PostsAdapter()
-        val layoutManager = LinearLayoutManager(this.context)
+        val layoutManager = LinearLayoutManager(context)
+
+        toolbar = root.findViewById(R.id.toolbar)
+        collapsingToolbar = root.findViewById(R.id.collapsing_toolbar)
+        sortingTabLayout = root.findViewById(R.id.tab_layout)
+
+        val recyclerView: RecyclerView = root.findViewById(R.id.recycler_view)
+        recyclerView.layoutManager = layoutManager
+        recyclerView.adapter = postsAdapter
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                onScrolled(recyclerView, dx, dy, layoutManager)
+            }
+        })
+        val swipeRefreshLayout: SwipeRefreshLayout = root.findViewById(R.id.swipe)
+        swipeRefreshLayout.setOnRefreshListener {
+            swipeRefreshLayout.post {
+                if (swipeRefreshLayout.isRefreshing) {
+                    onSwipeToRefresh {
+                        swipeRefreshLayout.isRefreshing = false
+                    }
+                }
+            }
+        }
+        initialize(postsAdapter)
+
+        for (sorting in sortings) {
+            sortingTabLayout!!.addTab(sortingTabLayout!!.newTab().setText(sorting))
+        }
+        val index = sortings.indexOf(sortingLiveData.value)
+        if (index != -1) {
+            sortingTabLayout!!.getTabAt(index)!!.select()
+        }
+        sortingTabLayout!!.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                onSortingSelected(tab?.text.toString())
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+        return root
+    }
+
+    open fun initialize(postsAdapter: PostsAdapter) {
+        sortingLiveData = viewModel.postSorting
+        viewModel.selectSubreddit(safeArgs.subredditName, false)
         viewModel.posts.observe(viewLifecycleOwner, { posts ->
             val oldSize = postsAdapter.posts.size
             val newSize = posts.size
@@ -64,43 +113,6 @@ class PostListFragment : Fragment() {
             }
             // (view?.parent as? ViewGroup)?.doOnPreDraw { startPostponedEnterTransition() }
         })
-        toolbar = root.findViewById(R.id.toolbar)
-        collapsingToolbar = root.findViewById(R.id.collapsing_toolbar)
-        tabLayout = root.findViewById(R.id.tab_layout)
-        if (tabLayout != null) {
-            for (sorting in sortings) {
-                tabLayout?.addTab(tabLayout!!.newTab().setText(sorting))
-            }
-            tabLayout!!.getTabAt(0)!!.select()
-            tabLayout!!.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab?) {
-                    viewModel.setPostSorting(tab?.text.toString())
-                }
-                override fun onTabUnselected(tab: TabLayout.Tab?) {}
-                override fun onTabReselected(tab: TabLayout.Tab?) {}
-            })
-        }
-
-        val recyclerView: RecyclerView = root.findViewById(R.id.recycler_view)
-        recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = postsAdapter
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (!viewModel.isPostListLoading() && layoutManager.findLastCompletelyVisibleItemPosition() + 2 == recyclerView.adapter?.itemCount && dy != 0) {
-                    viewModel.loadMorePosts()
-                }
-            }
-        })
-        val swipeRefreshLayout: SwipeRefreshLayout = root.findViewById(R.id.swipe)
-        swipeRefreshLayout.setOnRefreshListener {
-            swipeRefreshLayout.post {
-                if (swipeRefreshLayout.isRefreshing) {
-                    viewModel.refreshPosts(false) {
-                        swipeRefreshLayout.isRefreshing = false
-                    }
-                }
-            }
-        }
         viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
             if (isLoggedIn)
                 viewModel.loadMorePosts()
@@ -112,28 +124,33 @@ class PostListFragment : Fragment() {
             }
             currentSubreddit = subreddit
         }
-        return root
     }
 
+    open fun onSortingSelected(sorting: String) {
+        viewModel.setPostSorting(sorting)
+        viewModel.refreshPosts()
+    }
+
+    open fun onSwipeToRefresh(cb: () -> Unit) {
+        viewModel.refreshPosts(false, cb)
+    }
+
+    open fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int, layoutManager: LinearLayoutManager) {
+        if (!viewModel.isPostListLoading() && layoutManager.findLastCompletelyVisibleItemPosition() + 2 == recyclerView.adapter?.itemCount && dy != 0) {
+            viewModel.loadMorePosts()
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mainActivity = activity as MainActivity
         val drawerLayout = mainActivity.drawerLayout
         val navController = findNavController()
         val appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
-        // collapsingToolbar.setupWithNavController(toolbar!!, navController, appBarConfiguration)
-        if (!init) {
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-                if (destination.id == R.id.postListFragment) {
-                    mainActivity.setSupportActionBar(toolbar)
-                    if (toolbar?.navigationIcon == null) {
-                        toolbar?.setActionBarUpIndicator(true)
-                    }
-                    toolbar?.setNavigationOnClickListener { NavigationUI.navigateUp(navController, appBarConfiguration) }
-                }
-            }
-            init = true
-        }
+        collapsingToolbar!!.setupWithNavController(toolbar!!, navController, appBarConfiguration)
+        onCreateOptionsMenu(toolbar!!.menu, SupportMenuInflater(context))
+        toolbar!!.setOnMenuItemClickListener { onOptionsItemSelected(it) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -158,6 +175,11 @@ class PostListFragment : Fragment() {
             }
             R.id.action_user_posts -> {
                 Log.d(TAG, "User posts item selected")
+                viewModel.viewModelScope.launch {
+                    val userName = Store.getInstance(requireContext()).getUsername()
+                    val action = PostListFragmentDirections.actionPostListFragmentToUserPostListFragment(userName!!)
+                    findNavController().navigate(action)
+                }
                 true
             }
             R.id.action_toggle_big_preview -> {
@@ -168,7 +190,7 @@ class PostListFragment : Fragment() {
         }
     }
 
-    private fun shouldShowBigTemplate(postList: List<NamedItem>): Boolean {
+    protected fun shouldShowBigTemplate(postList: List<NamedItem>): Boolean {
         return if (viewModel.isBigTemplatePreferred.value != null) {
             viewModel.isBigTemplatePreferred.value!!
         } else {

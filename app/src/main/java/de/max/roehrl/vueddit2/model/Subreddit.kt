@@ -12,16 +12,16 @@ class Subreddit(json: JSONObject) : NamedItem("subreddit") {
         val random = fromName("random")
         val defaultSubreddits = listOf(frontPage, all, popular, random)
 
-        private fun fromName(name: String) : Subreddit {
+        fun fromName(name: String) : Subreddit {
             return Subreddit(JSONObject("{\"display_name\": \"$name\"}"))
         }
     }
 
     val name = json.optString("display_name")
     val subreddits = getSubreddits(json)
-    val isMultiReddit = subreddits.isNotEmpty()
-    val isSubscribedTo = true
-    val isStarred = false
+    var isMultiReddit = subreddits.isNotEmpty()
+    var isSubscribedTo = true
+    var isStarred = false
     var isVisited = true
 
     override fun toString(): String {

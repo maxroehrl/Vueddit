@@ -1,24 +1,23 @@
 package de.max.roehrl.vueddit2.ui.postdetail
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.appcompat.view.SupportMenuInflater
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import androidx.transition.TransitionInflater
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
-import de.max.roehrl.vueddit2.MainActivity
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.service.Reddit
-import de.max.roehrl.vueddit2.service.Util.setActionBarUpIndicator
 
 
 class PostDetailFragment : Fragment() {
@@ -26,12 +25,10 @@ class PostDetailFragment : Fragment() {
     private val viewModel: AppViewModel by activityViewModels()
     private var toolbar: MaterialToolbar? = null
     private var collapsingToolbar: CollapsingToolbarLayout? = null
-    private var init = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-        sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.shared_header)
+        // sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.shared_header)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -43,10 +40,10 @@ class PostDetailFragment : Fragment() {
         val commentsAdapter = CommentsAdapter(viewModel.selectedPost.value!!)
         recyclerView.adapter = commentsAdapter
         viewModel.resetComments()
-        viewModel.comments.observe(viewLifecycleOwner, { comments ->
+        viewModel.comments.observe(viewLifecycleOwner) { comments ->
             commentsAdapter.comments = comments
             commentsAdapter.notifyDataSetChanged()
-        })
+        }
         viewModel.selectedPost.observe(viewLifecycleOwner) { post ->
             toolbar?.title = post?.title ?: Reddit.frontpage
         }
@@ -64,25 +61,15 @@ class PostDetailFragment : Fragment() {
         return root
     }
 
-
+    @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // postponeEnterTransition()
-        val mainActivity = activity as MainActivity
-        val drawerLayout = mainActivity.drawerLayout
         val navController = findNavController()
-        val appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
-        //  collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
-        if (!init) {
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-                if (destination.id == R.id.postDetailFragment) {
-                    mainActivity.setSupportActionBar(toolbar)
-                    toolbar?.setActionBarUpIndicator(false)
-                    toolbar?.setNavigationOnClickListener { NavigationUI.navigateUp(navController, appBarConfiguration) }
-                }
-            }
-            init = true
-        }
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+        collapsingToolbar!!.setupWithNavController(toolbar!!, navController, appBarConfiguration)
+        onCreateOptionsMenu(toolbar!!.menu, SupportMenuInflater(context))
+        toolbar!!.setOnMenuItemClickListener { onOptionsItemSelected(it) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
