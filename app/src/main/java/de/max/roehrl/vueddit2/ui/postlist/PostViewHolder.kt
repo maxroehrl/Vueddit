@@ -70,7 +70,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
 
         val titleString = SpannableString(post.title)
-        val titleColor = if (post.stickied) "#53ba82" else "#ffffff"
+        val titleColor = if (highlightAuthor && post.stickied) "#53ba82" else "#ffffff"
         titleString.setSpan(ForegroundColorSpan(Color.parseColor(titleColor)), 0, titleString.length, 0)
         builder.append(titleString)
         builder.append(" ")
@@ -86,14 +86,14 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         if (post.over18) {
             val nsfwString = SpannableString("nsfw")
-            nsfwString.setSpan(BackgroundColorSpan(Color.RED), 0, nsfwString.length, 0)
+            nsfwString.setSpan(ForegroundColorSpan(Color.RED), 0, nsfwString.length, 0)
             metaBuilder.append(nsfwString)
             metaBuilder.append(" ")
         }
 
         if (post.spoiler) {
             val spoilerString = SpannableString("spoiler")
-            spoilerString.setSpan(BackgroundColorSpan(Color.YELLOW), 0, spoilerString.length, 0)
+            spoilerString.setSpan(ForegroundColorSpan(Color.YELLOW), 0, spoilerString.length, 0)
             metaBuilder.append(spoilerString)
             metaBuilder.append(" ")
         }
