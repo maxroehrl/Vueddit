@@ -112,7 +112,6 @@ open class PostListFragment : Fragment() {
     open fun initialize(postsAdapter: PostsAdapter) {
         sortingLiveData = viewModel.postSorting
         postsLiveData = viewModel.posts
-        viewModel.selectSubreddit(safeArgs.subredditName, false)
         viewModel.posts.observe(viewLifecycleOwner, { posts ->
             val oldSize = postsAdapter.posts.size
             val newSize = posts.size
@@ -140,6 +139,9 @@ open class PostListFragment : Fragment() {
             }
             currentSubreddit = subreddit
             postsAdapter.showBigPreview = null
+        }
+        if (viewModel.subreddit.value == null) {
+            viewModel.selectSubreddit(safeArgs.subredditName, false)
         }
     }
 
