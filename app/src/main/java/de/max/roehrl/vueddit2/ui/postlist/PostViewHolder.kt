@@ -13,7 +13,6 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.drawable.ProgressBarDrawable
 import com.facebook.drawee.view.SimpleDraweeView
@@ -23,6 +22,8 @@ import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.service.Util
+import java.lang.IllegalArgumentException
+
 
 open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val postHeader: RelativeLayout = itemView.findViewById(R.id.post_header)
@@ -45,11 +46,14 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     open fun onClick(view: View) {
         val viewModel: AppViewModel by (view.context as MainActivity).viewModels()
         viewModel.selectedPost.value = post
-        view.findNavController().navigate(R.id.action_postListFragment_to_postDetailFragment,
-                //null,
-                //null,
-                //FragmentNavigatorExtras(postHeader to "header")
-        )
+        try {
+            view.findNavController().navigate(
+                    PostListFragmentDirections.actionPostListFragmentToPostDetailFragment(post.subreddit, post.name),
+                    // null, null, FragmentNavigatorExtras(postHeader to "header")
+            )
+        } catch (error: IllegalArgumentException) {
+            view.findNavController().navigate(UserPostListFragmentDirections.actionUserPostListFragmentToPostDetailFragment(post.subreddit, post.name))
+        }
     }
 
     fun Int.toDips() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), postHeader.resources.displayMetrics).toInt()

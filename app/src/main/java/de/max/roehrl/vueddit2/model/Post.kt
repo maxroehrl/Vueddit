@@ -31,8 +31,9 @@ class Post(json: JSONObject) : NamedItem(json.optString("name")) {
     var spannedSelftext: Spanned? = null
     val score = json.optInt("score", 0)
     val likes = json.optBoolean("likes", false)
+    var saved = json.optBoolean("saved", false)
     val shown_comments = 0
-    val comments = listOf<JSONObject>()
+    val comments = mutableListOf<Comment>()
     val preview: Image = Image(json, 300)
     val image: Image = Image(json)
     val video: Video = Video(json)

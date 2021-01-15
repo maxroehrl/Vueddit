@@ -18,6 +18,8 @@ class UserPostListFragment : PostListFragment() {
     private var groupTabLayout: TabLayout? = null
     override val layoutId = R.layout.fragment_user_posts
     private val safeArgs: UserPostListFragmentArgs by navArgs()
+    private var currentUser: String? = null
+    override val showGotoUser = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = super.onCreateView(inflater, container, savedInstanceState)
@@ -48,13 +50,11 @@ class UserPostListFragment : PostListFragment() {
 
     override fun initialize(postsAdapter: PostsAdapter) {
         sortingLiveData = viewModel.userSorting
-        viewModel.setSelectedUser(safeArgs.userName)
-        toolbar?.title = "/u/${safeArgs.userName}"
+        postsLiveData = viewModel.userPostsAndComments
         viewModel.userPostsAndComments.observe(viewLifecycleOwner) { posts ->
             val oldSize = postsAdapter.itemCount
             val newSize = posts.size
             postsAdapter.posts = posts
-            postsAdapter.showBigPreview = shouldShowBigTemplate(posts)
             if (newSize > oldSize) {
                 if (oldSize > 0)
                     postsAdapter.notifyItemChanged(oldSize - 1)
@@ -63,7 +63,17 @@ class UserPostListFragment : PostListFragment() {
                 postsAdapter.notifyDataSetChanged()
             }
         }
-        viewModel.refreshUserPosts()
+        viewModel.selectedUser.observe(viewLifecycleOwner) { userName ->
+            if (userName != "") {
+                toolbar?.title = "/u/${userName}"
+                if (userName != currentUser) {
+                    viewModel.refreshUserPosts()
+                }
+                currentUser = userName
+
+            }
+        }
+        viewModel.setSelectedUser(safeArgs.userName)
     }
 
     private fun onGroupSelected(group: String) {
@@ -80,13 +90,32 @@ class UserPostListFragment : PostListFragment() {
         viewModel.refreshUserPosts(false, cb)
     }
 
-    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int, layoutManager: LinearLayoutManager) {
-        if (!viewModel.isUserPostListLoading() && layoutManager.findLastCompletelyVisibleItemPosition() + 2 == recyclerView.adapter?.itemCount && dy != 0) {
+    override fun onRecyclerViewScrolled(recyclerView: RecyclerView, dx: Int, dy: Int, layoutManager: LinearLayoutManager) {
+        if (!viewModel.isUserPostListLoading() && layoutManager.findLastVisibleItemPosition() + 2 == recyclerView.adapter?.itemCount && dy != 0) {
             viewModel.loadMoreUserPosts()
         }
     }
 
+    override fun gotoUser(userName: String) {
+        viewModel.setSelectedUser(userName)
+        viewModel.refreshUserPosts()
+    }
+
+    override fun gotoSubreddit(subredditName: String) {
+        UserPostListFragmentDirections.actionUserPostListFragmentToPostListFragment(subredditName)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.user_post_list, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.action_refresh -> {
+                viewModel.refreshUserPosts()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

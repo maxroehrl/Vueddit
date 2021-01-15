@@ -1,15 +1,19 @@
 package de.max.roehrl.vueddit2.model
 
 import android.app.Application
+import android.util.Log
 import android.webkit.CookieManager
 import androidx.lifecycle.*
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Store
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 // https://developer.android.com/topic/libraries/architecture/coroutines
 class AppViewModel(application: Application) : AndroidViewModel(application) {
+    private val TAG = "AppViewModel"
+
     val isLoggedIn: LiveData<Boolean> = liveData(Dispatchers.IO) {
         emit(Reddit.login(application))
     }
@@ -57,7 +61,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     val selectedUser: LiveData<String> = liveData {
-        emit("")
     }
 
     val selectedGroup: LiveData<String> = liveData {
@@ -159,7 +162,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 subreddit.value?.name ?: Subreddit.frontPage.name
             }
             val sorting = postSorting.value ?: "best"
-            val p = Reddit.getSubredditPosts(subredditName, after, sorting)
+            val time = null
+            val p = Reddit.getSubredditPosts(subredditName, after, sorting, time)
             posts.postValue(oldPosts + p)
 
             cb?.invoke()
@@ -250,5 +254,34 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setUserPostGroup(group: String) {
         (userPostGroup as MutableLiveData).value = group
+    }
+
+    fun saveOrUnsave(post: Post) {
+        viewModelScope.launch {
+            val response = Reddit.saveOrUnsave(post.saved, post.name)
+            Log.d(TAG, "Post saved $response")
+            post.saved = !post.saved
+        }
+    }
+
+    fun toggleBigPreview(postList: List<NamedItem>) {
+        (isBigTemplatePreferred as MutableLiveData).value = if (isBigTemplatePreferred.value != null) {
+            !isBigTemplatePreferred.value!!
+        } else {
+            !shouldShowBigTemplate(postList, null)
+        }
+    }
+
+    fun shouldShowBigTemplate(postList: List<NamedItem>, currentSubreddit: Subreddit?): Boolean {
+        return if (isBigTemplatePreferred.value != null) {
+            isBigTemplatePreferred.value!!
+        } else {
+            val subHasMoreThanHalfPictures = postList
+                    .subList(min(2, postList.size), min(10, postList.size))
+                    .map { item -> if (item is Post && item.image.url != null) 1 else 0 }
+                    .fold(0) { acc, it -> acc + it } > 4
+            val isNotFrontPage = currentSubreddit != null && currentSubreddit != Subreddit.frontPage
+            subHasMoreThanHalfPictures && isNotFrontPage
+        }
     }
 }

@@ -14,6 +14,7 @@ import com.android.volley.toolbox.NoCache
 import com.android.volley.toolbox.StringRequest
 import de.max.roehrl.vueddit2.BuildConfig
 import de.max.roehrl.vueddit2.model.Comment
+import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.model.Subreddit
 import org.json.JSONArray
@@ -114,9 +115,8 @@ object Reddit {
             subreddit: String = frontpage,
             after: String = "",
             sorting: String = "best",
-            group: String? = null,
             time: String? = null,
-    ): MutableList<Post> {
+    ): MutableList<NamedItem> {
         val url = "${if (subreddit == frontpage) "" else "/r/$subreddit"}/$sorting.json?raw_json=1"
         return getPosts(url, after, sorting, time)
     }
@@ -128,7 +128,7 @@ object Reddit {
             group: String = "submitted",
             time: String = "all",
             type: String = "all",
-    ): MutableList<Post> {
+    ): MutableList<NamedItem> {
         var url = "/user/$user/$group.json?raw_json=1&sort=$sorting"
         url += if (type != "all") "&type=$type" else ""
         return getPosts(url, after, sorting, time);
@@ -140,7 +140,7 @@ object Reddit {
             sorting: String,
             time: String?,
             limit: Int = 25,
-    ): MutableList<Post> {
+    ): MutableList<NamedItem> {
         var url = url2 + "&limit=$limit" + (if (after != null && after != "") "&after=$after" else "")
         if (time != null && setOf("top", "rising").contains(sorting)) {
             url += "&t=$time"
@@ -149,10 +149,15 @@ object Reddit {
         val postsData = JSONObject(response)
                 .optJSONObject("data")
                 ?.optJSONArray("children")
-        val posts = mutableListOf<Post>()
+        val posts = mutableListOf<NamedItem>()
         if (postsData != null) {
             for (i in 0 until postsData.length()) {
-                posts.add(Post(postsData.getJSONObject(i).getJSONObject("data")))
+                val postOrComment = postsData.getJSONObject(i).getJSONObject("data")
+                if (postOrComment.has("body")) {
+                    posts.add(Comment(postOrComment))
+                } else {
+                    posts.add(Post(postOrComment))
+                }
             }
         }
         return posts
@@ -266,7 +271,6 @@ object Reddit {
 
     suspend fun saveOrUnsave(saved: Boolean, name: String) : String {
         return post("/api/${if (saved) "un" else ""}save?id=$name")
-        // saveable.saved = !saveable.saved
     }
 
     fun getFormattedScore(score: Int): String {

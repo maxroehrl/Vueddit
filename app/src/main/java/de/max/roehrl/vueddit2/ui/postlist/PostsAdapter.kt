@@ -13,7 +13,7 @@ import de.max.roehrl.vueddit2.ui.postdetail.CommentViewHolder
 class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     var posts: List<NamedItem> = emptyList()
-    var showBigPreview = false
+    var showBigPreview: Boolean? = null
 
     companion object {
         private const val VIEW_TYPE_PROGRESS = 0
@@ -39,15 +39,17 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemViewType(position: Int): Int {
         val item = posts[position]
         return when {
-            item == NamedItem.Loading                                -> VIEW_TYPE_PROGRESS
-            showBigPreview && item is Post && item.image.url != null -> VIEW_TYPE_POST_BIG
-            item is Comment                                          -> VIEW_TYPE_COMMENT
-            else                                                     -> VIEW_TYPE_POST_SMALL
+            item == NamedItem.Loading                                        -> VIEW_TYPE_PROGRESS
+            showBigPreview == true && item is Post && item.image.url != null -> VIEW_TYPE_POST_BIG
+            item is Comment                                                  -> VIEW_TYPE_COMMENT
+            else                                                             -> VIEW_TYPE_POST_SMALL
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is PostViewHolder) {
+            holder.bind(posts[position])
+        } else if (holder is CommentViewHolder) {
             holder.bind(posts[position])
         }
     }
