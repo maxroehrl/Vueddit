@@ -15,6 +15,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.android.material.navigation.NavigationView
 import de.max.roehrl.vueddit2.model.AppViewModel
+import de.max.roehrl.vueddit2.ui.postlist.PostListFragmentDirections
 
 
 // https://developer.android.com/guide/navigation/navigation-ui
@@ -39,8 +40,7 @@ class MainActivity : AppCompatActivity() {
             if (isLoggedIn) {
                 viewModel.loadSubscriptions()
             } else {
-                Log.d(TAG, "Start login activity")
-                navController.navigate(R.id.action_postListFragment_to_loginActivity)
+                navController.navigate(PostListFragmentDirections.actionPostListFragmentToLoginActivity())
             }
         }
         viewModel.subreddits.observe(this) { subreddits ->

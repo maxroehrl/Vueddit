@@ -53,7 +53,7 @@
             app:argType="string" />
         <action
             android:id="@+id/action_userPostListFragment_to_postListFragment"
-            app:destination="@id/loginActivity"
+            app:destination="@id/postListFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
