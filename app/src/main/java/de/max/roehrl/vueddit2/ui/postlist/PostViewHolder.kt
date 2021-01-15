@@ -102,7 +102,9 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             metaBuilder.append(" ")
         }
 
-        metaBuilder.append("${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n${Util.getTimeFromNow(post.created_utc.toLong())} by ")
+        val timeFromNow = Util.getTimeFromNow(post.created_utc.toLong())
+        val edited = if (post.edited) " *" else ""
+        metaBuilder.append("${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n$timeFromNow$edited by ")
 
 
         val authorString = SpannableString("/u/${post.author}")
@@ -115,6 +117,8 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val authorFlairString = SpannableString(post.author_flair_text)
             val color = if (post.author_flair_background_color != "" && post.author_flair_background_color != "null") post.author_flair_background_color else "#767676"
             authorFlairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, authorFlairString.length, 0)
+            authorFlairString.setSpan(ForegroundColorSpan(Color.WHITE), 0, authorFlairString.length, 0)
+
             metaBuilder.append(authorFlairString)
         }
         if ((post.gid_1 != null && post.gid_1 > 0) || (post.gid_2 != null && post.gid_2 > 0) || (post.gid_3 != null && post.gid_3 > 0)) {
