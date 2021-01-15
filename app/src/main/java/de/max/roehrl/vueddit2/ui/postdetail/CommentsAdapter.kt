@@ -40,12 +40,12 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
 
     override fun getItemViewType(position: Int): Int {
         return when {
-            position == 0 && post.preview.url != null && post.video.src == "" -> VIEW_TYPE_HEADER_BIG
-            position == 0                                                     -> VIEW_TYPE_HEADER
-            position == 1 && comments[0] == NamedItem.Loading                 -> VIEW_TYPE_PROGRESS_BIG
-            comments[position - 1] == NamedItem.Loading                       -> VIEW_TYPE_PROGRESS
-            (comments[position - 1] as Comment).body == ""                    -> VIEW_TYPE_MORE
-            else                                                              -> VIEW_TYPE_COMMENT
+            position == 0 && post.preview.url != null && post.video.height == 0 -> VIEW_TYPE_HEADER_BIG
+            position == 0                                                       -> VIEW_TYPE_HEADER
+            position == 1 && comments[0] == NamedItem.Loading                   -> VIEW_TYPE_PROGRESS_BIG
+            comments[position - 1] == NamedItem.Loading                         -> VIEW_TYPE_PROGRESS
+            (comments[position - 1] as Comment).body == ""                      -> VIEW_TYPE_MORE
+            else                                                                -> VIEW_TYPE_COMMENT
         }
     }
 

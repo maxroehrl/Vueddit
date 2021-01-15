@@ -2,6 +2,8 @@ package de.max.roehrl.vueddit2.ui.postdetail
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.graphics.Color
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
@@ -10,20 +12,28 @@ import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ui.PlayerView
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
+import de.max.roehrl.vueddit2.model.VideoType
 import de.max.roehrl.vueddit2.service.CustomTabs
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Util
 import de.max.roehrl.vueddit2.ui.postlist.PostViewHolder
 
+
 @SuppressLint("SetJavaScriptEnabled")
 open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
     private val selfText: TextView = itemView.findViewById(R.id.self_text)
     private val numComments: TextView = itemView.findViewById(R.id.num_comments)
-    private val videoPreview: WebView = itemView.findViewById(R.id.video_preview)
+    private val embeddedWebView: WebView = itemView.findViewById(R.id.embedded_web_view)
+    private val videoView: PlayerView = itemView.findViewById(R.id.video_view)
     private val videoPreviewLayout: LinearLayout = itemView.findViewById(R.id.video_preview_layout)
+    override val highlightAuthor = true
 
     private inner class Client : WebViewClient() {
         override fun onPageFinished(view: WebView?, url: String?) {
@@ -60,15 +70,31 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
     }
 
     init {
-        videoPreview.webViewClient = Client()
-        videoPreview.webChromeClient = ChromeClient()
-        videoPreview.settings.javaScriptEnabled = true
-        videoPreview.settings.domStorageEnabled = true
-        videoPreview.settings.loadWithOverviewMode = true
-        videoPreview.settings.useWideViewPort = false
-        videoPreview.settings.displayZoomControls = false
-        videoPreview.settings.builtInZoomControls = true
-        videoPreview.settings.mediaPlaybackRequiresUserGesture = false
+        embeddedWebView.webViewClient = Client()
+        embeddedWebView.webChromeClient = ChromeClient()
+        embeddedWebView.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            loadWithOverviewMode = true
+            useWideViewPort = false
+            displayZoomControls = false
+            builtInZoomControls = true
+            mediaPlaybackRequiresUserGesture = false
+        }
+        videoView.player = SimpleExoPlayer.Builder(itemView.context).build().apply {
+            repeatMode = Player.REPEAT_MODE_ONE
+            playWhenReady = true
+        }
+        videoView.apply {
+            setShowNextButton(false)
+            setShowFastForwardButton(false)
+            setShowPreviousButton(false)
+            setShowRewindButton(false)
+            setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
+            setShutterBackgroundColor(Color.TRANSPARENT)
+            controllerHideOnTouch = true
+            hideController()
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -86,16 +112,33 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
     }
 
     private fun updateVideoPreview(post: Post) {
-        videoPreview.stopLoading()
-        if (this.post.video.height == 0) {
+        if (post.video.height == 0) {
             videoPreviewLayout.visibility = View.GONE
         } else {
             videoPreviewLayout.visibility = View.VISIBLE
             videoPreviewLayout.layoutParams.height = Util.getAspectFixHeight(post.video.width, post.video.height)
-            if (this.post.video.src.startsWith("http")) {
-                videoPreview.loadUrl(this.post.video.src)
-            } else {
-                videoPreview.loadData(this.post.video.src, "text/html", "UTF-8")
+            when (post.video.type) {
+                VideoType.DASH, VideoType.MP4 -> {
+                    videoView.visibility = View.VISIBLE
+                    embeddedWebView.visibility = View.GONE
+                    try {
+                        videoView.player!!.setMediaItem(MediaItem.fromUri(post.video.url!!))
+                        videoView.player!!.prepare()
+                    } catch (e: Exception) {
+                        Log.e("PostHeaderViewHolder", "Failed to load ${post.video.type} video from '${post.video.url}'", e)
+                    }
+                }
+                VideoType.EMBEDDED -> {
+                    videoView.visibility = View.GONE
+                    embeddedWebView.visibility = View.VISIBLE
+                    try {
+                        embeddedWebView.loadUrl(post.video.url!!)
+                    } catch (e: Exception) {
+                        Log.e("PostHeaderViewHolder", "Failed to load embedded video from '${post.video.url}'", e)
+                    }
+                }
+                else -> {
+                }
             }
         }
     }

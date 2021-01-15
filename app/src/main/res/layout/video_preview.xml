@@ -2,12 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/video_preview_layout"
     android:layout_width="match_parent"
-    android:layout_height="400dp">
+    android:layout_height="400dp"
+    android:orientation="vertical">
 
     <WebView
-        android:id="@+id/video_preview"
+        android:id="@+id/embedded_web_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent" />
 
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/video_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>
