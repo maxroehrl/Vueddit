@@ -24,4 +24,11 @@
     <style name="Theme.Vueddit2.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Vueddit2.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Theme.Vueddit2.NavigationTheme">
+        <!-- Color of text and icon when SELECTED -->
+        <item name="colorPrimary">@color/white</item>
+        <!-- Background color when SELECTED -->
+        <item name="colorControlHighlight">@color/highlight</item>
+    </style>
 </resources>

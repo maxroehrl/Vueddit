@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             for (sub in subreddits) {
                 val item = navView.menu.add(sub.name)
                 item.icon = ResourcesCompat.getDrawable(this@MainActivity.resources, sub.getIconId(), null)
+                item.isCheckable = true
                 if (sub.isMultiReddit) {
                     multiReddits.add(item)
                 }
