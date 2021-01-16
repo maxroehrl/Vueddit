@@ -53,7 +53,7 @@ class PostDetailFragment : Fragment() {
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.post {
                 if (swipeRefreshLayout.isRefreshing) {
-                    viewModel.loadComments {
+                    viewModel.refreshComments {
                         swipeRefreshLayout.isRefreshing = false
                     }
                 }
@@ -82,7 +82,7 @@ class PostDetailFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_refresh -> {
-                Log.d(TAG, "Refresh item selected")
+                viewModel.refreshComments()
                 true
             }
             R.id.action_sidebar -> {

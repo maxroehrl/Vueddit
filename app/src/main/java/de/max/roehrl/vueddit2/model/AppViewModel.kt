@@ -101,14 +101,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         emit("overview")
     }
 
-    fun loadComments(cb: () -> Unit) {
+    fun loadComments(cb: (() -> Unit)? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             val sorting = commentSorting.value ?: "top"
             val permalink = selectedPost.value!!.permalink + subtreeCommentName.value
             val pair = Reddit.getPostAndComments(permalink, sorting)
             selectedPost.postValue(pair.first)
             comments.postValue(pair.second.toMutableList())
-            cb()
+            cb?.invoke()
         }
     }
 
@@ -232,6 +232,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun refreshComments(cb: (() -> Unit)? = null) {
+        resetComments()
+        loadComments(cb)
+    }
+
     fun resetComments() {
         comments.value = mutableListOf(NamedItem.Loading)
     }
@@ -239,7 +244,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun loadMoreComments(comment: Comment) {
         if (comment.count == 0) {
             (subtreeCommentName as MutableLiveData).value = comment.parent_id.split("_")[1]
-            loadComments {}
+            loadComments()
         } else {
             viewModelScope.launch(Dispatchers.IO) {
                 val newComments = Reddit.getMoreComments(selectedPost.value!!.name, comment.children)
