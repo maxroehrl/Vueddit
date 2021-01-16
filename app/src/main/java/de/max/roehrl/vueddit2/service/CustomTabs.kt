@@ -5,6 +5,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import android.webkit.URLUtil
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent.Builder
 import androidx.browser.customtabs.CustomTabsIntent.SHARE_STATE_ON
 import androidx.core.content.ContextCompat
@@ -25,11 +27,12 @@ object CustomTabs {
                 .setUrlBarHidingEnabled(true)
                 .build()
         CustomTabsHelper.addKeepAliveExtra(context, customTabsIntent.intent)
-        val uri = Uri.parse(url)
+        val uri = Uri.parse(URLUtil.guessUrl(url))
         try {
             CustomTabsHelper.openCustomTab(context, customTabsIntent, uri, WebViewFallback())
         } catch (error: ActivityNotFoundException) {
             Log.e("CustomTabs", "Failed to open custom tab", error)
+            Toast.makeText(context, "You don't have any browser to open the web page", Toast.LENGTH_LONG).show()
         }
     }
 }
