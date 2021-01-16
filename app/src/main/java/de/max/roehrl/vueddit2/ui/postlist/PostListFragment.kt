@@ -28,6 +28,7 @@ import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.model.Subreddit
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Store
+import de.max.roehrl.vueddit2.ui.dialog.Sidebar
 import de.max.roehrl.vueddit2.ui.listener.RecyclerOnTouchListener
 import kotlinx.coroutines.launch
 
@@ -227,7 +228,9 @@ open class PostListFragment : Fragment() {
                 true
             }
             R.id.action_sidebar -> {
-                Log.d(TAG, "Sidebar item selected")
+                if (currentSubreddit != null && currentSubreddit != Subreddit.frontPage) {
+                    Sidebar(requireContext(), currentSubreddit!!.name, viewModel.viewModelScope).show()
+                }
                 true
             }
             R.id.action_logout -> {

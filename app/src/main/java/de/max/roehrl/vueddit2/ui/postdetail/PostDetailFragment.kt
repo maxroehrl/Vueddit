@@ -7,6 +7,7 @@ import android.view.*
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -18,6 +19,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.service.Reddit
+import de.max.roehrl.vueddit2.ui.dialog.Sidebar
 
 
 class PostDetailFragment : Fragment() {
@@ -84,7 +86,7 @@ class PostDetailFragment : Fragment() {
                 true
             }
             R.id.action_sidebar -> {
-                Log.d(TAG, "Sidebar item selected")
+                Sidebar(requireContext(), viewModel.selectedPost.value!!.subreddit, viewModel.viewModelScope).show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
