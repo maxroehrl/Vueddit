@@ -39,7 +39,9 @@ class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
         authorString.setSpan(ForegroundColorSpan(Color.parseColor(authorColor)), 0, authorString.length, 0)
         builder.append(authorString)
-        builder.append(" ${comment.ups} points ${Util.getTimeFromNow(comment.created_utc.toLong())}")
+        val timeFromNow = Util.getTimeFromNow(comment.created_utc.toLong())
+        val edited = if (comment.edited) " *" else ""
+        builder.append(" ${comment.ups} points $timeFromNow$edited")
 
         if (showSubreddit) {
             builder.append("in /r/${comment.subreddit} ")
