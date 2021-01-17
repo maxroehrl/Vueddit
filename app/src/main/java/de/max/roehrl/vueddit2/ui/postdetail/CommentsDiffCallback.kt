@@ -1,6 +1,7 @@
 package de.max.roehrl.vueddit2.ui.postdetail
 
 import androidx.recyclerview.widget.DiffUtil
+import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 
 class CommentsDiffCallback(private val oldList: List<NamedItem>, private val newList: List<NamedItem>) : DiffUtil.Callback() {
@@ -16,6 +17,10 @@ class CommentsDiffCallback(private val oldList: List<NamedItem>, private val new
         val item1 = oldList[oldPosition]
         val item2 = newList[newPosition]
 
-        return item1.id == item2.id
+        return if (item1 is Comment && item2 is Comment) {
+            item1.id == item2.id && item1.isLoading == item2.isLoading
+        } else {
+            item1.id == item2.id
+        }
     }
 }

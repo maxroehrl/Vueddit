@@ -249,10 +249,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             viewModelScope.launch(Dispatchers.IO) {
                 val newComments = Reddit.getMoreComments(selectedPost.value!!.name, comment.children)
                 val index = comments.value?.indexOf(comment)
-                val oldComments = comments.value!!
-                oldComments.remove(comment)
-                oldComments.addAll(index!!, newComments)
-                comments.postValue(oldComments)
+                if (index != null && index >= 0) {
+                    val oldComments = comments.value!!
+                    oldComments.remove(comment)
+                    oldComments.addAll(index, newComments)
+                    comments.postValue(oldComments)
+                } else {
+                    Log.e(TAG, "Error loading more comments")
+                }
             }
         }
     }

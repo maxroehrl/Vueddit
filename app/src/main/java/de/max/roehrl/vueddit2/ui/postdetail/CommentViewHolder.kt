@@ -32,10 +32,10 @@ class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val authorString = SpannableString(comment.author)
         val authorColor = when {
-            comment.is_submitter -> "#53ba82"
+            comment.is_submitter                 -> "#53ba82"
             comment.distinguished == "moderator" -> "#4afff5"
-            comment.distinguished == "admin" -> "#c40013"
-            else -> "#c4c4c4"
+            comment.distinguished == "admin"     -> "#c40013"
+            else                                 -> "#c4c4c4"
         }
         authorString.setSpan(ForegroundColorSpan(Color.parseColor(authorColor)), 0, authorString.length, 0)
         builder.append(authorString)
@@ -61,7 +61,7 @@ class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val color = if (comment.author_flair_background_color != "" && comment.author_flair_background_color != "null") comment.author_flair_background_color else "#767676"
             try {
                 flairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, flairString.length, 0)
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
                 Log.e(TAG, "Failed to parse color: '$color'", e)
             }
             flairString.setSpan(ForegroundColorSpan(Color.parseColor("#c2c2c2")), 0, flairString.length, 0)

@@ -27,7 +27,8 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
     val gid_1 = json.optJSONObject("gildings")?.optInt("gid_1", 0)
     val gid_2 = json.optJSONObject("gildings")?.optInt("gid_2", 0)
     val gid_3 = json.optJSONObject("gildings")?.optInt("gid_3", 0)
-    
+    var isLoading = false
+
     init {
         val mutableChildren = mutableListOf<String>()
         val childrenData = json.optJSONArray("children")
@@ -39,14 +40,14 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
         children = mutableChildren.toList()
     }
 
-    fun getSpannedBody(context: Context) : Spanned? {
+    fun getSpannedBody(context: Context): Spanned? {
         if (spannedBody == null) {
             spannedBody = Markdown.getInstance(context).toMarkDown(body)
         }
         return spannedBody
     }
 
-    fun getScore() : String {
+    fun getScore(): String {
         return Reddit.getFormattedScore(likes)
     }
 }

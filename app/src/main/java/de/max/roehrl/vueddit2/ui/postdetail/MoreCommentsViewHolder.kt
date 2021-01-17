@@ -9,7 +9,7 @@ import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.ui.view.IndentedLabel
 
-class MoreCommentsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class MoreCommentsViewHolder(itemView: View, private val adapter: CommentsAdapter) : RecyclerView.ViewHolder(itemView) {
     private val tv: IndentedLabel = itemView.findViewById(R.id.more)
 
     fun bind(comment: Comment) {
@@ -20,6 +20,8 @@ class MoreCommentsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             "load ${comment.count} more comment${if (comment.count == 1) " ↓" else "s ↓"}"
         }
         tv.setOnClickListener {
+            comment.isLoading = true
+            adapter.refreshComment(comment)
             val viewModel: AppViewModel by (itemView.context as MainActivity).viewModels()
             viewModel.loadMoreComments(comment)
         }

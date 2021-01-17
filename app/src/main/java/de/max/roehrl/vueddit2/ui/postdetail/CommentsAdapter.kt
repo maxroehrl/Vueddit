@@ -4,13 +4,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 
 class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun bind(comment: NamedItem) {
+            if (comment is Comment) {
+                itemView.findViewById<CircularProgressIndicator>(R.id.progress)
+                    .setPadding((40f * comment.depth + 20).toInt(), 10, 10, 10)
+            }
+        }
+    }
     var comments : MutableList<NamedItem> = mutableListOf()
 
     companion object {
@@ -29,8 +37,15 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
             VIEW_TYPE_COMMENT      -> CommentViewHolder(inflate(parent, R.layout.comment_item))
             VIEW_TYPE_HEADER       -> PostHeaderViewHolder(inflate(parent, R.layout.post_detail_header))
             VIEW_TYPE_HEADER_BIG   -> PostBigHeaderViewHolder(inflate(parent, R.layout.post_detail_header_big))
-            VIEW_TYPE_MORE         -> MoreCommentsViewHolder(inflate(parent, R.layout.more_comments_item))
+            VIEW_TYPE_MORE         -> MoreCommentsViewHolder(inflate(parent, R.layout.more_comments_item), this)
             else                   -> throw IllegalArgumentException("viewType not found")
+        }
+    }
+
+    fun refreshComment(comment: Comment) {
+        val index = comments.indexOf(comment)
+        if (index >= 0) {
+            notifyItemChanged(index)
         }
     }
 
@@ -43,7 +58,7 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
             position == 0 && post.preview.url != null && post.video.height == 0 -> VIEW_TYPE_HEADER_BIG
             position == 0                                                       -> VIEW_TYPE_HEADER
             position == 1 && comments[0] == NamedItem.Loading                   -> VIEW_TYPE_PROGRESS_BIG
-            comments[position - 1] == NamedItem.Loading                         -> VIEW_TYPE_PROGRESS
+            (comments[position - 1] as Comment).isLoading                       -> VIEW_TYPE_PROGRESS
             (comments[position - 1] as Comment).body == ""                      -> VIEW_TYPE_MORE
             else                                                                -> VIEW_TYPE_COMMENT
         }
@@ -54,6 +69,7 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
             is PostHeaderViewHolder   -> holder.bind(post)
             is MoreCommentsViewHolder -> holder.bind(comments[position - 1] as Comment)
             is CommentViewHolder      -> holder.bind(comments[position - 1] as Comment)
+            is ProgressViewHolder     -> holder.bind(comments[position - 1])
         }
     }
 

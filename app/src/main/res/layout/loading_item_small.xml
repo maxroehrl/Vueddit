@@ -12,6 +12,7 @@
         android:layout_gravity="center"
         android:indeterminate="true"
         app:indicatorSize="20dp"
+        app:trackThickness="2dp"
         app:indicatorColor="@color/highlight" />
 
 </LinearLayout>
