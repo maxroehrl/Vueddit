@@ -20,11 +20,11 @@ class IndentedLabel(context: Context, attrs: AttributeSet) : AppCompatTextView(c
     }
 
     override fun onDraw(canvas: Canvas?) {
-        super.setPadding((factor * this.depth + 20).toInt(), this.paddingTop2, 10, 10)
+        setPadding((factor * depth + 20).toInt(), paddingTop2, 10, 10)
         super.onDraw(canvas)
         for (i in 0..depth) {
             val indent = i * factor
-            canvas?.drawLine(indent, 0f, indent, super.getHeight().toFloat(), paint)
+            canvas?.drawLine(indent, 0f, indent, height.toFloat(), paint)
         }
     }
 
