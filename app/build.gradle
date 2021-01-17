@@ -45,7 +45,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.2'
     implementation 'androidx.recyclerview:recyclerview:1.2.0-beta01'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
-    implementation 'androidx.datastore:datastore-preferences:1.0.0-alpha05'
+    implementation 'androidx.datastore:datastore-preferences:1.0.0-alpha06'
     implementation 'io.noties.markwon:core:4.6.1'
     implementation 'saschpe.android:customtabs:3.0.2'
     implementation 'com.android.volley:volley:1.1.1'

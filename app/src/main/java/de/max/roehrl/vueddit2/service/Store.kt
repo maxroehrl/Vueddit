@@ -3,10 +3,7 @@ package de.max.roehrl.vueddit2.service
 import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.preferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.createDataStore
 import de.max.roehrl.vueddit2.model.SingletonHolder
 import kotlinx.coroutines.flow.Flow
@@ -27,10 +24,10 @@ class Store private constructor(context: Context) {
     companion object : SingletonHolder<Store, Context>(::Store) {
         private const val TAG = "Store"
         private const val PREFERENCE_NAME = "reddit"
-        private val USERNAME = preferencesKey<String>("username")
-        private val AUTH_TOKEN = preferencesKey<String>("authToken")
-        private val VALID_UNTIL = preferencesKey<Long>("validUntil")
-        private val REFRESH_TOKEN = preferencesKey<String>("refreshToken")
+        private val USERNAME = stringPreferencesKey("username")
+        private val AUTH_TOKEN = stringPreferencesKey("authToken")
+        private val VALID_UNTIL = longPreferencesKey("validUntil")
+        private val REFRESH_TOKEN = stringPreferencesKey("refreshToken")
     }
 
     private fun <T> getFlow(key: Preferences.Key<T>): Flow<T?> {
