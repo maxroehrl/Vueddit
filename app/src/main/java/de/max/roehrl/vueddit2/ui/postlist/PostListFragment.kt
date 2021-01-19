@@ -6,6 +6,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.SupportMenuInflater
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
@@ -215,7 +216,21 @@ open class PostListFragment : Fragment() {
     }
 
     open fun gotoSubreddit(subredditName: String) {
+        val oldSubredditName = viewModel.subreddit.value!!
         viewModel.selectSubreddit(subredditName, false)
+        createGoBackSnackBar(oldSubredditName)
+    }
+
+    private fun createGoBackSnackBar(goBackToSubreddit: Subreddit) {
+        val view = activity?.findViewById<View>(R.id.nav_host_fragment)
+        Snackbar.make(view!!, "", 8000).apply {
+            setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
+            setActionTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
+            setAction("Go back to ${goBackToSubreddit.name}") {
+                gotoSubreddit(goBackToSubreddit.name)
+            }
+            show()
+        }
     }
 
     @SuppressLint("RestrictedApi")
