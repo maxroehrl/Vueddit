@@ -59,10 +59,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val selectedUser: LiveData<String> = liveData {
     }
 
-    val selectedGroup: LiveData<String> = liveData {
-        emit("overview")
-    }
-
     val userSorting: LiveData<String> = liveData {
         emit("new")
     }

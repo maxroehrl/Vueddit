@@ -33,7 +33,7 @@ class UserPostListFragment : PostListFragment() {
             for (group in groups) {
                 groupTabLayout!!.addTab(groupTabLayout!!.newTab().setText(group))
             }
-            val index = groups.indexOf(viewModel.selectedGroup.value)
+            val index = groups.indexOf(viewModel.userPostGroup.value)
             if (index != -1) {
                 groupTabLayout!!.getTabAt(index)!!.select()
             }
