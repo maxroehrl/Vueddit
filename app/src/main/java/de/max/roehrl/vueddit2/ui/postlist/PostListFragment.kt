@@ -39,7 +39,7 @@ open class PostListFragment : Fragment() {
     private var currentSubreddit: Subreddit? = null
     protected var toolbar: MaterialToolbar? = null
     private var collapsingToolbar: CollapsingToolbarLayout? = null
-    private var sortingTabLayout: TabLayout? = null
+    protected var sortingTabLayout: TabLayout? = null
     protected open val isGroupTabLayoutVisible = false
     protected open val sortings = listOf("best", "hot", "top", "new", "controversial", "rising")
     private val safeArgs: PostListFragmentArgs by navArgs()

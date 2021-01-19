@@ -74,6 +74,9 @@ class UserPostListFragment : PostListFragment() {
 
             }
         }
+        viewModel.userPostGroup.observe(viewLifecycleOwner) { group ->
+            sortingTabLayout?.visibility = if (listOf("overview", "submitted", "comments").contains(group)) View.VISIBLE else View.GONE
+        }
         viewModel.setSelectedUser(safeArgs.userName)
     }
 
