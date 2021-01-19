@@ -3,6 +3,7 @@ package de.max.roehrl.vueddit2.ui.postlist
 import android.os.Bundle
 import android.view.*
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -102,7 +103,7 @@ class UserPostListFragment : PostListFragment() {
     }
 
     override fun gotoSubreddit(subredditName: String) {
-        UserPostListFragmentDirections.actionUserPostListFragmentToPostListFragment(subredditName)
+        findNavController().navigate(UserPostListFragmentDirections.actionUserPostListFragmentToPostListFragment(subredditName))
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

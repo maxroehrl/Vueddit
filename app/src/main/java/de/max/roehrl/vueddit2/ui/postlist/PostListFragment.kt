@@ -198,7 +198,7 @@ open class PostListFragment : Fragment() {
     }
 
     open fun gotoUser(userName: String) {
-        PostListFragmentDirections.actionPostListFragmentToUserPostListFragment(userName)
+        findNavController().navigate(PostListFragmentDirections.actionPostListFragmentToUserPostListFragment(userName))
     }
 
     open fun gotoSubreddit(subredditName: String) {
