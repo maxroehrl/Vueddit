@@ -102,8 +102,8 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
     }
 
     @SuppressLint("SetTextI18n")
-    override fun bind(post: NamedItem) {
-        super.bind(post)
+    override fun bind(post: NamedItem, highlightSticky: Boolean) {
+        super.bind(post, highlightSticky)
         if (this.post.selftext.isEmpty()) {
             selfText.visibility = View.GONE
             selfText.text = ""

@@ -59,7 +59,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun Int.toDips() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), postHeader.resources.displayMetrics).toInt()
 
     @SuppressLint("SetTextI18n")
-    open fun bind(post: NamedItem) {
+    open fun bind(post: NamedItem, highlightSticky: Boolean = true) {
         this.post = post as Post
         // ViewCompat.setTransitionName(postHeader, post.name)
         val builder = SpannableStringBuilder()
@@ -74,7 +74,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
 
         val titleString = SpannableString(post.title)
-        val titleColor = if (highlightAuthor && post.stickied) "#53ba82" else "#ffffff"
+        val titleColor = if (highlightSticky && post.stickied) "#53ba82" else "#ffffff"
         titleString.setSpan(ForegroundColorSpan(Color.parseColor(titleColor)), 0, titleString.length, 0)
         builder.append(titleString)
         builder.append(" ")

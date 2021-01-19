@@ -14,6 +14,7 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     var posts: List<NamedItem> = emptyList()
     var showBigPreview: Boolean? = null
+    var highlightStickied = true
 
     companion object {
         private const val VIEW_TYPE_PROGRESS = 0
@@ -48,7 +49,7 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is PostViewHolder) {
-            holder.bind(posts[position])
+            holder.bind(posts[position], highlightStickied)
         } else if (holder is CommentViewHolder) {
             holder.bind(posts[position])
         }

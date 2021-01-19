@@ -136,6 +136,7 @@ open class PostListFragment : Fragment() {
         viewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
             toolbar?.title = subreddit?.name ?: Reddit.frontpage
             if (viewModel.isLoggedIn.value == true && subreddit != currentSubreddit && currentSubreddit != null) {
+                postsAdapter.highlightStickied = subreddit != Subreddit.frontPage
                 viewModel.refreshPosts(true)
             }
             currentSubreddit = subreddit
