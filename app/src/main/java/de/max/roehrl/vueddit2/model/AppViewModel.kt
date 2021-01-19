@@ -22,10 +22,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         emit(Store.getInstance(application).getUsername())
     }
 
-    val subreddits: MutableLiveData<MutableList<Subreddit>> by lazy {
-        MutableLiveData<MutableList<Subreddit>>().also {
-            it.value = Subreddit.defaultSubreddits.toMutableList()
-        }
+    val subreddits: LiveData<List<Subreddit>> = liveData {
+        emit(Subreddit.defaultSubreddits)
     }
 
     val subreddit: LiveData<Subreddit> = liveData {
@@ -48,10 +46,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    val posts: MutableLiveData<List<NamedItem>> by lazy {
-        MutableLiveData<List<NamedItem>>().also {
-            it.value = listOf(NamedItem.Loading)
-        }
+    val posts: LiveData<List<NamedItem>> = liveData {
+        emit(listOf(NamedItem.Loading))
     }
 
     val selectedPost = MutableLiveData<Post>()
@@ -79,10 +75,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         emit(null)
     }
 
-    val comments: MutableLiveData<MutableList<NamedItem>> by lazy {
-        MutableLiveData<MutableList<NamedItem>>().also {
-            it.value = mutableListOf(NamedItem.Loading)
-        }
+    val comments: LiveData<MutableList<NamedItem>> = liveData {
+        emit(mutableListOf<NamedItem>(NamedItem.Loading))
     }
 
     val subtreeCommentName: LiveData<String> = liveData {
@@ -107,7 +101,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val permalink = selectedPost.value!!.permalink + subtreeCommentName.value
             val pair = Reddit.getPostAndComments(permalink, sorting)
             selectedPost.postValue(pair.first)
-            comments.postValue(pair.second.toMutableList())
+            (comments as MutableLiveData).postValue(pair.second.toMutableList())
             cb?.invoke()
         }
     }
@@ -150,7 +144,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val oldPosts = posts.value?.toMutableList() ?: mutableListOf()
             if (showLoadingIndicator) {
                 if (!isPostListLoading()) {
-                    posts.postValue(oldPosts + NamedItem)
+                    (posts as MutableLiveData).postValue(oldPosts + NamedItem)
                 } else {
                     oldPosts.removeLast()
                 }
@@ -164,7 +158,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val sorting = postSorting.value ?: "best"
             val time = null
             val p = Reddit.getSubredditPosts(subredditName, after, sorting, time)
-            posts.postValue(oldPosts + p)
+            (posts as MutableLiveData).postValue(oldPosts + p)
 
             cb?.invoke()
         }
@@ -176,7 +170,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     .sortedWith(compareBy { sub: Subreddit -> sub.isStarred }.thenBy { it.isVisited })
             val multiReddits = Reddit.getMultis()
             val all = listOf(Subreddit.defaultSubreddits, subscriptions, multiReddits).flatten().toMutableList()
-            subreddits.postValue(all)
+            (subreddits as MutableLiveData).postValue(all)
         }
     }
 
@@ -185,7 +179,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun refreshPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
-        posts.value = emptyList()
+        (posts as MutableLiveData).value = emptyList()
         loadMorePosts(showLoadingIndicator, cb)
     }
 
@@ -237,7 +231,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun resetComments() {
-        comments.value = mutableListOf(NamedItem.Loading)
+        (comments as MutableLiveData).value = mutableListOf(NamedItem.Loading)
     }
 
     fun loadMoreComments(comment: Comment) {
@@ -252,7 +246,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     val oldComments = comments.value!!
                     oldComments.remove(comment)
                     oldComments.addAll(index, newComments)
-                    comments.postValue(oldComments)
+                    (comments as MutableLiveData).postValue(oldComments)
                 } else {
                     Log.e(TAG, "Error loading more comments")
                 }
