@@ -67,6 +67,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         emit("all")
     }
 
+    val topPostsTime: LiveData<String> = liveData {
+        emit("all")
+    }
+
     val isBigTemplatePreferred: LiveData<Boolean?> = liveData {
         emit(null)
     }
@@ -118,11 +122,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     oldPosts.removeLast()
                 }
             }
-            val after = lastPost?.id ?: ""
             val userName = selectedUser.value!!
+            val after = lastPost?.id ?: ""
             val sorting = userSorting.value ?: "new"
             val group = userPostGroup.value ?: "overview"
-            val p = Reddit.getUserPosts(userName, after, sorting, group)
+            val time = topPostsTime.value ?: "all"
+            val type = selectedType.value ?: "all"
+            val p = Reddit.getUserPosts(userName, after, sorting, group, time, type)
             (userPostsAndComments as MutableLiveData).postValue(oldPosts + p)
 
             cb?.invoke()
@@ -145,14 +151,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     oldPosts.removeLast()
                 }
             }
-            val after = lastPost?.id ?: ""
             val subredditName = if (subreddit.value?.isMultiReddit == true) {
                 subreddit.value!!.subreddits
             } else {
                 subreddit.value?.name ?: Subreddit.frontPage.name
             }
+            val after = lastPost?.id ?: ""
             val sorting = postSorting.value ?: "best"
-            val time = null
+            val time = topPostsTime.value ?: "all"
             val p = Reddit.getSubredditPosts(subredditName, after, sorting, time)
             (posts as MutableLiveData).postValue(oldPosts + p)
 
@@ -181,6 +187,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setUserPostSorting(sorting: String) {
         (userSorting as MutableLiveData).value = sorting
+    }
+
+    fun setSavedPostsType(type: String) {
+        (selectedType as MutableLiveData).value = type
+    }
+
+    fun setTopPostsTime(time : String) {
+        (topPostsTime as MutableLiveData).value = time
     }
 
     fun refreshUserPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {

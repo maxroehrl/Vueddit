@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import de.max.roehrl.vueddit2.MainActivity
 import de.max.roehrl.vueddit2.R
@@ -31,6 +32,7 @@ import de.max.roehrl.vueddit2.service.Store
 import de.max.roehrl.vueddit2.ui.dialog.Sidebar
 import de.max.roehrl.vueddit2.ui.listener.RecyclerOnTouchListener
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 open class PostListFragment : Fragment() {
@@ -149,7 +151,18 @@ open class PostListFragment : Fragment() {
 
     open fun onSortingSelected(sorting: String) {
         viewModel.setPostSorting(sorting)
-        viewModel.refreshPosts()
+        if (listOf("top", "rising").contains(sorting)) {
+            val items = listOf("Hour", "Day", "Week", "Month", "Year", "All")
+            AlertDialog.Builder(requireContext()).apply {
+                setItems(items.toTypedArray()) { _, which ->
+                    val time = items[which].toLowerCase(Locale.getDefault())
+                    viewModel.setTopPostsTime(time)
+                    viewModel.refreshPosts()
+                }
+            }.show()
+        } else {
+            viewModel.refreshPosts()
+        }
     }
 
     open fun onSwipeToRefresh(cb: () -> Unit) {

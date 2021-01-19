@@ -2,6 +2,7 @@ package de.max.roehrl.vueddit2.ui.postlist
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -11,6 +12,7 @@ import com.google.android.material.tabs.TabLayout
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Store
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 class UserPostListFragment : PostListFragment() {
@@ -71,23 +73,50 @@ class UserPostListFragment : PostListFragment() {
                     viewModel.refreshUserPosts()
                 }
                 currentUser = userName
-
             }
         }
-        viewModel.userPostGroup.observe(viewLifecycleOwner) { group ->
-            sortingTabLayout?.visibility = if (listOf("overview", "submitted", "comments").contains(group)) View.VISIBLE else View.GONE
-        }
         viewModel.setSelectedUser(safeArgs.userName)
+        viewModel.setUserPostGroup("overview")
+        viewModel.userPostGroup.observe(viewLifecycleOwner) { group ->
+            if (listOf("overview", "submitted", "comments").contains(group)) {
+                sortingTabLayout?.visibility = View.VISIBLE
+            } else {
+                sortingTabLayout?.visibility = View.GONE
+                viewModel.setUserPostSorting("new")
+            }
+            if (group == "saved") {
+                val items = listOf("All", "Comments", "Links")
+                AlertDialog.Builder(requireContext()).apply {
+                    setItems(items.toTypedArray()) { _, which ->
+                        val type = items[which].toLowerCase(Locale.getDefault())
+                        viewModel.setSavedPostsType(type)
+                        viewModel.refreshUserPosts()
+                    }
+                }.show()
+            } else {
+                viewModel.refreshUserPosts()
+            }
+        }
     }
 
     private fun onGroupSelected(group: String) {
         viewModel.setUserPostGroup(group)
-        viewModel.refreshUserPosts()
     }
 
     override fun onSortingSelected(sorting: String) {
         viewModel.setUserPostSorting(sorting)
-        viewModel.refreshUserPosts()
+        if (listOf("top", "rising").contains(sorting)) {
+            val items = listOf("Hour", "Day", "Week", "Month", "Year", "All")
+            AlertDialog.Builder(requireContext()).apply {
+                setItems(items.toTypedArray()) { _, which ->
+                    val time = items[which].toLowerCase(Locale.getDefault())
+                    viewModel.setTopPostsTime(time)
+                    viewModel.refreshUserPosts()
+                }
+            }.show()
+        } else {
+            viewModel.refreshUserPosts()
+        }
     }
 
     override fun onSwipeToRefresh(cb: () -> Unit) {
