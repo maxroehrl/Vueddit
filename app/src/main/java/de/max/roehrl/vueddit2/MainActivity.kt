@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.forEach
 import androidx.core.widget.doOnTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
@@ -46,6 +47,13 @@ class MainActivity : AppCompatActivity() {
                 navController.navigate(PostListFragmentDirections.actionPostListFragmentToLoginActivity())
             }
         }
+        viewModel.subreddit.observe(this) { subreddit ->
+            navView.menu.forEach { item ->
+                if (item.title == subreddit.name && (subreddit.isMultiReddit == multiReddits.contains(item))) {
+                    item.isChecked = true
+                }
+            }
+        }
         viewModel.subreddits.observe(this) { subreddits ->
             setNavItems(subreddits)
         }
@@ -68,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                 multiReddits.add(item)
             }
             if (sub.name == viewModel.subreddit.value?.name) {
-                navView.setCheckedItem(item.itemId)
+                item.isChecked = true
             }
         }
     }
