@@ -8,6 +8,8 @@ import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Store
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.NoSuchElementException
 import kotlin.math.min
 
 // https://developer.android.com/topic/libraries/architecture/coroutines
@@ -169,7 +171,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun loadSubscriptions() {
         viewModelScope.launch(Dispatchers.IO) {
             val subscriptions = Reddit.getSubscriptions()
-                    .sortedWith(compareBy { sub: Subreddit -> sub.isStarred }.thenBy { it.isVisited })
+                .sortedWith(compareBy { sub: Subreddit -> sub.isStarred }
+                    .thenBy { it.isVisited }
+                    .thenBy { it.name.toLowerCase(Locale.getDefault()) })
             val multiReddits = Reddit.getMultis()
             val all = listOf(Subreddit.defaultSubreddits, subscriptions, multiReddits).flatten().toMutableList()
             (subreddits as MutableLiveData).postValue(all)
