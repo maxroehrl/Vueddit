@@ -28,6 +28,7 @@ class PostDetailFragment : Fragment() {
     private val viewModel: AppViewModel by activityViewModels()
     private var toolbar: MaterialToolbar? = null
     private var collapsingToolbar: CollapsingToolbarLayout? = null
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +43,7 @@ class PostDetailFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_post_detail, container, false)
         toolbar = root.findViewById(R.id.toolbar)
         collapsingToolbar = root.findViewById(R.id.collapsing_toolbar)
-        val recyclerView = root.findViewById<RecyclerView>(R.id.comments)
+        recyclerView = root.findViewById(R.id.comments)
         recyclerView.layoutManager = LinearLayoutManager(context)
         val commentsAdapter = CommentsAdapter(viewModel.selectedPost.value!!)
         recyclerView.adapter = commentsAdapter
@@ -103,6 +104,14 @@ class PostDetailFragment : Fragment() {
         collapsingToolbar!!.setupWithNavController(toolbar!!, navController, appBarConfiguration)
         onCreateOptionsMenu(toolbar!!.menu, SupportMenuInflater(context))
         toolbar!!.setOnMenuItemClickListener { onOptionsItemSelected(it) }
+    }
+
+    override fun onDestroy() {
+        val headerVh = recyclerView.findViewHolderForAdapterPosition(0)
+        if (headerVh is PostHeaderViewHolder) {
+            headerVh.onDestroy()
+        }
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -97,6 +97,10 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
         }
     }
 
+    fun onDestroy() {
+        videoView.player?.release()
+    }
+
     @SuppressLint("SetTextI18n")
     override fun bind(post: NamedItem) {
         super.bind(post)
