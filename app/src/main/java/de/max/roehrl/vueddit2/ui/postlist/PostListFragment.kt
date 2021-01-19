@@ -2,8 +2,8 @@ package de.max.roehrl.vueddit2.ui.postlist
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.fragment.app.Fragment
@@ -229,8 +229,10 @@ open class PostListFragment : Fragment() {
                 true
             }
             R.id.action_sidebar -> {
-                if (currentSubreddit != null && currentSubreddit != Subreddit.frontPage) {
+                if (currentSubreddit != null && currentSubreddit != Subreddit.frontPage && !currentSubreddit!!.isMultiReddit) {
                     Sidebar(requireContext(), currentSubreddit!!.name, viewModel.viewModelScope).show()
+                } else {
+                    Toast.makeText(context, "No sidebar available", Toast.LENGTH_SHORT).show()
                 }
                 true
             }
