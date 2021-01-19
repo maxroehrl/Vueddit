@@ -238,7 +238,7 @@ object Reddit {
         if (response != "[]") {
             val data = JSONArray(response)
             for (i in 0 until data.length()) {
-                list.add(Subreddit(data.getJSONObject(i).getJSONObject("data")))
+                list.add(Subreddit(data.getJSONObject(i).getJSONObject("data"), true))
             }
         }
         return list

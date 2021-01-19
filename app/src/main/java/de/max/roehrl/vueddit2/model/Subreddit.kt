@@ -4,7 +4,7 @@ import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Reddit
 import org.json.JSONObject
 
-class Subreddit(json: JSONObject) : NamedItem("subreddit") {
+class Subreddit(json: JSONObject, var isMultiReddit: Boolean = false) : NamedItem("subreddit") {
     companion object {
         val frontPage = fromName(Reddit.frontpage)
         val all = fromName("all")
@@ -19,7 +19,6 @@ class Subreddit(json: JSONObject) : NamedItem("subreddit") {
 
     val name = json.optString("display_name")
     val subreddits = getSubreddits(json)
-    var isMultiReddit = subreddits.isNotEmpty()
     var isSubscribedTo = true
     var isStarred = false
     var isVisited = true
