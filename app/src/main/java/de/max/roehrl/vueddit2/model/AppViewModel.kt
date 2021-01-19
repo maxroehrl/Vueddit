@@ -198,14 +198,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         loadMoreUserPosts(showLoadingIndicator, cb)
     }
 
+    val searchResults: LiveData<List<Subreddit>?> = liveData {
+        emit(null)
+    }
+
     fun updateSearchText(text: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (text.isEmpty()) {
-                loadSubscriptions()
-            } else {
-                val searchResults = Reddit.searchForSubreddit(text)
-                subreddits.postValue(searchResults.toMutableList())
-            }
+            (searchResults as MutableLiveData).postValue(if (text.isEmpty()) null else Reddit.searchForSubreddit(text))
         }
     }
 

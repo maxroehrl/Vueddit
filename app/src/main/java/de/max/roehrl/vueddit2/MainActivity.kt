@@ -3,7 +3,8 @@ package de.max.roehrl.vueddit2
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.widget.EditText
+import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
@@ -14,7 +15,9 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.textfield.TextInputEditText
 import de.max.roehrl.vueddit2.model.AppViewModel
+import de.max.roehrl.vueddit2.model.Subreddit
 import de.max.roehrl.vueddit2.ui.postlist.PostListFragmentDirections
 
 
@@ -44,18 +47,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
         viewModel.subreddits.observe(this) { subreddits ->
-            multiReddits.clear()
-            navView.menu.clear()
-            for (sub in subreddits) {
-                val item = navView.menu.add(sub.name)
-                item.icon = ResourcesCompat.getDrawable(this@MainActivity.resources, sub.getIconId(), null)
-                item.isCheckable = true
-                if (sub.isMultiReddit) {
-                    multiReddits.add(item)
-                }
-                if (sub.name == viewModel.subreddit.value?.name) {
-                    navView.setCheckedItem(item.itemId)
-                }
+            setNavItems(subreddits)
+        }
+        viewModel.searchResults.observe(this) { subreddits ->
+            if (subreddits != null && subreddits.isEmpty()) {
+                Toast.makeText(this, "No search results", Toast.LENGTH_SHORT).show()
+            }
+            setNavItems(subreddits ?: viewModel.subreddits.value ?: listOf())
+        }
+    }
+
+    private fun setNavItems(subreddits: List<Subreddit>) {
+        multiReddits.clear()
+        navView.menu.clear()
+        for (sub in subreddits) {
+            val item = navView.menu.add(sub.name)
+            item.icon = ResourcesCompat.getDrawable(this@MainActivity.resources, sub.getIconId(), null)
+            item.isCheckable = true
+            if (sub.isMultiReddit) {
+                multiReddits.add(item)
+            }
+            if (sub.name == viewModel.subreddit.value?.name) {
+                navView.setCheckedItem(item.itemId)
             }
         }
     }
@@ -65,7 +78,7 @@ class MainActivity : AppCompatActivity() {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         navView.setupWithNavController(navController)
 
-        val searchText = navView.getHeaderView(0).findViewById<EditText>(R.id.search_text)
+        val searchText = navView.getHeaderView(0).findViewById<TextInputEditText>(R.id.search_text)
         searchText.doOnTextChanged { text, _, _, _ ->
             viewModel.updateSearchText(text.toString())
         }
@@ -75,6 +88,7 @@ class MainActivity : AppCompatActivity() {
             val isMultiReddit = multiReddits.contains(item)
             viewModel.selectSubreddit(item.title.toString(), isMultiReddit)
             drawerLayout.close()
+            (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(currentFocus?.windowToken, 0)
             true
         }
     }
