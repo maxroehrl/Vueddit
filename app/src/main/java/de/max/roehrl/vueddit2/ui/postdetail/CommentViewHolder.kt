@@ -64,7 +64,7 @@ class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             } catch (e: IllegalArgumentException) {
                 Log.e(TAG, "Failed to parse color: '$color'", e)
             }
-            flairString.setSpan(ForegroundColorSpan(Color.parseColor("#c2c2c2")), 0, flairString.length, 0)
+            flairString.setSpan(ForegroundColorSpan(Color.WHITE), 0, flairString.length, 0)
             builder.append(flairString)
             builder.append(" ")
         }
