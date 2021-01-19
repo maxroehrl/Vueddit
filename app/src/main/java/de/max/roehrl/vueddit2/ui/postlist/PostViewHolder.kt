@@ -7,6 +7,7 @@ import android.text.SpannableStringBuilder
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.RelativeLayout
@@ -22,10 +23,11 @@ import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.service.Util
-import java.lang.IllegalArgumentException
+import kotlin.IllegalArgumentException
 
 
 open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private val TAG = "PostViewHolder"
     private val postHeader: RelativeLayout = itemView.findViewById(R.id.post_header)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val meta: TextView = itemView.findViewById(R.id.meta)
@@ -67,7 +69,11 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         if (post.link_flair_text != "" && post.link_flair_text != "null") {
             val flairString = SpannableString(post.link_flair_text)
             val color = if (post.link_flair_background_color != "" && post.link_flair_background_color != "null") post.link_flair_background_color else "#767676"
-            flairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, flairString.length, 0)
+            try {
+                flairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, flairString.length, 0)
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "Failed to parse link_flair_background_color: '$color'", e)
+            }
             flairString.setSpan(RelativeSizeSpan(0.85f), 0, flairString.length, 0)
             builder.append(flairString)
             builder.append(" ")
@@ -116,7 +122,11 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         if (highlightAuthor && post.author_flair_text != "" && post.author_flair_text != "null") {
             val authorFlairString = SpannableString(post.author_flair_text)
             val color = if (post.author_flair_background_color != "" && post.author_flair_background_color != "null") post.author_flair_background_color else "#767676"
-            authorFlairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, authorFlairString.length, 0)
+            try {
+                authorFlairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, authorFlairString.length, 0)
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "Failed to parse author_flair_background_color: '$color'", e)
+            }
             authorFlairString.setSpan(ForegroundColorSpan(Color.WHITE), 0, authorFlairString.length, 0)
 
             metaBuilder.append(authorFlairString)
