@@ -75,8 +75,10 @@ class UserPostListFragment : PostListFragment() {
                 currentUser = userName
             }
         }
+        if (viewModel.selectedUser.value != safeArgs.userName) {
+            viewModel.setUserPostGroup("overview")
+        }
         viewModel.setSelectedUser(safeArgs.userName)
-        viewModel.setUserPostGroup("overview")
         viewModel.userPostGroup.observe(viewLifecycleOwner) { group ->
             if (listOf("overview", "submitted", "comments").contains(group)) {
                 sortingTabLayout?.visibility = View.VISIBLE
