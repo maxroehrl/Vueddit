@@ -22,7 +22,7 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@id/postListFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_postListFragment_to_postDetailFragment"
             app:destination="@id/postDetailFragment"
@@ -31,7 +31,7 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@id/postListFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_postListFragment_to_userPostListFragment"
             app:destination="@id/userPostListFragment"
@@ -40,7 +40,7 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@id/postListFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <deepLink
             android:id="@+id/subreddit_deep_link"
             app:uri="https://www.reddit.com/r/{subreddit_name}" />
@@ -62,7 +62,7 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@id/userPostListFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_userPostListFragment_to_postDetailFragment"
             app:destination="@id/postDetailFragment"
@@ -71,7 +71,7 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@id/userPostListFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <deepLink
             android:id="@+id/user_deep_link"
             app:uri="https://www.reddit.com/u/{user_name}" />
@@ -100,7 +100,7 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@id/postDetailFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_postDetailFragment_to_postListFragment"
             app:destination="@id/postListFragment"
@@ -109,7 +109,7 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
             app:popUpTo="@id/postDetailFragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
         <deepLink
             android:id="@+id/post_deep_link"
             app:uri="https://www.reddit.com/r/{subreddit_name}/comments/{post_name}/{post_title}/{comment_name}" />
