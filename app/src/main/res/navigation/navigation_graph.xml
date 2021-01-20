@@ -88,6 +88,10 @@
         <argument
             android:name="post_name"
             app:argType="string" />
+        <argument
+            android:name="comment_name"
+            app:argType="string"
+            app:nullable="true" />
         <action
             android:id="@+id/action_postDetailFragment_to_userPostListFragment"
             app:destination="@id/userPostListFragment"
@@ -108,7 +112,7 @@
             app:popUpToInclusive="true" />
         <deepLink
             android:id="@+id/post_deep_link"
-            app:uri="https://www.reddit.com/r/{subreddit_name}/comments/{post_name}/.*" />
+            app:uri="https://www.reddit.com/r/{subreddit_name}/comments/{post_name}/{post_title}/{comment_name}" />
     </fragment>
 
     <activity
