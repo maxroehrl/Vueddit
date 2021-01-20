@@ -120,7 +120,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             if (showLoadingIndicator) {
                 if (!isPostListLoading()) {
                     (userPostsAndComments as MutableLiveData).postValue(oldPosts + NamedItem)
-                } else {
+                } else if (oldPosts.isNotEmpty()) {
                     oldPosts.removeLast()
                 }
             }
