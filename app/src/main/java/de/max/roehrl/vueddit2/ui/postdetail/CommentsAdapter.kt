@@ -10,16 +10,18 @@ import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 
-class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(comment: NamedItem) {
+        fun bind(comment: NamedItem?) {
             if (comment is Comment) {
                 itemView.findViewById<CircularProgressIndicator>(R.id.progress)
                     .setPadding((40f * comment.depth + 20).toInt(), 10, 10, 10)
             }
         }
     }
-    var comments : MutableList<NamedItem> = mutableListOf()
+
+    var post: Post? = null
+    var comments: MutableList<NamedItem> = mutableListOf(NamedItem.Loading)
 
     companion object {
         private const val VIEW_TYPE_PROGRESS_BIG = 0
@@ -55,25 +57,25 @@ class CommentsAdapter(private val post: Post) : RecyclerView.Adapter<RecyclerVie
 
     override fun getItemViewType(position: Int): Int {
         return when {
-            position == 0 && post.preview.url != null && post.video.height == 0 -> VIEW_TYPE_HEADER_BIG
-            position == 0                                                       -> VIEW_TYPE_HEADER
-            position == 1 && comments[0] == NamedItem.Loading                   -> VIEW_TYPE_PROGRESS_BIG
-            (comments[position - 1] as Comment).isLoading                       -> VIEW_TYPE_PROGRESS
-            (comments[position - 1] as Comment).body == ""                      -> VIEW_TYPE_MORE
-            else                                                                -> VIEW_TYPE_COMMENT
+            position == 0 && post?.preview?.url != null && post?.video?.height == 0 -> VIEW_TYPE_HEADER_BIG
+            position == 0 && post != null                                           -> VIEW_TYPE_HEADER
+            post == null || (position == 1 && comments[0] == NamedItem.Loading)     -> VIEW_TYPE_PROGRESS_BIG
+            (comments[position - 1] as Comment).isLoading                           -> VIEW_TYPE_PROGRESS
+            (comments[position - 1] as Comment).body == ""                          -> VIEW_TYPE_MORE
+            else                                                                    -> VIEW_TYPE_COMMENT
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is PostHeaderViewHolder   -> holder.bind(post)
+            is PostHeaderViewHolder   -> holder.bind(post!!)
             is MoreCommentsViewHolder -> holder.bind(comments[position - 1] as Comment)
             is CommentViewHolder      -> holder.bind(comments[position - 1] as Comment)
-            is ProgressViewHolder     -> holder.bind(comments[position - 1])
+            is ProgressViewHolder     -> holder.bind(if (position > 0) comments[position - 1] else null)
         }
     }
 
     override fun getItemCount(): Int {
-        return comments.size + 1
+        return if (post != null) comments.size + 1 else comments.size
     }
 }

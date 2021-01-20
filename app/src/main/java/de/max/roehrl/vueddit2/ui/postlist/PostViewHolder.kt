@@ -50,11 +50,11 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         viewModel.selectedPost.value = post
         try {
             view.findNavController().navigate(
-                    PostListFragmentDirections.actionPostListFragmentToPostDetailFragment(post.subreddit, post.name),
+                    PostListFragmentDirections.actionPostListFragmentToPostDetailFragment(post.subreddit, post.name, null),
                     // null, null, FragmentNavigatorExtras(postHeader to "header")
             )
         } catch (error: IllegalArgumentException) {
-            view.findNavController().navigate(UserPostListFragmentDirections.actionUserPostListFragmentToPostDetailFragment(post.subreddit, post.name))
+            view.findNavController().navigate(UserPostListFragmentDirections.actionUserPostListFragmentToPostDetailFragment(post.subreddit, post.name, null))
         }
     }
 

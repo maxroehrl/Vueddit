@@ -97,10 +97,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         emit("overview")
     }
 
-    fun loadComments(cb: (() -> Unit)? = null) {
+    private fun loadComments(cb: (() -> Unit)? = null) {
+        val post = selectedPost.value!!
+        loadComments(post.subreddit, post.name, cb)
+    }
+
+    fun loadComments(subredditName: String,
+                     postName: String,
+                     cb: (() -> Unit)? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             val sorting = commentSorting.value ?: "top"
-            val permalink = selectedPost.value!!.permalink + subtreeCommentName.value
+            val post = if (postName.startsWith("t3_")) postName.substring(3) else postName
+            val permalink = "/r/$subredditName/comments/$post"
             val pair = Reddit.getPostAndComments(permalink, sorting)
             selectedPost.postValue(pair.first)
             (comments as MutableLiveData).postValue(pair.second.toMutableList())

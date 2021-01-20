@@ -2,12 +2,14 @@ package de.max.roehrl.vueddit2.ui.postdetail
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.DiffUtil
@@ -29,6 +31,7 @@ class PostDetailFragment : Fragment() {
     private var toolbar: MaterialToolbar? = null
     private var collapsingToolbar: CollapsingToolbarLayout? = null
     private lateinit var recyclerView: RecyclerView
+    private val safeArgs: PostDetailFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,9 +48,11 @@ class PostDetailFragment : Fragment() {
         collapsingToolbar = root.findViewById(R.id.collapsing_toolbar)
         recyclerView = root.findViewById(R.id.comments)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        val commentsAdapter = CommentsAdapter(viewModel.selectedPost.value!!)
+        val commentsAdapter = CommentsAdapter()
+        if (viewModel.selectedPost.value != null && safeArgs.postName == viewModel.selectedPost.value?.name) {
+            commentsAdapter.post = viewModel.selectedPost.value
+        }
         recyclerView.adapter = commentsAdapter
-        viewModel.resetComments()
         viewModel.comments.observe(viewLifecycleOwner) { comments ->
             val oldSize = commentsAdapter.comments.size
             val newSize = comments.size
@@ -65,13 +70,12 @@ class PostDetailFragment : Fragment() {
                 if (oldSize == 1 && commentsAdapter.comments[0] == NamedItem.Loading) {
                     commentsAdapter.notifyItemChanged(1)
                     commentsAdapter.notifyItemRangeInserted(2, newSize - 1)
+                    if (safeArgs.commentName != null) {
+                        // TODO Scroll to and highlight comment with name == safeArgs.commentName
+                        Log.d(TAG, "Selecting comment ${safeArgs.commentName}")
+                    }
                 } else {
-                    result = DiffUtil.calculateDiff(
-                        CommentsDiffCallback(
-                            commentsAdapter.comments,
-                            comments
-                        )
-                    )
+                    result = DiffUtil.calculateDiff(CommentsDiffCallback(commentsAdapter.comments, comments))
                 }
             }
             commentsAdapter.comments.clear()
@@ -80,6 +84,7 @@ class PostDetailFragment : Fragment() {
         }
         viewModel.selectedPost.observe(viewLifecycleOwner) { post ->
             toolbar?.title = post?.title ?: Reddit.frontpage
+            commentsAdapter.post = post
         }
         val swipeRefreshLayout: SwipeRefreshLayout = root.findViewById(R.id.swipe)
         swipeRefreshLayout.setOnRefreshListener {
@@ -91,7 +96,7 @@ class PostDetailFragment : Fragment() {
                 }
             }
         }
-        viewModel.loadComments {}
+        viewModel.loadComments(safeArgs.subredditName, safeArgs.postName)
         return root
     }
 
