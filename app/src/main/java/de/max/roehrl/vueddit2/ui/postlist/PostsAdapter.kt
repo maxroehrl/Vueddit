@@ -28,7 +28,7 @@ class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             VIEW_TYPE_PROGRESS   -> ProgressViewHolder(inflate(parent, R.layout.loading_item))
             VIEW_TYPE_POST_SMALL -> PostViewHolder(inflate(parent, R.layout.post_item))
             VIEW_TYPE_POST_BIG   -> PostBigViewHolder(inflate(parent, R.layout.post_item_big))
-            VIEW_TYPE_COMMENT    -> CommentViewHolder(inflate(parent, R.layout.comment_item))
+            VIEW_TYPE_COMMENT    -> UserCommentViewHolder(inflate(parent, R.layout.comment_item))
             else                 -> throw IllegalArgumentException("viewType not found")
         }
     }

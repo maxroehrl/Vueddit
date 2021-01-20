@@ -17,12 +17,17 @@ import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Util
 import de.max.roehrl.vueddit2.ui.view.IndentedLabel
 
-class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+open class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val TAG = "CommentViewHolder"
-    private val header: IndentedLabel = itemView.findViewById(R.id.comment_header)
+    protected val header: IndentedLabel = itemView.findViewById(R.id.comment_header)
     private val body: IndentedLabel = itemView.findViewById(R.id.comment_body)
-    private lateinit var comment: Comment
+    protected lateinit var comment: Comment
     val showSubreddit = false
+
+    init {
+        header.setOnClickListener { onClick() }
+        body.setOnClickListener { onClick() }
+    }
 
     @SuppressLint("SetTextI18n")
     fun bind(comment: NamedItem) {
@@ -73,5 +78,9 @@ class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         Markdown.getInstance(body.context).setMarkdown(body, comment.getSpannedBody(body.context))
         body.setDepth(comment.depth, 10)
+    }
+
+    protected open fun onClick() {
+
     }
 }

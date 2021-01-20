@@ -18,6 +18,7 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
     val depth = json.optInt("depth", 0)
     val children: List<String>
     val created_utc = json.optInt("created_utc")
+    val permalink = json.optString("permalink")
     val edited = json.optBoolean("edited", false)
     val is_submitter = json.optBoolean("is_submitter", false)
     val distinguished = json.optString("distinguished", "")

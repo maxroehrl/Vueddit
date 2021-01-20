@@ -40,7 +40,7 @@
             app:popUpTo="@id/postListFragment" />
         <deepLink
             android:id="@+id/subreddit_deep_link"
-            app:uri="reddit.com/r/{subreddit_name}" />
+            app:uri="https://www.reddit.com/r/{subreddit_name}" />
     </fragment>
 
     <fragment
@@ -69,7 +69,7 @@
             app:popUpTo="@id/userPostListFragment" />
         <deepLink
             android:id="@+id/user_deep_link"
-            app:uri="reddit.com/u/{user_name}" />
+            app:uri="https://www.reddit.com/u/{user_name}" />
     </fragment>
 
     <fragment
@@ -101,7 +101,7 @@
             app:popUpTo="@id/postDetailFragment" />
         <deepLink
             android:id="@+id/post_deep_link"
-            app:uri="reddit.com/r/{subreddit_name}/comments/{post_name}/.*" />
+            app:uri="https://www.reddit.com/r/{subreddit_name}/comments/{post_name}/.*" />
     </fragment>
 
     <activity

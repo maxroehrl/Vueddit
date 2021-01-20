@@ -54,7 +54,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val selectedPost = MutableLiveData<Post>()
 
-    val userPostsAndComments: LiveData<List<NamedItem>> = liveData(Dispatchers.IO) {
+    val userPostsAndComments: LiveData<List<NamedItem>> = liveData {
         emit(listOf(NamedItem.Loading))
     }
 
