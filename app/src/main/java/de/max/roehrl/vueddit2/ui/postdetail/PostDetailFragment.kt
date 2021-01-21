@@ -111,12 +111,20 @@ class PostDetailFragment : Fragment() {
         toolbar!!.setOnMenuItemClickListener { onOptionsItemSelected(it) }
     }
 
-    override fun onDestroy() {
+    override fun onPause() {
         val headerVh = recyclerView.findViewHolderForAdapterPosition(0)
         if (headerVh is PostHeaderViewHolder) {
-            headerVh.onDestroy()
+            headerVh.onPause()
         }
-        super.onDestroy()
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        val headerVh = recyclerView.findViewHolderForAdapterPosition(0)
+        if (headerVh is PostHeaderViewHolder) {
+            headerVh.onStop()
+        }
+        super.onDestroyView()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

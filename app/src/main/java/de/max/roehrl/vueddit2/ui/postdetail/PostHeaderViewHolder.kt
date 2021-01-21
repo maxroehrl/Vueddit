@@ -97,8 +97,12 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
         }
     }
 
-    fun onDestroy() {
+    fun onStop() {
         videoView.player?.release()
+    }
+
+    fun onPause() {
+        videoView.player?.pause()
     }
 
     @SuppressLint("SetTextI18n")
