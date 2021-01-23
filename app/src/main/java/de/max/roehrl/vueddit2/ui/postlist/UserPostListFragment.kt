@@ -22,6 +22,7 @@ class UserPostListFragment : PostListFragment() {
     override val layoutId = R.layout.fragment_user_posts
     private val safeArgs: UserPostListFragmentArgs by navArgs()
     private var currentUser: String? = null
+    private var currentGroup: String? = null
     override val showGotoUser = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -80,24 +81,27 @@ class UserPostListFragment : PostListFragment() {
         }
         viewModel.setSelectedUser(safeArgs.userName)
         viewModel.userPostGroup.observe(viewLifecycleOwner) { group ->
-            if (listOf("overview", "submitted", "comments").contains(group)) {
-                sortingTabLayout?.visibility = View.VISIBLE
-            } else {
-                sortingTabLayout?.visibility = View.GONE
-                viewModel.setUserPostSorting("new")
+            if (group != currentGroup) {
+                if (listOf("overview", "submitted", "comments").contains(group)) {
+                    sortingTabLayout?.visibility = View.VISIBLE
+                } else {
+                    sortingTabLayout?.visibility = View.GONE
+                    viewModel.setUserPostSorting("new")
+                }
+                if (group == "saved") {
+                    val items = listOf("All", "Comments", "Links")
+                    AlertDialog.Builder(requireContext()).apply {
+                        setItems(items.toTypedArray()) { _, which ->
+                            val type = items[which].toLowerCase(Locale.getDefault())
+                            viewModel.setSavedPostsType(type)
+                            viewModel.refreshUserPosts()
+                        }
+                    }.show()
+                } else {
+                    viewModel.refreshUserPosts()
+                }
             }
-            if (group == "saved") {
-                val items = listOf("All", "Comments", "Links")
-                AlertDialog.Builder(requireContext()).apply {
-                    setItems(items.toTypedArray()) { _, which ->
-                        val type = items[which].toLowerCase(Locale.getDefault())
-                        viewModel.setSavedPostsType(type)
-                        viewModel.refreshUserPosts()
-                    }
-                }.show()
-            } else {
-                viewModel.refreshUserPosts()
-            }
+            currentGroup = group
         }
     }
 
