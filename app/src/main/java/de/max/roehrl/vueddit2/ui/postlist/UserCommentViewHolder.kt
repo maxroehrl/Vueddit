@@ -3,8 +3,8 @@ package de.max.roehrl.vueddit2.ui.postlist
 import android.view.View
 import androidx.core.net.toUri
 import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.findNavController
 import androidx.navigation.navOptions
-import de.max.roehrl.vueddit2.MainActivity
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.ui.postdetail.CommentViewHolder
@@ -21,6 +21,6 @@ class UserCommentViewHolder(itemView: View) : CommentViewHolder(itemView) {
             }
             popUpTo = R.id.userPostListFragment
         }
-        (header.context as MainActivity).navController.navigate(request, options)
+        header.findNavController().navigate(request, options)
     }
 }
