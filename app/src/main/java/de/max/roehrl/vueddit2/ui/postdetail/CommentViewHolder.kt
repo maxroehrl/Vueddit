@@ -9,6 +9,7 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
@@ -36,13 +37,13 @@ open class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         val builder = SpannableStringBuilder()
 
         val authorString = SpannableString(comment.author)
-        val authorColor = when {
-            comment.is_submitter                 -> "#53ba82"
-            comment.distinguished == "moderator" -> "#4afff5"
-            comment.distinguished == "admin"     -> "#c40013"
-            else                                 -> "#c4c4c4"
-        }
-        authorString.setSpan(ForegroundColorSpan(Color.parseColor(authorColor)), 0, authorString.length, 0)
+        val authorColor = ContextCompat.getColor(header.context, when {
+            comment.is_submitter                 -> R.color.comment_author_op
+            comment.distinguished == "moderator" -> R.color.comment_author_mod
+            comment.distinguished == "admin"     -> R.color.comment_author_admin
+            else                                 -> R.color.comment_author
+        })
+        authorString.setSpan(ForegroundColorSpan(authorColor), 0, authorString.length, 0)
         builder.append(authorString)
         val timeFromNow = Util.getTimeFromNow(comment.created_utc.toLong())
         val edited = if (comment.edited) " *" else ""
@@ -63,13 +64,15 @@ open class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         if (comment.author_flair_text != "" && comment.author_flair_text != "null") {
             builder.append(" ")
             val flairString = SpannableString(comment.author_flair_text)
-            val color = if (comment.author_flair_background_color != "" && comment.author_flair_background_color != "null") comment.author_flair_background_color else "#767676"
+            var color = ContextCompat.getColor(header.context, R.color.comment_flair_bg)
             try {
-                flairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, flairString.length, 0)
+                if (comment.author_flair_background_color != "")
+                    color = Color.parseColor(comment.author_flair_background_color)
             } catch (e: IllegalArgumentException) {
-                Log.e(TAG, "Failed to parse author_flair_background_color: '$color'", e)
+                Log.e(TAG, "Failed to parse author_flair_background_color: '${comment.author_flair_background_color}'")
             }
-            flairString.setSpan(ForegroundColorSpan(Color.WHITE), 0, flairString.length, 0)
+            flairString.setSpan(BackgroundColorSpan(color), 0, flairString.length, 0)
+            flairString.setSpan(ForegroundColorSpan(ContextCompat.getColor(header.context, R.color.comment_flair_text)), 0, flairString.length, 0)
             builder.append(flairString)
             builder.append(" ")
         }

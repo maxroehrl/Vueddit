@@ -2,10 +2,11 @@ package de.max.roehrl.vueddit2.ui.view
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
+import de.max.roehrl.vueddit2.R
 
 class IndentedLabel(context: Context, attrs: AttributeSet) : AppCompatTextView(context, attrs) {
     private var depth = 0
@@ -15,7 +16,7 @@ class IndentedLabel(context: Context, attrs: AttributeSet) : AppCompatTextView(c
 
     init {
         paint.style = Paint.Style.STROKE
-        paint.color = Color.parseColor("#282828")
+        paint.color = ContextCompat.getColor(context, R.color.comment_indent_lines)
         paint.strokeWidth = 5f
     }
 

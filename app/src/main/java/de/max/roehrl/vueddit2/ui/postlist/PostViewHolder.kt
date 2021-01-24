@@ -77,26 +77,29 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         if (post.link_flair_text != "" && post.link_flair_text != "null") {
             val flairString = SpannableString(post.link_flair_text)
-            val color = if (post.link_flair_background_color != "" && post.link_flair_background_color != "null") post.link_flair_background_color else "#767676"
+            var color = ContextCompat.getColor(meta.context, R.color.post_flair_bg)
             try {
-                flairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, flairString.length, 0)
+                if (post.link_flair_background_color != "")
+                    color = Color.parseColor(post.link_flair_background_color)
             } catch (e: IllegalArgumentException) {
-                Log.e(TAG, "Failed to parse link_flair_background_color: '$color'", e)
+                Log.e(TAG, "Failed to parse link_flair_background_color: '${post.link_flair_background_color}'")
             }
+            flairString.setSpan(BackgroundColorSpan(color), 0, flairString.length, 0)
             flairString.setSpan(RelativeSizeSpan(0.85f), 0, flairString.length, 0)
             builder.append(flairString)
             builder.append(" ")
         }
 
         val titleString = SpannableString(post.title)
-        val titleColor = if (highlightSticky && post.stickied) "#53ba82" else "#ffffff"
-        titleString.setSpan(ForegroundColorSpan(Color.parseColor(titleColor)), 0, titleString.length, 0)
+        val titleColor = ContextCompat.getColor(meta.context, if (highlightSticky && post.stickied) R.color.post_title_sticky else R.color.post_title)
+        titleString.setSpan(ForegroundColorSpan(titleColor), 0, titleString.length, 0)
         builder.append(titleString)
         builder.append(" ")
 
         val domainString = SpannableString(" (${post.domain})")
-        domainString.setSpan(ForegroundColorSpan(Color.parseColor("#767676")), 0, domainString.length, 0)
+        domainString.setSpan(ForegroundColorSpan(ContextCompat.getColor(meta.context, R.color.post_meta)), 0, domainString.length, 0)
         domainString.setSpan(RelativeSizeSpan(0.85f), 0, domainString.length, 0)
+
         builder.append(domainString)
 
         title.setText(builder, TextView.BufferType.SPANNABLE)
@@ -105,14 +108,14 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         if (post.over18) {
             val nsfwString = SpannableString("nsfw")
-            nsfwString.setSpan(ForegroundColorSpan(Color.RED), 0, nsfwString.length, 0)
+            nsfwString.setSpan(ForegroundColorSpan(ContextCompat.getColor(meta.context, R.color.post_nsfw)), 0, nsfwString.length, 0)
             metaBuilder.append(nsfwString)
             metaBuilder.append(" ")
         }
 
         if (post.spoiler) {
             val spoilerString = SpannableString("spoiler")
-            spoilerString.setSpan(ForegroundColorSpan(Color.YELLOW), 0, spoilerString.length, 0)
+            spoilerString.setSpan(ForegroundColorSpan(ContextCompat.getColor(meta.context, R.color.post_spoiler)), 0, spoilerString.length, 0)
             metaBuilder.append(spoilerString)
             metaBuilder.append(" ")
         }
@@ -121,22 +124,23 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val edited = if (post.edited) " *" else ""
         metaBuilder.append("${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n$timeFromNow$edited by ")
 
-
         val authorString = SpannableString("/u/${post.author}")
-        val authorColor = if (highlightAuthor) "#53ba82" else "#767676"
-        authorString.setSpan(ForegroundColorSpan(Color.parseColor(authorColor)), 0, authorString.length, 0)
+        val authorColor = ContextCompat.getColor (meta.context, if (highlightAuthor) R.color.post_author_highlight else R.color.post_author)
+        authorString.setSpan(ForegroundColorSpan(authorColor), 0, authorString.length, 0)
         metaBuilder.append(authorString)
         metaBuilder.append(" ")
 
         if (highlightAuthor && post.author_flair_text != "" && post.author_flair_text != "null") {
             val authorFlairString = SpannableString(post.author_flair_text)
-            val color = if (post.author_flair_background_color != "" && post.author_flair_background_color != "null") post.author_flair_background_color else "#767676"
+            var color = ContextCompat.getColor(meta.context, R.color.post_flair_bg)
             try {
-                authorFlairString.setSpan(BackgroundColorSpan(Color.parseColor(color)), 0, authorFlairString.length, 0)
+                if (post.author_flair_background_color != "")
+                    color = Color.parseColor(post.author_flair_background_color)
             } catch (e: IllegalArgumentException) {
-                Log.e(TAG, "Failed to parse author_flair_background_color: '$color'", e)
+                Log.e(TAG, "Failed to parse author_flair_background_color: '${post.author_flair_background_color}'")
             }
-            authorFlairString.setSpan(ForegroundColorSpan(Color.WHITE), 0, authorFlairString.length, 0)
+            authorFlairString.setSpan(BackgroundColorSpan(color), 0, authorFlairString.length, 0)
+            authorFlairString.setSpan(ForegroundColorSpan(ContextCompat.getColor(meta.context, R.color.post_flair_text)), 0, authorFlairString.length, 0)
 
             metaBuilder.append(authorFlairString)
         }
