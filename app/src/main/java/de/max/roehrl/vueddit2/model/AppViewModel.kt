@@ -281,7 +281,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun saveOrUnsave(post: Post) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val response = Reddit.saveOrUnsave(post.saved, post.name)
             Log.d(TAG, "Post saved $response")
             post.saved = !post.saved
