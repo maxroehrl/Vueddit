@@ -10,6 +10,8 @@ import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.ui.postdetail.CommentViewHolder
 
 class UserCommentViewHolder(itemView: View) : CommentViewHolder(itemView) {
+    override val showSubreddit = true
+
     override fun onClick() {
         val request = NavDeepLinkRequest.Builder.fromUri((Reddit.api + comment.permalink).toUri()).build()
         val options = navOptions {

@@ -23,7 +23,7 @@ open class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     protected val header: IndentedLabel = itemView.findViewById(R.id.comment_header)
     private val body: IndentedLabel = itemView.findViewById(R.id.comment_body)
     protected lateinit var comment: Comment
-    val showSubreddit = false
+    open val showSubreddit = false
 
     init {
         header.setOnClickListener { onClick() }
@@ -50,7 +50,7 @@ open class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
         builder.append(" ${comment.ups} points $timeFromNow$edited")
 
         if (showSubreddit) {
-            builder.append("in /r/${comment.subreddit} ")
+            builder.append(" in /r/${comment.subreddit} ")
         }
         if (comment.gid_1 != null && comment.gid_1 > 0) {
             builder.append("\uD83E\uDD48x${comment.gid_1} ")
