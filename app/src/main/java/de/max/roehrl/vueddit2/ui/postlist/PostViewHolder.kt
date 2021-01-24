@@ -22,7 +22,11 @@ import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
+import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Util
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlin.IllegalArgumentException
 
 
@@ -33,6 +37,8 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val meta: TextView = itemView.findViewById(R.id.meta)
     protected val imageView: SimpleDraweeView = itemView.findViewById(R.id.preview)
     private val votes: TextView = itemView.findViewById(R.id.votes)
+    private val upvote: TextView = itemView.findViewById(R.id.up)
+    private val downvote: TextView = itemView.findViewById(R.id.down)
     protected val progress = ProgressBarDrawable()
     protected lateinit var post: Post
     open val highlightAuthor = false
@@ -43,6 +49,8 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         title.setOnClickListener { view -> onClick(view) }
         meta.setOnClickListener { view -> onClick(view) }
         imageView.setOnClickListener { view -> onClick(view) }
+        upvote.setOnClickListener { vote(true) }
+        downvote.setOnClickListener { vote(false) }
     }
 
     open fun onClick(view: View) {
@@ -134,7 +142,6 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         if ((post.gid_1 != null && post.gid_1 > 0) || (post.gid_2 != null && post.gid_2 > 0) || (post.gid_3 != null && post.gid_3 > 0)) {
             metaBuilder.append("\n")
         }
-
         if (post.gid_1 != null && post.gid_1 > 0) {
             metaBuilder.append("\uD83E\uDD48x${post.gid_1} ")
         }
@@ -146,7 +153,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
         meta.setText(metaBuilder, TextView.BufferType.SPANNABLE)
 
-        votes.text = post.getScore()
+        updateVotes()
         updatePreviewImage(post)
     }
 
@@ -158,6 +165,40 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         } else {
             imageView.hierarchy.setProgressBarImage(null)
             imageView.setActualImageResource(R.drawable.ic_comment_text_multiple_outline)
+        }
+    }
+
+    private fun updateVotes() {
+        votes.text = post.getScore()
+        votes.setTextColor(getVoteChevronColor(null))
+        upvote.setTextColor(getVoteChevronColor(true))
+        downvote.setTextColor(getVoteChevronColor(false))
+    }
+
+    private fun getVoteChevronColor(up: Boolean?): Int {
+        val colorString = if ((post.likes == up && up != null) || (up == null && post.likes != null)) {
+            if (post.likes == true) "#53ba82" else "#bf5826"
+        } else {
+            "#b8b8b8"
+        }
+        return Color.parseColor(colorString)
+    }
+
+    private fun vote(up: Boolean) {
+        GlobalScope.launch(Dispatchers.IO) {
+            var dir = if (up) 1 else -1
+            if (post.likes == up) {
+                post.likes = null
+                post.score -= dir
+                dir = 0
+            } else {
+                post.likes = up
+                post.score += dir
+            }
+            Reddit.vote(post.name, dir.toString())
+            GlobalScope.launch(Dispatchers.Main) {
+                updateVotes()
+            }
         }
     }
 }

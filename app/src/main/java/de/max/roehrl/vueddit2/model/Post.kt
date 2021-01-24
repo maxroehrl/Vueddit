@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.Spanned
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
+import org.json.JSONException
 import org.json.JSONObject
 
 class Post(json: JSONObject) : NamedItem(json.optString("name")) {
@@ -29,14 +30,22 @@ class Post(json: JSONObject) : NamedItem(json.optString("name")) {
     val created_utc = json.optInt("created_utc")
     val selftext = json.optString("selftext")
     var spannedSelftext: Spanned? = null
-    val score = json.optInt("score", 0)
-    val likes = json.optBoolean("likes", false)
+    var score = json.optInt("score", 0)
+    var likes: Boolean? = null
     var saved = json.optBoolean("saved", false)
     val shown_comments = 0
     val comments = mutableListOf<Comment>()
     val preview: Image = Image(json, 300)
     val image: Image = Image(json)
     val video: Video = Video(json)
+
+    init {
+        likes = try {
+            json.getBoolean("likes")
+        } catch (e: JSONException) {
+            null
+        }
+    }
 
     fun getSpannedSelftext(context: Context): Spanned? {
         if (spannedSelftext == null) {
