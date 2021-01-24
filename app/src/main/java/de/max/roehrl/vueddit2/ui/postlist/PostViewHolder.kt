@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.drawable.ProgressBarDrawable
@@ -177,11 +178,11 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private fun getVoteChevronColor(up: Boolean?): Int {
         val colorString = if ((post.likes == up && up != null) || (up == null && post.likes != null)) {
-            if (post.likes == true) "#53ba82" else "#bf5826"
+            if (post.likes == true) R.color.upvoted else R.color.downvoted
         } else {
-            "#b8b8b8"
+            R.color.neutral
         }
-        return Color.parseColor(colorString)
+        return ContextCompat.getColor(votes.context, colorString)
     }
 
     private fun vote(up: Boolean) {

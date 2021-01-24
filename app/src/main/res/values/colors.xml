@@ -20,4 +20,7 @@
     <color name="border_color">#767676</color>
     <color name="self_text_color">#ffffff</color>
     <color name="sortings_bar">#303030</color>
+    <color name="downvoted">#bf5826</color>
+    <color name="upvoted">@color/highlight</color>
+    <color name="neutral">#b8b8b8</color>
 </resources>
