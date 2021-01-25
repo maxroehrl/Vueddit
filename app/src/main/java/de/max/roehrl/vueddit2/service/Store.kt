@@ -6,6 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.createDataStore
 import de.max.roehrl.vueddit2.model.SingletonHolder
+import de.max.roehrl.vueddit2.model.Subreddit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -16,10 +17,14 @@ import java.io.IOException
 // https://developer.android.com/topic/libraries/architecture/datastore
 class Store private constructor(context: Context) {
     private val preferenceDataStore: DataStore<Preferences> = context.createDataStore(PREFERENCE_NAME)
-    private val username : Flow<String?> = getFlow(USERNAME)
-    private val authToken : Flow<String?> = getFlow(AUTH_TOKEN)
-    private val validUntil : Flow<Long?> = getFlow(VALID_UNTIL)
-    private val refreshToken : Flow<String?> = getFlow(REFRESH_TOKEN)
+    private val username: Flow<String?> = getFlow(USERNAME)
+    private val authToken: Flow<String?> = getFlow(AUTH_TOKEN)
+    private val validUntil: Flow<Long?> = getFlow(VALID_UNTIL)
+    private val refreshToken: Flow<String?> = getFlow(REFRESH_TOKEN)
+    private val visitedSubreddits: Flow<Set<String>?> = getFlow(VISITED_SUBS)
+    private val starredSubreddits: Flow<Set<String>?> = getFlow(STARRED_SUBS)
+    private val cachedSubscribedSubreddits: Flow<Set<String>?> = getFlow(CACHED_SUBSCRIBED_SUBS)
+    private val cachedMultiSubreddits: Flow<Set<String>?> = getFlow(CACHED_MULTI_SUBS)
 
     companion object : SingletonHolder<Store, Context>(::Store) {
         private const val TAG = "Store"
@@ -28,36 +33,56 @@ class Store private constructor(context: Context) {
         private val AUTH_TOKEN = stringPreferencesKey("authToken")
         private val VALID_UNTIL = longPreferencesKey("validUntil")
         private val REFRESH_TOKEN = stringPreferencesKey("refreshToken")
+        private val VISITED_SUBS = stringSetPreferencesKey("visitedSubs")
+        private val STARRED_SUBS = stringSetPreferencesKey("starredSubs")
+        private val CACHED_SUBSCRIBED_SUBS = stringSetPreferencesKey("cachedSubscribedSubs")
+        private val CACHED_MULTI_SUBS = stringSetPreferencesKey("cachedMultiSubs")
     }
 
     private fun <T> getFlow(key: Preferences.Key<T>): Flow<T?> {
         return preferenceDataStore.data
-            .catch { exception ->
-                // dataStore.data throws an IOException when an error is encountered when reading data
-                if (exception is IOException) {
-                    emit(emptyPreferences())
-                } else {
-                    throw exception
+                .catch { exception ->
+                    // dataStore.data throws an IOException when an error is encountered when reading data
+                    if (exception is IOException) {
+                        emit(emptyPreferences())
+                    } else {
+                        throw exception
+                    }
+                }.map { value ->
+                    value[key]
                 }
-            }.map { value ->
-                value[key]
-            }
     }
 
-    suspend fun getUsername() : String? {
+    suspend fun getUsername(): String? {
         return username.first()
     }
 
-    suspend fun getRefreshToken() : String? {
+    suspend fun getRefreshToken(): String? {
         return refreshToken.first()
     }
 
-    suspend fun getValidUntil() : Long? {
+    suspend fun getValidUntil(): Long? {
         return validUntil.first()
     }
 
-    suspend fun getAuthToken() : String? {
+    suspend fun getAuthToken(): String? {
         return authToken.first()
+    }
+
+    suspend fun getVisitedSubreddits(): Set<String> {
+        return visitedSubreddits.first() ?: emptySet()
+    }
+
+    suspend fun getStarredSubreddits(): Set<String> {
+        return starredSubreddits.first() ?: emptySet()
+    }
+
+    suspend fun getCachedSubscribedSubreddits(): Set<String> {
+        return cachedSubscribedSubreddits.first() ?: emptySet()
+    }
+
+    suspend fun getCachedMultiSubreddits(): Set<String> {
+        return cachedMultiSubreddits.first() ?: emptySet()
     }
 
     suspend fun updateTokens(authToken: String, validUntil: Long, refreshToken: String?) {
@@ -70,6 +95,50 @@ class Store private constructor(context: Context) {
                 }
                 preferences[REFRESH_TOKEN] = refreshToken
             }
+        }
+    }
+
+    suspend fun addToStarredSubreddits(name: String) {
+        preferenceDataStore.edit { preferences ->
+            val starred = preferences[STARRED_SUBS]?.toMutableSet() ?: mutableSetOf()
+            starred.add(name)
+            preferences[STARRED_SUBS] = starred
+        }
+    }
+
+    suspend fun removeFromStarredSubreddits(name: String) {
+        preferenceDataStore.edit { preferences ->
+            val starred = preferences[STARRED_SUBS]?.toMutableSet() ?: mutableSetOf()
+            starred.remove(name)
+            preferences[STARRED_SUBS] = starred
+        }
+    }
+
+    suspend fun addToVisitedSubreddits(name: String) {
+        preferenceDataStore.edit { preferences ->
+            val visited = preferences[VISITED_SUBS]?.toMutableSet() ?: mutableSetOf()
+            visited.add(name)
+            preferences[VISITED_SUBS] = visited.filter { !Subreddit.defaultSubreddits.contains(Subreddit.fromName(it)) }.toSet()
+        }
+    }
+
+    suspend fun removeFromVisitedSubreddits(name: String) {
+        preferenceDataStore.edit { preferences ->
+            val visited = preferences[VISITED_SUBS]?.toMutableSet() ?: mutableSetOf()
+            visited.remove(name)
+            preferences[VISITED_SUBS] = visited
+        }
+    }
+
+    suspend fun updateCachedSubscribedSubreddits(subreddits: List<Subreddit>) {
+        preferenceDataStore.edit { preferences ->
+            preferences[CACHED_SUBSCRIBED_SUBS] = subreddits.map { it.name }.toSet()
+        }
+    }
+
+    suspend fun updateCachedMultiSubreddits(subreddits: List<Subreddit>) {
+        preferenceDataStore.edit { preferences ->
+            preferences[CACHED_MULTI_SUBS] = subreddits.map { it.name }.toSet()
         }
     }
 

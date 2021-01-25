@@ -73,9 +73,9 @@ open class PostListFragment : Fragment() {
                 onRecyclerViewScrolled(recyclerView, dx, dy, layoutManager)
             }
         })
-        recyclerView.addOnItemTouchListener(RecyclerOnTouchListener(requireContext(), recyclerView) { view, position ->
+        recyclerView.addOnItemTouchListener(RecyclerOnTouchListener(requireContext(), recyclerView, { view, position ->
             onItemLongPressed(view, position)
-        })
+        }, null))
         val swipeRefreshLayout: SwipeRefreshLayout = root.findViewById(R.id.swipe)
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.post {
@@ -138,7 +138,7 @@ open class PostListFragment : Fragment() {
         }
         viewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
             toolbar?.title = subreddit?.name ?: Reddit.frontpage
-            if (viewModel.isLoggedIn.value == true && subreddit != currentSubreddit && currentSubreddit != null) {
+            if (subreddit != null && subreddit != currentSubreddit && viewModel.isLoggedIn.value == true) {
                 postsAdapter.highlightStickied = subreddit != Subreddit.frontPage
                 viewModel.refreshPosts(true)
             }
@@ -216,7 +216,7 @@ open class PostListFragment : Fragment() {
     }
 
     open fun gotoSubreddit(subredditName: String) {
-        val oldSubredditName = viewModel.subreddit.value!!
+        val oldSubredditName = viewModel.subreddit.value ?: Subreddit.frontPage
         viewModel.selectSubreddit(subredditName, false)
         createGoBackSnackBar(oldSubredditName)
     }
@@ -278,6 +278,17 @@ open class PostListFragment : Fragment() {
             }
             R.id.action_toggle_big_preview -> {
                 viewModel.toggleBigPreview(postsLiveData.value!!)
+                true
+            }
+            R.id.action_remove_visited -> {
+                viewModel.removeSubredditFromVisited(currentSubreddit!!.name)
+                val view = activity?.findViewById<View>(R.id.nav_host_fragment)
+                val text = requireContext().getString(R.string.removed_from_visited, currentSubreddit!!.name)
+                Snackbar.make(view!!, text, 3000).apply {
+                    setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
+                    setTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
+                    show()
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)

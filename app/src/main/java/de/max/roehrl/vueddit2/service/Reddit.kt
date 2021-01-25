@@ -54,7 +54,7 @@ object Reddit {
     @Volatile private var refreshToken: String? = ""
     @Volatile private var validUntil: Long? = null
 
-    suspend fun login(context: Context) : Boolean {
+    suspend fun login(context: Context): Boolean {
         store = Store.getInstance(context)
         val token = store.getAuthToken()
         if (token != null) {
@@ -107,7 +107,7 @@ object Reddit {
         }
     }
 
-    suspend fun getUser() : String {
+    suspend fun getUser(): String {
         return JSONObject(get("/api/v1/me?raw_json=1")).getString("name")
     }
 
@@ -131,7 +131,7 @@ object Reddit {
     ): MutableList<NamedItem> {
         var url = "/user/$user/$group.json?raw_json=1&sort=$sorting"
         url += if (type != "all") "&type=$type" else ""
-        return getPosts(url, after, sorting, time);
+        return getPosts(url, after, sorting, time)
     }
 
     private suspend fun getPosts(
@@ -228,7 +228,7 @@ object Reddit {
         return subscriptions
     }
 
-    suspend fun subscribe(subreddit: String, unsub:Boolean=false) : String {
+    suspend fun subscribe(subreddit: String, unsub: Boolean = false): String {
         return post("/api/subscribe?action=${if (unsub) "un" else ""}sub&sr_name=$subreddit")
     }
 
@@ -244,32 +244,35 @@ object Reddit {
         return list
     }
 
-    suspend fun searchForSubreddit(query: String) : List<Subreddit> {
+    suspend fun searchForSubreddit(query: String): List<Subreddit> {
         val response = get("/api/search_reddit_names?raw_json=1&include_over_18=true&include_unadvertisable=true&query=$query")
         val list = mutableListOf<Subreddit>()
         if (response != "[]") {
             try {
                 val data = JSONObject(response).getJSONArray("names")
                 for (i in 0 until data.length()) {
-                    list.add(Subreddit(JSONObject("{display_name: \"${data.getString(i)}\"}")))
+                    val name = data.getString(i)
+                    val subreddit = Subreddit(JSONObject("{display_name: \"$name\"}"))
+                    subreddit.isVisited = false
+                    list.add(subreddit)
                 }
             } catch (error: JSONException) {
-                Log.e(TAG, "Error", error)
+                Log.e(TAG, "Failed to search for subreddit with query: \'$query\'", error)
             }
         }
         return list
     }
 
-    suspend fun getSidebar(subreddit: String) : String {
+    suspend fun getSidebar(subreddit: String): String {
         val response = get("/r/$subreddit/about.json?raw_json=1")
         return JSONObject(response).getJSONObject("data").getString("description")
     }
 
-    suspend fun vote(id: String, dir: String) : String {
+    suspend fun vote(id: String, dir: String): String {
         return post("/api/vote?id=$id&dir=$dir")
     }
 
-    suspend fun saveOrUnsave(saved: Boolean, name: String) : String {
+    suspend fun saveOrUnsave(saved: Boolean, name: String): String {
         return post("/api/${if (saved) "un" else ""}save?id=$name")
     }
 
@@ -277,7 +280,7 @@ object Reddit {
         return if (score >= 10000) String.format("%.1fk", score.toFloat() / 1000f) else score.toString()
     }
 
-    private suspend fun post(url: String, bodyText: String? = null) : String {
+    private suspend fun post(url: String, bodyText: String? = null): String {
         refreshAuthToken()
         return suspendCoroutine { continuation ->
             makeOAuthRequest("$oauthApi$url", Request.Method.POST, bodyText, { response ->
@@ -309,7 +312,7 @@ object Reddit {
         requestQueue.add(OAuthRequest(method, url, content, successListener, errorListener))
     }
 
-    private suspend fun makeTokenRequest(url: String, bodyText: String) : String {
+    private suspend fun makeTokenRequest(url: String, bodyText: String): String {
         return suspendCoroutine { continuation ->
             requestQueue.add(TokenRequest(url, bodyText,
                     { response -> continuation.resume(response) },
@@ -318,7 +321,7 @@ object Reddit {
         }
     }
 
-    suspend fun onAuthorizationSuccessful(uri: Uri) : Boolean {
+    suspend fun onAuthorizationSuccessful(uri: Uri): Boolean {
         if (uri.getQueryParameter("state") == randomState) {
             val code = uri.getQueryParameter("code")
             val url = "$api/api/v1/access_token"

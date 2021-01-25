@@ -24,7 +24,7 @@ class Subreddit(json: JSONObject, var isMultiReddit: Boolean = false) : NamedIte
     var isVisited = true
 
     override fun toString(): String {
-        return "$name (${if (isMultiReddit) subreddits else "isStarred: $isStarred"})"
+        return "$name (${if (isMultiReddit) subreddits else "isStarred: $isStarred, isVisited: $isStarred"})"
     }
 
     private fun getSubreddits(json: JSONObject) : String {
@@ -46,5 +46,15 @@ class Subreddit(json: JSONObject, var isMultiReddit: Boolean = false) : NamedIte
             isSubscribedTo -> R.drawable.ic_star_outline
             else -> R.drawable.ic_plus_thick
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return (other is Subreddit) && name == other.name && isMultiReddit == other.isMultiReddit
+    }
+
+    override fun hashCode(): Int {
+        var result = isMultiReddit.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
     }
 }

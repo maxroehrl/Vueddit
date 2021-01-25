@@ -31,4 +31,13 @@
         <!-- Background color when SELECTED -->
         <item name="colorControlHighlight">@color/highlight</item>
     </style>
+
+    <style name="Theme.Vueddit2.Dialog.Alert" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/Theme.Vueddit2.ButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Theme.Vueddit2.ButtonStyle</item>
+    </style>
+
+    <style name="Theme.Vueddit2.ButtonStyle" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/highlight</item>
+    </style>
 </resources>
