@@ -2,12 +2,12 @@ package de.max.roehrl.vueddit2.ui.postlist
 
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Store
@@ -90,7 +90,7 @@ class UserPostListFragment : PostListFragment() {
                 }
                 if (group == "saved") {
                     val items = listOf("All", "Comments", "Links")
-                    AlertDialog.Builder(requireContext()).apply {
+                    MaterialAlertDialogBuilder(requireContext()).apply {
                         setItems(items.toTypedArray()) { _, which ->
                             val type = items[which].toLowerCase(Locale.getDefault())
                             viewModel.setSavedPostsType(type)
@@ -113,7 +113,7 @@ class UserPostListFragment : PostListFragment() {
         viewModel.setUserPostSorting(sorting)
         if (listOf("top", "rising").contains(sorting)) {
             val items = listOf("Hour", "Day", "Week", "Month", "Year", "All")
-            AlertDialog.Builder(requireContext()).apply {
+            MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
                     val time = items[which].toLowerCase(Locale.getDefault())
                     viewModel.setTopPostsTime(time)

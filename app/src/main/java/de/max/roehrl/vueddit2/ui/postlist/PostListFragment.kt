@@ -3,8 +3,6 @@ package de.max.roehrl.vueddit2.ui.postlist
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -20,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import de.max.roehrl.vueddit2.MainActivity
@@ -154,7 +153,7 @@ open class PostListFragment : Fragment() {
         viewModel.setPostSorting(sorting)
         if (listOf("top", "rising").contains(sorting)) {
             val items = listOf("Hour", "Day", "Week", "Month", "Year", "All")
-            AlertDialog.Builder(requireContext()).apply {
+            MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
                     val time = items[which].toLowerCase(Locale.getDefault())
                     viewModel.setTopPostsTime(time)
@@ -180,15 +179,15 @@ open class PostListFragment : Fragment() {
         val post = postsLiveData.value?.get(position)
         if (post is Post) {
             val items = mutableListOf<String>()
-            items.add(if (post.saved) "Unsave" else "Save")
+            items.add(view.context.getString(if (post.saved) R.string.unsave else R.string.save))
             val showGotoSubreddit = post.subreddit != viewModel.subreddit.value?.name
             if (showGotoSubreddit) {
-                items.add("Goto /r/${post.subreddit}")
+                items.add(view.context.getString(R.string.goto_sub, post.subreddit))
             }
             if (showGotoUser) {
-                items.add("Goto /u/${post.author}")
+                items.add(view.context.getString(R.string.goto_user, post.author))
             }
-            val builder = AlertDialog.Builder(requireContext()).apply {
+            MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
                     when (which) {
                         0 -> {
@@ -206,8 +205,8 @@ open class PostListFragment : Fragment() {
                         }
                     }
                 }
+                show()
             }
-            builder.create().show()
         }
     }
 
@@ -226,7 +225,7 @@ open class PostListFragment : Fragment() {
         Snackbar.make(view!!, "", 8000).apply {
             setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
             setActionTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
-            setAction("Go back to ${goBackToSubreddit.name}") {
+            setAction(requireContext().getString(R.string.go_back_to, goBackToSubreddit.name)) {
                 gotoSubreddit(goBackToSubreddit.name)
             }
             show()
@@ -260,7 +259,13 @@ open class PostListFragment : Fragment() {
                 if (currentSubreddit != null && currentSubreddit != Subreddit.frontPage && !currentSubreddit!!.isMultiReddit) {
                     Sidebar(requireContext(), currentSubreddit!!.name, viewModel.viewModelScope).show()
                 } else {
-                    Toast.makeText(context, "No sidebar available", Toast.LENGTH_SHORT).show()
+                    val view = activity?.findViewById<View>(R.id.nav_host_fragment)
+                    val text = requireContext().getString(R.string.no_sidebar)
+                    Snackbar.make(view!!, text, 3000).apply {
+                        setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
+                        setTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
+                        show()
+                    }
                 }
                 true
             }
