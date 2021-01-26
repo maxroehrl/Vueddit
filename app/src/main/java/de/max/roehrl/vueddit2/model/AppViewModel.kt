@@ -225,7 +225,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             if (showLoadingIndicator) {
                 if (!isPostListLoading()) {
                     (posts as MutableLiveData).postValue(oldPosts + NamedItem)
-                } else {
+                } else if (oldPosts.isNotEmpty()) {
                     oldPosts.removeLast()
                 }
             }
