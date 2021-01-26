@@ -20,6 +20,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.AppViewModel
+import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.ui.dialog.Sidebar
@@ -58,6 +59,7 @@ class PostDetailFragment : Fragment() {
             val oldSize = commentsAdapter.comments.size
             val newSize = comments.size
             var result: DiffUtil.DiffResult? = null
+            var comment: NamedItem? = null
             if (newSize == 1) {
                 if (comments[0] is NamedItem.Loading) {
                     if (oldSize > 1) {
@@ -72,8 +74,9 @@ class PostDetailFragment : Fragment() {
                     commentsAdapter.notifyItemChanged(1)
                     commentsAdapter.notifyItemRangeInserted(2, newSize - 1)
                     if (safeArgs.commentName != null) {
-                        // TODO Scroll to and highlight comment with name == safeArgs.commentName
-                        Log.d(TAG, "Selecting comment ${safeArgs.commentName}")
+                        comment = comments.find { item ->
+                            item is Comment && item.name == safeArgs.commentName
+                        }
                     }
                 } else {
                     result = DiffUtil.calculateDiff(CommentsDiffCallback(commentsAdapter.comments, comments))
@@ -82,6 +85,21 @@ class PostDetailFragment : Fragment() {
             commentsAdapter.comments.clear()
             commentsAdapter.comments.addAll(comments)
             result?.dispatchUpdatesTo(commentsAdapter)
+            if (comment != null && comment is Comment) {
+                viewModel.selectComment(comment)
+            }
+        }
+        viewModel.selectedComment.observe(viewLifecycleOwner) { comment ->
+            Log.d(TAG, "Selecting comment ${safeArgs.commentName}")
+            commentsAdapter.selectedComment = comment
+            if (comment != null) {
+                val index = commentsAdapter.comments.indexOf(comment)
+                if (index >= 0) {
+                    recyclerView.post {
+                        recyclerView.smoothScrollToPosition(index + 1)
+                    }
+                }
+            }
         }
         viewModel.selectedPost.observe(viewLifecycleOwner) { post ->
             toolbar?.title = post?.title ?: Reddit.frontpage
@@ -97,7 +115,7 @@ class PostDetailFragment : Fragment() {
                 }
             }
         }
-        viewModel.loadComments(safeArgs.subredditName, safeArgs.postName)
+        viewModel.loadComments(safeArgs.subredditName, safeArgs.postName, safeArgs.commentName)
         return root
     }
 

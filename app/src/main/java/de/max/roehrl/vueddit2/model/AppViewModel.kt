@@ -101,9 +101,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         emit(mutableListOf<NamedItem>(NamedItem.Loading))
     }
 
-    val subtreeCommentName: LiveData<String> = liveData {
-        emit("")
-    }
+    val selectedComment: LiveData<Comment?> = liveData { }
 
     val postSorting: LiveData<String> = liveData {
         emit("best")
@@ -117,18 +115,22 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         emit("overview")
     }
 
-    private fun loadComments(cb: (() -> Unit)? = null) {
+    private fun loadComments(commentName: String?, cb: (() -> Unit)? = null) {
         val post = selectedPost.value!!
-        loadComments(post.subreddit, post.name, cb)
+        loadComments(post.subreddit, post.name, commentName, cb)
     }
 
     fun loadComments(subredditName: String,
                      postName: String,
+                     commentName: String?,
                      cb: (() -> Unit)? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             val sorting = commentSorting.value ?: "top"
             val post = if (postName.startsWith("t3_")) postName.substring(3) else postName
-            val permalink = "/r/$subredditName/comments/$post"
+            var permalink = "/r/$subredditName/comments/$post"
+            if (commentName != null) {
+                permalink += "/$commentName"
+            }
             val pair = Reddit.getPostAndComments(permalink, sorting)
             selectedPost.postValue(pair.first)
             (comments as MutableLiveData).postValue(pair.second.toMutableList())
@@ -406,7 +408,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun refreshComments(cb: (() -> Unit)? = null) {
         resetComments()
-        loadComments(cb)
+        loadComments(null, cb)
     }
 
     fun resetComments() {
@@ -415,8 +417,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadMoreComments(comment: Comment) {
         if (comment.count == 0) {
-            (subtreeCommentName as MutableLiveData).value = comment.parent_id.split("_")[1]
-            loadComments()
+            val subtreeCommentName = comment.parent_id.split("_")[1]
+            loadComments(subtreeCommentName)
         } else {
             viewModelScope.launch(Dispatchers.IO) {
                 val newComments = Reddit.getMoreComments(selectedPost.value!!.name, comment.moreChildren)
