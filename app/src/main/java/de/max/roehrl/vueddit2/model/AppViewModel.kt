@@ -154,7 +154,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             selectComment(comment)
         } else {
             // Collapse current and child comments
-            val numToCollapse = comments.subList(index + 1, comments.size - 1).indexOfFirst { item ->
+            val numToCollapse = comments.subList(index + 1, comments.size).indexOfFirst { item ->
                 item is Comment && item.depth <= comment.depth
             }
             if (numToCollapse >= 1) {
@@ -173,9 +173,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val comments = comments.value!!
         val index = comments.indexOf(comment)
         var commentCandidates = if (next) {
-            comments.subList(index + 1, comments.size - 1)
+            comments.subList(index + 1, comments.size)
         } else {
-            comments.subList(0, index - 1)
+            comments.subList(0, index)
         }
         commentCandidates = commentCandidates.filter { it is Comment && it.depth == depth }.toMutableList()
         if (commentCandidates.isNotEmpty()) {
