@@ -1,13 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/comment"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/comment_bg">
+
+    <LinearLayout
+        android:id="@+id/button_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <include
+            layout="@layout/vote_buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/done"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/comment_done"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="@dimen/button_bar_text_size" />
+
+        <TextView
+            android:id="@+id/hide"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/comment_hide"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="@dimen/button_bar_text_size" />
+
+        <TextView
+            android:id="@+id/more"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/comment_more"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="@dimen/button_bar_text_size" />
+
+        <TextView
+            android:id="@+id/prev"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/comment_prev"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="@dimen/button_bar_text_size" />
+
+        <TextView
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/comment_next"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="@dimen/button_bar_text_size" />
+
+    </LinearLayout>
 
     <de.max.roehrl.vueddit2.ui.view.IndentedLabel
         android:id="@+id/comment_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/button_bar"
         android:textColor="@color/post_meta"
         android:textSize="@dimen/comment_text_size" />
 

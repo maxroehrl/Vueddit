@@ -22,6 +22,16 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var post: Post? = null
     var comments: MutableList<NamedItem> = mutableListOf(NamedItem.Loading)
+    var selectedComment: Comment? = null
+        set(value) {
+            if (field != null) {
+                refreshComment(field!!)
+            }
+            field = value
+            if (value != null) {
+                refreshComment(value)
+            }
+        }
 
     companion object {
         private const val VIEW_TYPE_PROGRESS_BIG = 0
@@ -47,7 +57,7 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     fun refreshComment(comment: Comment) {
         val index = comments.indexOf(comment)
         if (index >= 0) {
-            notifyItemChanged(index)
+            notifyItemChanged(index + 1)
         }
     }
 
@@ -70,7 +80,7 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         when (holder) {
             is PostHeaderViewHolder   -> holder.bind(post!!)
             is MoreCommentsViewHolder -> holder.bind(comments[position - 1] as Comment)
-            is CommentViewHolder      -> holder.bind(comments[position - 1] as Comment)
+            is CommentViewHolder      -> holder.bind(comments[position - 1] as Comment, selectedComment == comments[position - 1])
             is ProgressViewHolder     -> holder.bind(if (position > 0) comments[position - 1] else null)
         }
     }

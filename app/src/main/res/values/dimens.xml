@@ -10,4 +10,5 @@
     <dimen name="post_text_size_meta">12sp</dimen>
     <dimen name="self_text_size">13sp</dimen>
     <dimen name="num_comments_text_size">14sp</dimen>
+    <dimen name="button_bar_text_size">12sp</dimen>
 </resources>

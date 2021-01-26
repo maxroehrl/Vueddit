@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.Spanned
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
+import org.json.JSONException
 import org.json.JSONObject
 
 class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
@@ -12,11 +13,13 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
     val body = json.optString("body", "")
     var spannedBody: Spanned? = null
     val subreddit = json.optString("subreddit")
-    val likes = json.optInt("likes", 0)
+    var likes: Boolean? = null
     val count = json.optInt("count", 0)
-    val ups = json.optInt("ups", 0)
+    var ups = json.optInt("ups", 0)
+    var saved = json.optBoolean("saved", false)
     val depth = json.optInt("depth", 0)
-    val children: List<String>
+    var children: List<NamedItem>? = null
+    var moreChildren: List<String>
     val created_utc = json.optInt("created_utc")
     val permalink = json.optString("permalink")
     val edited = json.optBoolean("edited", false)
@@ -38,7 +41,12 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
                 mutableChildren.add(childrenData.getString(i))
             }
         }
-        children = mutableChildren.toList()
+        moreChildren = mutableChildren.toList()
+        likes = try {
+            json.getBoolean("likes")
+        } catch (e: JSONException) {
+            null
+        }
     }
 
     fun getSpannedBody(context: Context): Spanned? {
@@ -49,6 +57,14 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
     }
 
     fun getScore(): String {
-        return Reddit.getFormattedScore(likes)
+        return Reddit.getFormattedScore(ups)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is Comment && name == other.name
+    }
+
+    override fun hashCode(): Int {
+        return name.hashCode()
     }
 }

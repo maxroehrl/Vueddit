@@ -136,6 +136,52 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun selectComment(comment: Comment?) {
+        (selectedComment as MutableLiveData).value = comment
+    }
+
+    fun collapse(comment: Comment) {
+        val comments = comments.value!!
+        val index = comments.indexOf(comment)
+        if (comment.children != null) {
+            // Restore current and child comments
+            if (comment.children!!.isNotEmpty() && comments.addAll(index + 1, comment.children!!)) {
+                (this.comments as MutableLiveData).postValue(comments)
+            }
+            comment.children = null
+            selectComment(comment)
+        } else {
+            // Collapse current and child comments
+            val numToCollapse = comments.subList(index + 1, comments.size - 1).indexOfFirst { item ->
+                item is Comment && item.depth <= comment.depth
+            }
+            if (numToCollapse >= 1) {
+                val subList = comments.subList(index + 1, numToCollapse + index + 1)
+                comment.children = subList.toList()
+                subList.clear()
+                (this.comments as MutableLiveData).postValue(comments)
+            } else {
+                comment.children = emptyList()
+            }
+            selectComment(null)
+        }
+    }
+
+    fun selectNeighboringComment(comment: Comment, depth: Int, next: Boolean) {
+        val comments = comments.value!!
+        val index = comments.indexOf(comment)
+        var commentCandidates = if (next) {
+            comments.subList(index + 1, comments.size - 1)
+        } else {
+            comments.subList(0, index - 1)
+        }
+        commentCandidates = commentCandidates.filter { it is Comment && it.depth == depth }.toMutableList()
+        if (commentCandidates.isNotEmpty()) {
+            val newlySelectedComment = commentCandidates[if (next) 0 else commentCandidates.size - 1]
+            selectComment(newlySelectedComment as Comment)
+        }
+    }
+
     fun loadMoreUserPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             var lastPost: NamedItem? = null
@@ -373,7 +419,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             loadComments()
         } else {
             viewModelScope.launch(Dispatchers.IO) {
-                val newComments = Reddit.getMoreComments(selectedPost.value!!.name, comment.children)
+                val newComments = Reddit.getMoreComments(selectedPost.value!!.name, comment.moreChildren)
                 val index = comments.value?.indexOf(comment)
                 if (index != null && index >= 0) {
                     val oldComments = comments.value!!
@@ -393,9 +439,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveOrUnsave(post: Post) {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = Reddit.saveOrUnsave(post.saved, post.name)
-            Log.d(TAG, "Post saved $response")
+            Reddit.saveOrUnsave(post.saved, post.name)
             post.saved = !post.saved
+        }
+    }
+
+    fun saveOrUnsave(comment: Comment) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Reddit.saveOrUnsave(comment.saved, comment.name)
+            comment.saved = !comment.saved
         }
     }
 

@@ -52,4 +52,10 @@
     <string name="vote_count">0</string>
     <string name="spoiler">spoiler</string>
     <string name="nsfw">nsfw</string>
+    <string name="save">Save</string>
+    <string name="unsave">Unsave</string>
+    <string name="goto_user">Goto /u/%s</string>
+    <string name="goto_sub">Goto /r/%s</string>
+    <string name="go_back_to">Go back to %s</string>
+    <string name="no_sidebar">No sidebar available</string>
 </resources>
