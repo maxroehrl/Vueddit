@@ -1,6 +1,5 @@
 package de.max.roehrl.vueddit2.ui.postlist
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -28,7 +27,6 @@ import de.max.roehrl.vueddit2.service.Util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlin.IllegalArgumentException
 
 
 open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -69,7 +67,6 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun Int.toDips() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), postHeader.resources.displayMetrics).toInt()
 
-    @SuppressLint("SetTextI18n")
     open fun bind(post: NamedItem, highlightSticky: Boolean = true) {
         this.post = post as Post
         // ViewCompat.setTransitionName(postHeader, post.name)
@@ -107,24 +104,27 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val metaBuilder = SpannableStringBuilder()
 
         if (post.over18) {
-            val nsfwString = SpannableString("nsfw")
+            val nsfwString = SpannableString(meta.context.getString(R.string.nsfw))
             nsfwString.setSpan(ForegroundColorSpan(ContextCompat.getColor(meta.context, R.color.post_nsfw)), 0, nsfwString.length, 0)
             metaBuilder.append(nsfwString)
             metaBuilder.append(" ")
         }
 
         if (post.spoiler) {
-            val spoilerString = SpannableString("spoiler")
+            val spoilerString = SpannableString(meta.context.getString(R.string.spoiler))
             spoilerString.setSpan(ForegroundColorSpan(ContextCompat.getColor(meta.context, R.color.post_spoiler)), 0, spoilerString.length, 0)
             metaBuilder.append(spoilerString)
             metaBuilder.append(" ")
         }
-
-        val timeFromNow = Util.getTimeFromNow(post.created_utc.toLong())
-        val edited = if (post.edited) " *" else ""
-        metaBuilder.append("${post.num_comments} comment${if (post.num_comments != 1) "s" else ""} in /r/${post.subreddit}\n$timeFromNow$edited by ")
-
-        val authorString = SpannableString("/u/${post.author}")
+        metaBuilder.append(meta.resources.getQuantityString(R.plurals.num_comments, post.num_comments, post.num_comments))
+        metaBuilder.append(" in /r/")
+        metaBuilder.append(post.subreddit)
+        metaBuilder.append("\n")
+        metaBuilder.append(Util.getTimeFromNow(post.created_utc.toLong()))
+        if (post.edited) {
+            metaBuilder.append(" *")
+        }
+        val authorString = SpannableString(" by /u/${post.author}")
         val authorColor = ContextCompat.getColor (meta.context, if (highlightAuthor) R.color.post_author_highlight else R.color.post_author)
         authorString.setSpan(ForegroundColorSpan(authorColor), 0, authorString.length, 0)
         metaBuilder.append(authorString)

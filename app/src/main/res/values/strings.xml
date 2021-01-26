@@ -14,8 +14,6 @@
     <string name="menu_toggle_big_post_preview">Toggle post preview size</string>
     <string name="user_posts_list">User posts list</string>
     <string name="menu_remove_visited">Remove from visited subreddits</string>
-    <string name="upvote">Upvote</string>
-    <string name="downvote">Downvote</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="subscribe">Do you really want to subscribe to "/r/%s"</string>
@@ -23,4 +21,35 @@
     <string name="subscribed">Subscription was added</string>
     <string name="unsubscribed">Subscription was removed</string>
     <string name="removed_from_visited">"/r/%s" was removed from visited subreddits</string>
+    <string name="showing">Showing </string>
+    <plurals name="num_comments">
+        <item quantity="one">%d comment</item>
+        <item quantity="other">%d comments</item>
+    </plurals>
+    <plurals name="showing_num_comments">
+        <item quantity="one">Showing %d comment</item>
+        <item quantity="other">Showing %d comments</item>
+    </plurals>
+    <string name="comment_done">Done</string>
+    <string name="comment_hide">Hide</string>
+    <string name="comment_more">More</string>
+    <string name="comment_prev">▲ Prev</string>
+    <string name="comment_next">Next ▼</string>
+    <string name="comment_parent">▲ Parent</string>
+    <string name="comment_root">▲ Root</string>
+    <plurals name="num_upvotes">
+        <item quantity="one">%d point</item>
+        <item quantity="other">%d points</item>
+    </plurals>
+    <plurals name="num_children">
+        <item quantity="one">%d child</item>
+        <item quantity="other">%d children</item>
+    </plurals>
+    <string name="upvote">Upvote</string>
+    <string name="downvote">Downvote</string>
+    <string name="upvote_arrow">▲</string>
+    <string name="downvote_arrow">▼</string>
+    <string name="vote_count">0</string>
+    <string name="spoiler">spoiler</string>
+    <string name="nsfw">nsfw</string>
 </resources>

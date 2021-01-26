@@ -105,7 +105,6 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
         videoView.player?.pause()
     }
 
-    @SuppressLint("SetTextI18n")
     override fun bind(post: NamedItem, highlightSticky: Boolean) {
         super.bind(post, highlightSticky)
         if (this.post.selftext.isEmpty()) {
@@ -115,7 +114,8 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
             selfText.visibility = View.VISIBLE
             Markdown.getInstance(selfText.context).setMarkdown(selfText, this.post.getSpannedSelftext(selfText.context))
         }
-        numComments.text = "Showing ${this.post.num_comments} comment${if (this.post.num_comments != 1) "s" else ""}"
+        numComments.text = numComments.resources.getQuantityString(R.plurals.showing_num_comments,
+                this.post.num_comments, this.post.num_comments)
         updateVideoPreview(post as Post)
     }
 
