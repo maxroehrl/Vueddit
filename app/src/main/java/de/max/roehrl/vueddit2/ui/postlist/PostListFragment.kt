@@ -139,10 +139,10 @@ open class PostListFragment : Fragment() {
             toolbar?.title = subreddit?.name ?: Reddit.frontpage
             if (subreddit != null && subreddit != currentSubreddit && viewModel.isLoggedIn.value == true) {
                 postsAdapter.highlightStickied = subreddit != Subreddit.frontPage
+                postsAdapter.showBigPreview = null
                 viewModel.refreshPosts(true)
             }
-            currentSubreddit = subreddit
-            postsAdapter.showBigPreview = null
+            currentSubreddit = subreddit ?: currentSubreddit
         }
         if (viewModel.subreddit.value == null) {
             viewModel.selectSubreddit(safeArgs.subredditName, false)

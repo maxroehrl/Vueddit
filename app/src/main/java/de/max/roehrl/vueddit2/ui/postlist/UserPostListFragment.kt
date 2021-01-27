@@ -68,7 +68,7 @@ class UserPostListFragment : PostListFragment() {
             }
         }
         viewModel.selectedUser.observe(viewLifecycleOwner) { userName ->
-            if (userName != "") {
+            if (userName != null && userName != "") {
                 toolbar?.title = "/u/${userName}"
                 if (userName != currentUser) {
                     viewModel.refreshUserPosts()
