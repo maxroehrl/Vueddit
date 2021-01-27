@@ -67,4 +67,8 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
     override fun hashCode(): Int {
         return name.hashCode()
     }
+
+    fun isCollapsed(): Boolean {
+        return children != null
+    }
 }

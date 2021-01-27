@@ -18,9 +18,9 @@ class CommentsDiffCallback(private val oldList: List<NamedItem>, private val new
         val item2 = newList[newPosition]
 
         return if (item1 is Comment && item2 is Comment) {
-            item1.id == item2.id && item1.isLoading == item2.isLoading && item1.children == item2.children
+            item1.isLoading == item2.isLoading && item1.isCollapsed() == item2.isCollapsed()
         } else {
-            item1.id == item2.id
+            true
         }
     }
 }
