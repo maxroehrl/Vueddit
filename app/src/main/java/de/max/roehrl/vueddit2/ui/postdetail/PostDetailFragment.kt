@@ -48,7 +48,8 @@ class PostDetailFragment : Fragment() {
         toolbar = root.findViewById(R.id.toolbar)
         collapsingToolbar = root.findViewById(R.id.collapsing_toolbar)
         recyclerView = root.findViewById(R.id.comments)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        val linearLayoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = linearLayoutManager
         val commentsAdapter = CommentsAdapter()
         if (viewModel.selectedPost.value != null && safeArgs.postName == viewModel.selectedPost.value?.name) {
             commentsAdapter.post = viewModel.selectedPost.value
@@ -96,7 +97,7 @@ class PostDetailFragment : Fragment() {
                 val index = commentsAdapter.comments.indexOf(comment)
                 if (index >= 0) {
                     recyclerView.post {
-                        recyclerView.smoothScrollToPosition(index + 1)
+                        linearLayoutManager.scrollToPositionWithOffset(index + 1, 100)
                     }
                 }
             }
