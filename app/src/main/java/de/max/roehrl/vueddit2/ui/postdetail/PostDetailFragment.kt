@@ -95,7 +95,9 @@ class PostDetailFragment : Fragment() {
             commentsAdapter.selectedComment = comment
             if (comment != null) {
                 val index = commentsAdapter.comments.indexOf(comment)
-                if (index >= 0) {
+                if (index >= 0
+                        && (linearLayoutManager.findFirstVisibleItemPosition() > index
+                        || linearLayoutManager.findLastVisibleItemPosition() < index)) {
                     recyclerView.post {
                         linearLayoutManager.scrollToPositionWithOffset(index + 1, 100)
                     }
