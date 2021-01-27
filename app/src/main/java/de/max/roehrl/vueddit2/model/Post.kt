@@ -61,4 +61,12 @@ class Post(json: JSONObject) : NamedItem(json.optString("name")) {
     override fun toString(): String {
         return "Post $name ('$title') by $author"
     }
+
+    override fun equals(other: Any?): Boolean {
+        return other is Post && other.name == name
+    }
+
+    override fun hashCode(): Int {
+        return name.hashCode()
+    }
 }
