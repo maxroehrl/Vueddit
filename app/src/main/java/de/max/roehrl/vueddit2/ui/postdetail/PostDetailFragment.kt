@@ -61,6 +61,7 @@ class PostDetailFragment : Fragment() {
             val newSize = comments.size
             var result: DiffUtil.DiffResult? = null
             var comment: NamedItem? = null
+            var refreshAll = false
             if (newSize == 1) {
                 if (comments[0] is NamedItem.Loading) {
                     if (oldSize > 1) {
@@ -79,6 +80,9 @@ class PostDetailFragment : Fragment() {
                             item is Comment && item.name == safeArgs.commentName
                         }
                     }
+                } else if (oldSize - newSize == 1) {
+                    // HACK This fixed collapsing a comment with one child which is bugged in DiffUtil
+                    refreshAll = true
                 } else {
                     result = DiffUtil.calculateDiff(CommentsDiffCallback(commentsAdapter.comments, comments))
                 }
@@ -86,6 +90,9 @@ class PostDetailFragment : Fragment() {
             commentsAdapter.comments.clear()
             commentsAdapter.comments.addAll(comments)
             result?.dispatchUpdatesTo(commentsAdapter)
+            if (refreshAll) {
+                commentsAdapter.notifyDataSetChanged()
+            }
             if (comment != null && comment is Comment) {
                 viewModel.selectComment(comment)
             }
