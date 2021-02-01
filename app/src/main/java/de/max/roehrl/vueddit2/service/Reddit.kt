@@ -40,10 +40,7 @@ object Reddit {
     private const val clientId = "m_gI8cFDcqC7uA"
     const val redirectUri = "http://localhost:8080"
     private val redirectUriEncoded = URLEncoder.encode(redirectUri, "utf-8")
-    private val scope = URLEncoder.encode(
-            "mysubreddits read vote save subscribe wikiread identity history flair",
-            "utf-8"
-    )
+    private val scope = URLEncoder.encode("mysubreddits read vote save subscribe wikiread identity history flair", "utf-8")
     const val frontpage = "reddit front page"
     private val requestQueue = RequestQueue(NoCache(), BasicNetwork(HurlStack())).apply {
         start()
@@ -67,6 +64,8 @@ object Reddit {
                 Log.i(TAG, "User $username is logged in")
                 return true
             } catch (error: VolleyError) {
+                Log.i(TAG, "User is logged out")
+            } catch (error: JSONException) {
                 Log.i(TAG, "User is logged out")
             }
         }
@@ -107,7 +106,7 @@ object Reddit {
         }
     }
 
-    suspend fun getUser(): String {
+    private suspend fun getUser(): String {
         return JSONObject(get("/api/v1/me?raw_json=1")).getString("name")
     }
 
@@ -214,7 +213,6 @@ object Reddit {
         val response = get("/subreddits/mine/subscriber?raw_json=1&limit=100")
         val subscriptions = mutableListOf<Subreddit>()
         try {
-            // TODO This is called to early
             val subs = JSONObject(response)
                     .getJSONObject("data")
                     .getJSONArray("children")
