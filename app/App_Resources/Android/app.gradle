@@ -8,7 +8,7 @@ dependencies {
   // https://github.com/balysv/material-ripple/releases
   implementation 'com.balysv:material-ripple:1.0.2'
   // https://github.com/facebook/fresco/releases
-  implementation 'com.facebook.fresco:fresco:2.3.0'
+  implementation 'com.facebook.fresco:fresco:2.4.0'
 }
 
 // If you want to add something to be applied before applying plugins' include.gradle files
