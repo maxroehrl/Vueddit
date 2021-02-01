@@ -1,0 +1,42 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: set up NodeJS 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Set up nativescript
+        run: npm install -g nativescript
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Set up android target
+        run: ns platform add android
+
+      - name: Build
+        run: ns build android
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Vueddit
+          path: ${{ github.workspace }}/platforms/android/app/build/outputs/apk/debug/app-debug.apk
