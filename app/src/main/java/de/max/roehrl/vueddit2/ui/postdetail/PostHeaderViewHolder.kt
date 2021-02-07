@@ -8,6 +8,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.navigation.findNavController
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -16,8 +17,8 @@ import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.model.VideoType
-import de.max.roehrl.vueddit2.service.CustomTabs
 import de.max.roehrl.vueddit2.service.Markdown
+import de.max.roehrl.vueddit2.service.Url
 import de.max.roehrl.vueddit2.service.Util
 import de.max.roehrl.vueddit2.ui.postlist.PostViewHolder
 
@@ -161,6 +162,6 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
     }*/
 
     override fun onClick(view: View) {
-        CustomTabs.openUrl(selfText.context, post.url)
+        Url.openUrl(selfText.context, selfText.findNavController(), post.url)
     }
 }

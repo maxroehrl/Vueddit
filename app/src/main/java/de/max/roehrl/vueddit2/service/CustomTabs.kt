@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
-import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent.Builder
 import androidx.browser.customtabs.CustomTabsIntent.SHARE_STATE_ON
@@ -16,22 +15,24 @@ import saschpe.android.customtabs.CustomTabsHelper
 import saschpe.android.customtabs.WebViewFallback
 
 object CustomTabs {
-    fun openUrl(context: Context, url: String) {
+    private const val TAG = "CustomTabs"
+
+    fun openInCustomTabs(context: Context, url: String) {
         val backArrow : Bitmap = ContextCompat.getDrawable(context, R.drawable.ic_arror_left)!!.toBitmap()
         val customTabsIntent = Builder()
-                .setShareState(SHARE_STATE_ON)
-                .setShowTitle(true)
-                .setStartAnimations(context, R.anim.slide_in_right, R.anim.slide_out_left)
-                .setExitAnimations(context, R.anim.slide_in_left, R.anim.slide_out_right)
-                .setCloseButtonIcon(backArrow)
-                .setUrlBarHidingEnabled(true)
-                .build()
+            .setShareState(SHARE_STATE_ON)
+            .setShowTitle(true)
+            .setStartAnimations(context, R.anim.slide_in_right, R.anim.slide_out_left)
+            .setExitAnimations(context, R.anim.slide_in_left, R.anim.slide_out_right)
+            .setCloseButtonIcon(backArrow)
+            .setUrlBarHidingEnabled(true)
+            .build()
         CustomTabsHelper.addKeepAliveExtra(context, customTabsIntent.intent)
-        val uri = Uri.parse(URLUtil.guessUrl(url))
+        val uri = Uri.parse(url)
         try {
             CustomTabsHelper.openCustomTab(context, customTabsIntent, uri, WebViewFallback())
         } catch (error: ActivityNotFoundException) {
-            Log.e("CustomTabs", "Failed to open custom tab", error)
+            Log.e(TAG, "Failed to open custom tab", error)
             Toast.makeText(context, "You don't have any browser to open the web page", Toast.LENGTH_LONG).show()
         }
     }

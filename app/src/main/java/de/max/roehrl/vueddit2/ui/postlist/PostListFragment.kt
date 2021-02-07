@@ -144,7 +144,7 @@ open class PostListFragment : Fragment() {
             }
             currentSubreddit = subreddit ?: currentSubreddit
         }
-        if (viewModel.subreddit.value == null) {
+        if (viewModel.subreddit.value != null && viewModel.subreddit.value!!.name != safeArgs.subredditName) {
             viewModel.selectSubreddit(safeArgs.subredditName, false)
         }
     }

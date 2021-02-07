@@ -25,6 +25,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.Subreddit
+import de.max.roehrl.vueddit2.service.Markdown
+import de.max.roehrl.vueddit2.service.Url
 import de.max.roehrl.vueddit2.ui.listener.RecyclerOnTouchListener
 import de.max.roehrl.vueddit2.ui.postlist.PostListFragmentDirections
 
@@ -86,6 +88,7 @@ class MainActivity : AppCompatActivity() {
         super.onPostCreate(savedInstanceState)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         navView.setupWithNavController(navController)
+        Markdown.getInstance(this).urlOpenCallback = { url : String -> Url.openUrl(this, navController, url) }
 
         val searchText = navView.getHeaderView(0).findViewById<TextInputEditText>(R.id.search_text)
         searchText.doOnTextChanged { text, _, _, _ ->

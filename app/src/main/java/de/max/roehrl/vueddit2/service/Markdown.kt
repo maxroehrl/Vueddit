@@ -15,7 +15,7 @@ import java.util.regex.Pattern
 
 class Markdown private constructor(context: Context) {
     private val markwon: Markwon
-    private var urlOpenCallback = { url : String -> CustomTabs.openUrl(context, url) }
+    var urlOpenCallback = { url : String -> Url.openUrl(context, null, url) }
     private val malformedHadingRegex = Regex("^#+(?=[^#\\s])", RegexOption.MULTILINE)
 
     init {
@@ -52,7 +52,7 @@ class Markdown private constructor(context: Context) {
             }
 
             override fun onClick(view: View) {
-                urlOpenCallback(url)
+                urlOpenCallback.invoke(url)
             }
         }
         class LinkifyTextAddedListener : CorePlugin.OnTextAddedListener {
