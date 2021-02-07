@@ -34,10 +34,10 @@ class PostDetailFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private val safeArgs: PostDetailFragmentArgs by navArgs()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    /*override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.shared_header)
-    }
+        sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.shared_header)
+    }*/
 
     override fun onCreateView(
         inflater: LayoutInflater,
