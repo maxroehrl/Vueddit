@@ -12,22 +12,48 @@ class Image(post: JSONObject, preferredWidth: Int = Util.getScreenWidth()) {
 
     init {
         val images = post.optJSONObject("preview")?.optJSONArray("images")
+        val mediaEmbedded = post.optJSONObject("media_metadata")
         if (images != null && images.length() > 0) {
-            val resolutions = images.getJSONObject(0).getJSONArray("resolutions")
-            val dists = mutableListOf<Int>()
-            for (i in 0 until resolutions.length()) {
-                dists.add(resolutions.getJSONObject(i).getInt("width") - preferredWidth)
+            val resolutionsArray = images.getJSONObject(0).getJSONArray("resolutions")
+            val resolutions = mutableListOf<JSONObject>()
+            for (i in 0 until resolutionsArray.length()) {
+                resolutions.add(resolutionsArray.getJSONObject(i))
             }
-            val min = dists.minByOrNull { it.absoluteValue }
-            val index = dists.indexOf(min)
-            if (index >= 0) {
-                val jsonObject = resolutions.getJSONObject(index)
-                url = jsonObject.optString("url")
-                height = jsonObject.optInt("height")
-                width = jsonObject.optInt("width")
+            val preferredImage = getPreferredImage(resolutions, preferredWidth)
+            if (preferredImage != null) {
+                url = preferredImage.optString("url")
+                height = preferredImage.optInt("height")
+                width = preferredImage.optInt("width")
             } else {
                 Log.d("Image", "Failed to load image for post: '${post.optString("title")}'")
             }
+        } else if (mediaEmbedded != null) {
+            for (key in mediaEmbedded.keys()) {
+                val galleryImage = mediaEmbedded.getJSONObject(key)
+                val resolutions = mutableListOf(galleryImage.getJSONObject("s"))
+                val previews = galleryImage.getJSONArray("p")
+                for (i in 0 until previews.length()) {
+                    resolutions.add(previews.getJSONObject(i))
+                }
+                val preferredImage = getPreferredImage(resolutions, preferredWidth, "x")
+                if (preferredImage != null) {
+                    url = preferredImage.optString("u")
+                    height = preferredImage.optInt("y")
+                    width = preferredImage.optInt("x")
+                    break
+                }
+            }
         }
+    }
+
+    private fun getPreferredImage(
+        resolutions: List<JSONObject>,
+        preferredWidth: Int,
+        widthProp: String = "width"
+    ): JSONObject? {
+        val distances = resolutions.map { it.getInt(widthProp) - preferredWidth }
+        val min = distances.minByOrNull { it.absoluteValue }
+        val index = distances.indexOf(min)
+        return resolutions.getOrNull(index)
     }
 }
