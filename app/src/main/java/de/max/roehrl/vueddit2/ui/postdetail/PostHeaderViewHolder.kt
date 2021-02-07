@@ -1,15 +1,11 @@
 package de.max.roehrl.vueddit2.ui.postdetail
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.graphics.Color
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.exoplayer2.MediaItem
@@ -28,6 +24,7 @@ import de.max.roehrl.vueddit2.ui.postlist.PostViewHolder
 
 @SuppressLint("SetJavaScriptEnabled")
 open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
+    private val TAG = "PostHeaderViewHolder"
     private val selfText: TextView = itemView.findViewById(R.id.self_text)
     private val numComments: TextView = itemView.findViewById(R.id.num_comments)
     private val embeddedWebView: WebView = itemView.findViewById(R.id.embedded_web_view)
@@ -41,7 +38,7 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
         }
     }
 
-    private inner class ChromeClient : WebChromeClient() {
+    /*private inner class ChromeClient : WebChromeClient() {
         var view: View? = null
         var callback: CustomViewCallback? = null
         var originalSystemUiVisibility: Int? = null
@@ -67,11 +64,11 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
                 this.callback = callback
             }
         }
-    }
+    }*/
 
     init {
         embeddedWebView.webViewClient = Client()
-        embeddedWebView.webChromeClient = ChromeClient()
+        // embeddedWebView.webChromeClient = ChromeClient()
         embeddedWebView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -133,7 +130,7 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
                         videoView.player!!.setMediaItem(MediaItem.fromUri(post.video.url!!))
                         videoView.player!!.prepare()
                     } catch (e: Exception) {
-                        Log.e("PostHeaderViewHolder", "Failed to load ${post.video.type} video from '${post.video.url}'", e)
+                        Log.e(TAG, "Failed to load ${post.video.type} video from '${post.video.url}'", e)
                     }
                 }
                 VideoType.EMBEDDED -> {
@@ -142,7 +139,7 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
                     try {
                         embeddedWebView.loadUrl(post.video.url!!)
                     } catch (e: Exception) {
-                        Log.e("PostHeaderViewHolder", "Failed to load embedded video from '${post.video.url}'", e)
+                        Log.e(TAG, "Failed to load embedded video from '${post.video.url}'", e)
                     }
                 }
                 else -> {
