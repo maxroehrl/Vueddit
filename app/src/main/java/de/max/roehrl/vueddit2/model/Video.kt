@@ -19,16 +19,16 @@ class Video(json: JSONObject) {
     init {
         when {
             json.optJSONObject("secure_media")?.optJSONObject("reddit_video") != null ->
-                this.setVideoObject(json.optJSONObject("secure_media")?.optJSONObject("reddit_video"), "dash_url")
+                setVideoObject(json.optJSONObject("secure_media")?.optJSONObject("reddit_video"), "dash_url")
 
             json.optJSONObject("preview")?.optJSONObject("reddit_video_preview") != null ->
-                this.setVideoObject(json.optJSONObject("preview")?.optJSONObject("reddit_video_preview"), "dash_url")
+                setVideoObject(json.optJSONObject("preview")?.optJSONObject("reddit_video_preview"), "dash_url")
 
             json.optJSONObject("preview")?.optJSONArray("images")?.optJSONObject(0)?.optJSONObject("variants")?.optJSONObject("mp4")?.optJSONObject("source") != null ->
-                this.setVideoObject(json.optJSONObject("preview")?.optJSONArray("images")?.optJSONObject(0)?.optJSONObject("variants")?.optJSONObject("mp4")?.optJSONObject("source"), "url")
+                setVideoObject(json.optJSONObject("preview")?.optJSONArray("images")?.optJSONObject(0)?.optJSONObject("variants")?.optJSONObject("mp4")?.optJSONObject("source"), "url")
 
             json.optJSONObject("secure_media_embed")?.optString("media_domain_url") != null ->
-                this.setVideoObject(json.optJSONObject("secure_media_embed"), "media_domain_url")
+                setVideoObject(json.optJSONObject("secure_media_embed"), "media_domain_url")
 
         }
     }

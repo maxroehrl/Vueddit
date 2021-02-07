@@ -58,11 +58,11 @@ class Markdown private constructor(context: Context) {
         class LinkifyTextAddedListener : CorePlugin.OnTextAddedListener {
             val builder = SpannableStringBuilder()
             override fun onTextAdded(visitor: MarkwonVisitor, text: String, start: Int) {
-                this.builder.clear()
-                this.builder.clearSpans()
-                this.builder.append(text)
-                if (Linkify.addLinks(this.builder, mask, null, null, transformFilter)) {
-                    val spans : Array<URLSpan>? = this.builder.getSpans(0, this.builder.length, URLSpan::class.java)
+                builder.clear()
+                builder.clearSpans()
+                builder.append(text)
+                if (Linkify.addLinks(builder, mask, null, null, transformFilter)) {
+                    val spans : Array<URLSpan>? = builder.getSpans(0, builder.length, URLSpan::class.java)
                     if (spans != null && spans.isNotEmpty()) {
                         val spannableBuilder = visitor.builder()
                         for (span in spans) {
@@ -70,9 +70,9 @@ class Markdown private constructor(context: Context) {
                             clickableSpan.setURL(span.url)
                             spannableBuilder.setSpan(
                                 clickableSpan,
-                                start + this.builder.getSpanStart(span),
-                                start + this.builder.getSpanEnd(span),
-                                this.builder.getSpanFlags(span))
+                                start + builder.getSpanStart(span),
+                                start + builder.getSpanEnd(span),
+                                builder.getSpanFlags(span))
                         }
                     }
                 }

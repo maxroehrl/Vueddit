@@ -65,7 +65,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
     }
 
-    fun Int.toDips() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), postHeader.resources.displayMetrics).toInt()
+    fun Int.toDips() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, toFloat(), postHeader.resources.displayMetrics).toInt()
 
     open fun bind(post: NamedItem, highlightSticky: Boolean = true) {
         this.post = post as Post

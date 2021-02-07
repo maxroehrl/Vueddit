@@ -31,6 +31,6 @@ class IndentedLabel(context: Context, attrs: AttributeSet) : AppCompatTextView(c
 
     fun setDepth(depth: Int, paddingTop: Int) {
         this.depth = depth
-        this.paddingTop2 = paddingTop
+        paddingTop2 = paddingTop
     }
 }
