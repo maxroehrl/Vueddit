@@ -14,9 +14,22 @@
             android:name="subreddit_name"
             android:defaultValue="reddit front page"
             app:argType="string" />
+        <argument
+            android:name="root_fragment"
+            android:defaultValue="false"
+            app:argType="boolean" />
         <action
             android:id="@+id/action_postListFragment_to_loginActivity"
             app:destination="@id/loginActivity"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/postListFragment"
+            app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_postListFragment_to_postListFragment"
+            app:destination="@id/postListFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
@@ -64,6 +77,15 @@
             app:popUpTo="@id/userPostListFragment"
             app:popUpToInclusive="false" />
         <action
+            android:id="@+id/action_userPostListFragment_to_userPostListFragment"
+            app:destination="@id/userPostListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/userPostListFragment"
+            app:popUpToInclusive="false" />
+        <action
             android:id="@+id/action_userPostListFragment_to_postDetailFragment"
             app:destination="@id/postDetailFragment"
             app:enterAnim="@anim/slide_in_right"
@@ -92,6 +114,10 @@
             android:name="comment_name"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="post_json"
+            android:defaultValue="null"
+            app:argType="string" />
         <action
             android:id="@+id/action_postDetailFragment_to_userPostListFragment"
             app:destination="@id/userPostListFragment"

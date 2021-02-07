@@ -2,39 +2,39 @@ package de.max.roehrl.vueddit2.ui.postlist
 
 import android.os.Bundle
 import android.view.*
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import de.max.roehrl.vueddit2.R
+import de.max.roehrl.vueddit2.model.Comment
+import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.service.Store
 import kotlinx.coroutines.launch
 import java.util.*
 
-
 class UserPostListFragment : PostListFragment() {
     override val sortings = listOf("new", "top", "hot", "controversial")
-    override val isGroupTabLayoutVisible = true
-    private var groupTabLayout: TabLayout? = null
+    override val viewModel: UserPostListViewModel by viewModels()
     override val layoutId = R.layout.fragment_user_posts
+    override val isGroupTabLayoutVisible = true
+    override var showGotoUser = false
     private val safeArgs: UserPostListFragmentArgs by navArgs()
     private var currentUser: String? = null
     private var currentGroup: String? = null
-    override val showGotoUser = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = super.onCreateView(inflater, container, savedInstanceState)
-        groupTabLayout = root?.findViewById(R.id.group_tab_layout)
-            viewModel.viewModelScope.launch {
+        val groupTabLayout: TabLayout? = root?.findViewById(R.id.group_tab_layout)
+        viewModel.viewModelScope.launch {
             var groups = listOf("overview", "submitted", "comments", "gilded")
             if (Store.getInstance(requireContext()).getUsername() == safeArgs.userName) {
                 groups = listOf("overview", "submitted", "comments", "saved", "upvoted", "downvoted", "hidden", "gilded")
             }
             for (group in groups) {
-                groupTabLayout!!.addTab(groupTabLayout!!.newTab().setText(group))
+                groupTabLayout!!.addTab(groupTabLayout.newTab().setText(group))
             }
             val index = groups.indexOf(viewModel.userPostGroup.value)
             if (index != -1) {
@@ -53,9 +53,8 @@ class UserPostListFragment : PostListFragment() {
     }
 
     override fun initialize(postsAdapter: PostsAdapter) {
-        sortingLiveData = viewModel.userSorting
-        postsLiveData = viewModel.userPostsAndComments
-        viewModel.userPostsAndComments.observe(viewLifecycleOwner) { posts ->
+        viewModel.setSelectedUser(safeArgs.userName)
+        viewModel.posts.observe(viewLifecycleOwner) { posts ->
             val oldSize = postsAdapter.itemCount
             val newSize = posts.size
             postsAdapter.posts = posts
@@ -71,22 +70,18 @@ class UserPostListFragment : PostListFragment() {
             if (userName != null && userName != "") {
                 toolbar?.title = "/u/${userName}"
                 if (userName != currentUser) {
-                    viewModel.refreshUserPosts()
+                    viewModel.refreshPosts()
                 }
                 currentUser = userName
             }
         }
-        if (viewModel.selectedUser.value != safeArgs.userName) {
-            viewModel.setUserPostGroup("overview")
-        }
-        viewModel.setSelectedUser(safeArgs.userName)
         viewModel.userPostGroup.observe(viewLifecycleOwner) { group ->
             if (group != currentGroup) {
                 if (listOf("overview", "submitted", "comments").contains(group)) {
                     sortingTabLayout?.visibility = View.VISIBLE
                 } else {
                     sortingTabLayout?.visibility = View.GONE
-                    viewModel.setUserPostSorting("new")
+                    viewModel.setPostSorting("new")
                 }
                 if (group == "saved") {
                     val items = listOf("All", "Comments", "Links")
@@ -94,11 +89,11 @@ class UserPostListFragment : PostListFragment() {
                         setItems(items.toTypedArray()) { _, which ->
                             val type = items[which].toLowerCase(Locale.getDefault())
                             viewModel.setSavedPostsType(type)
-                            viewModel.refreshUserPosts()
+                            viewModel.refreshPosts()
                         }
                     }.show()
                 } else {
-                    viewModel.refreshUserPosts()
+                    viewModel.refreshPosts()
                 }
             }
             currentGroup = group
@@ -110,34 +105,23 @@ class UserPostListFragment : PostListFragment() {
     }
 
     override fun onSortingSelected(sorting: String) {
-        viewModel.setUserPostSorting(sorting)
+        viewModel.setPostSorting(sorting)
         if (listOf("top", "rising").contains(sorting)) {
             val items = listOf("Hour", "Day", "Week", "Month", "Year", "All")
             MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
                     val time = items[which].toLowerCase(Locale.getDefault())
                     viewModel.setTopPostsTime(time)
-                    viewModel.refreshUserPosts()
+                    viewModel.refreshPosts()
                 }
             }.show()
         } else {
-            viewModel.refreshUserPosts()
-        }
-    }
-
-    override fun onSwipeToRefresh(cb: () -> Unit) {
-        viewModel.refreshUserPosts(false, cb)
-    }
-
-    override fun onRecyclerViewScrolled(recyclerView: RecyclerView, dx: Int, dy: Int, layoutManager: LinearLayoutManager) {
-        if (!viewModel.isUserPostListLoading() && layoutManager.findLastVisibleItemPosition() + 2 == recyclerView.adapter?.itemCount && dy != 0) {
-            viewModel.loadMoreUserPosts()
+            viewModel.refreshPosts()
         }
     }
 
     override fun gotoUser(userName: String) {
-        viewModel.setSelectedUser(userName)
-        viewModel.refreshUserPosts()
+        findNavController().navigate(UserPostListFragmentDirections.actionUserPostListFragmentToUserPostListFragment(userName))
     }
 
     override fun gotoSubreddit(subredditName: String) {
@@ -148,13 +132,30 @@ class UserPostListFragment : PostListFragment() {
         inflater.inflate(R.menu.user_post_list, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
-            R.id.action_refresh -> {
-                viewModel.refreshUserPosts()
-                true
+    override fun onItemLongPressed(view: View, position: Int) {
+        val item = viewModel.posts.value?.get(position)
+        if (item is Post) {
+            showGotoUser = currentUser != item.author
+            super.onItemLongPressed(view, position)
+        } else if (item is Comment) {
+            showGotoUser = currentUser != item.author
+            val items = mutableListOf(
+                view.context.getString(if (item.saved) R.string.unsave else R.string.save),
+                view.context.getString(R.string.goto_sub, item.subreddit),
+            )
+            if (showGotoUser) {
+                items.add(view.context.getString(R.string.goto_user, item.author))
             }
-            else -> super.onOptionsItemSelected(item)
+            MaterialAlertDialogBuilder(requireContext()).apply {
+                setItems(items.toTypedArray()) { _, which ->
+                    when (which) {
+                        0 -> viewModel.saveOrUnsave(item)
+                        1 -> gotoSubreddit(item.subreddit)
+                        2 -> gotoUser(item.author)
+                    }
+                }
+                show()
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package de.max.roehrl.vueddit2.model
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Reddit
 import org.json.JSONObject
+import java.util.*
 
 class Subreddit(json: JSONObject, var isMultiReddit: Boolean = false) : NamedItem("subreddit") {
     companion object {
@@ -49,12 +50,13 @@ class Subreddit(json: JSONObject, var isMultiReddit: Boolean = false) : NamedIte
     }
 
     override fun equals(other: Any?): Boolean {
-        return (other is Subreddit) && name == other.name && isMultiReddit == other.isMultiReddit
+        return (other is Subreddit) && name.equals(other.name, true)
+                && isMultiReddit == other.isMultiReddit
     }
 
     override fun hashCode(): Int {
         var result = isMultiReddit.hashCode()
-        result = 31 * result + name.hashCode()
+        result = 31 * result + name.toLowerCase(Locale.getDefault()).hashCode()
         return result
     }
 }

@@ -6,11 +6,10 @@ import android.util.Log
 import android.view.*
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,19 +18,19 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import de.max.roehrl.vueddit2.R
-import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
-import de.max.roehrl.vueddit2.service.Reddit
+import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.ui.dialog.Sidebar
 
-
 class PostDetailFragment : Fragment() {
-    private val TAG = "PostDetailFragment"
-    private val viewModel: AppViewModel by activityViewModels()
-    private var toolbar: MaterialToolbar? = null
-    private var collapsingToolbar: CollapsingToolbarLayout? = null
+    companion object {
+        private const val TAG = "PostDetailFragment"
+    }
+    private lateinit var toolbar: MaterialToolbar
+    private lateinit var collapsingToolbar: CollapsingToolbarLayout
     private lateinit var recyclerView: RecyclerView
+    private val viewModel: PostDetailViewModel by viewModels()
     private val safeArgs: PostDetailFragmentArgs by navArgs()
 
     /*override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +49,10 @@ class PostDetailFragment : Fragment() {
         recyclerView = root.findViewById(R.id.comments)
         val linearLayoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = linearLayoutManager
-        val commentsAdapter = CommentsAdapter()
-        if (viewModel.selectedPost.value != null && safeArgs.postName == viewModel.selectedPost.value?.name) {
-            commentsAdapter.post = viewModel.selectedPost.value
-            viewModel.resetComments()
+        val commentsAdapter = CommentsAdapter(viewModel)
+        if (safeArgs.postJson != "null") {
+            val post = Post.fromJSONString(safeArgs.postJson)
+            viewModel.selectedPost.value = post
         }
         recyclerView.adapter = commentsAdapter
         viewModel.comments.observe(viewLifecycleOwner) { comments ->
@@ -112,7 +111,7 @@ class PostDetailFragment : Fragment() {
             }
         }
         viewModel.selectedPost.observe(viewLifecycleOwner) { post ->
-            toolbar?.title = post?.title ?: Reddit.frontpage
+            toolbar.title = post?.title ?: ""
             commentsAdapter.post = post
         }
         val swipeRefreshLayout: SwipeRefreshLayout = root.findViewById(R.id.swipe)
@@ -133,11 +132,9 @@ class PostDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // postponeEnterTransition()
-        val navController = findNavController()
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
-        collapsingToolbar!!.setupWithNavController(toolbar!!, navController, appBarConfiguration)
-        onCreateOptionsMenu(toolbar!!.menu, SupportMenuInflater(context))
-        toolbar!!.setOnMenuItemClickListener { onOptionsItemSelected(it) }
+        collapsingToolbar.setupWithNavController(toolbar, findNavController())
+        onCreateOptionsMenu(toolbar.menu, SupportMenuInflater(context))
+        toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
     }
 
     override fun onPause() {

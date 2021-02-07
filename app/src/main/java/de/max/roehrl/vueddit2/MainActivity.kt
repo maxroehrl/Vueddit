@@ -26,18 +26,21 @@ import com.google.android.material.textfield.TextInputEditText
 import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.Subreddit
 import de.max.roehrl.vueddit2.service.Markdown
+import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Url
 import de.max.roehrl.vueddit2.ui.listener.RecyclerOnTouchListener
+import de.max.roehrl.vueddit2.ui.postlist.PostListFragmentArgs
 import de.max.roehrl.vueddit2.ui.postlist.PostListFragmentDirections
-
 
 // https://developer.android.com/guide/navigation/navigation-ui
 class MainActivity : AppCompatActivity() {
+    companion object {
+        private const val TAG = "MainActivity"
+    }
     lateinit var drawerLayout: DrawerLayout
     lateinit var navView: NavigationView
     lateinit var navController: NavController
     private val viewModel: AppViewModel by viewModels()
-    private val TAG = "MainActivity"
     private val multiReddits = mutableListOf<MenuItem>()
     private var searchTextLength: Int = 0
 
@@ -80,13 +83,13 @@ class MainActivity : AppCompatActivity() {
             } else {
                 viewModel.subreddits.value!!
             })
-
         }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+        navController.setGraph(R.navigation.navigation_graph, PostListFragmentArgs(Reddit.frontpage, true).toBundle())
         navView.setupWithNavController(navController)
         Markdown.getInstance(this).urlOpenCallback = { url : String -> Url.openUrl(this, navController, url) }
 

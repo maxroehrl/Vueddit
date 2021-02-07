@@ -10,14 +10,11 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import de.max.roehrl.vueddit2.MainActivity
 import de.max.roehrl.vueddit2.R
-import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.service.Markdown
@@ -28,8 +25,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-open class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val TAG = "CommentViewHolder"
+open class CommentViewHolder(itemView: View, private val viewModel: PostDetailViewModel?) :
+    RecyclerView.ViewHolder(itemView) {
+    companion object {
+        private const val TAG = "CommentViewHolder"
+    }
     protected val header: IndentedLabel = itemView.findViewById(R.id.comment_header)
     private val body: IndentedLabel = itemView.findViewById(R.id.comment_body)
     private val votes: TextView = itemView.findViewById(R.id.votes)
@@ -156,13 +156,11 @@ open class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     }
 
     private fun collapse() {
-        val viewModel: AppViewModel by (itemView.context as MainActivity).viewModels()
-        viewModel.collapse(comment)
+        viewModel?.collapse(comment)
     }
 
     private fun selectComment(comment: Comment?) {
-        val viewModel: AppViewModel by (itemView.context as MainActivity).viewModels()
-        viewModel.selectComment(comment)
+        viewModel?.selectComment(comment)
     }
 
     private fun getVoteChevronColor(up: Boolean?): Int {
@@ -201,14 +199,13 @@ open class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     private fun showMore() {
         MaterialAlertDialogBuilder(more.context).apply {
-            val viewModel: AppViewModel by (itemView.context as MainActivity).viewModels()
             val items = mutableListOf<String>()
             items.add(more.context.getString(if (comment.saved) R.string.unsave else R.string.save))
             items.add(more.context.getString(R.string.goto_user, comment.author))
             setItems(items.toTypedArray()) { _, which ->
                 when (which) {
                     0 -> {
-                        viewModel.saveOrUnsave(comment)
+                        viewModel?.saveOrUnsave(comment)
                     }
                     1 -> {
                         more.findNavController().navigate(PostDetailFragmentDirections.actionPostDetailFragmentToUserPostListFragment(comment.author))
@@ -220,10 +217,9 @@ open class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     }
 
     private fun selectNeighboringComment(isNextButton: Boolean) {
-        val viewModel: AppViewModel by (itemView.context as MainActivity).viewModels()
         var depth = comment.depth
         val next = isNextButton && depth == 0
         depth = if (isNextButton || depth == 0) 0 else depth - 1
-        viewModel.selectNeighboringComment(comment, depth, next)
+        viewModel?.selectNeighboringComment(comment, depth, next)
     }
 }

@@ -17,7 +17,9 @@ import de.max.roehrl.vueddit2.service.Reddit
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
-    private val TAG = "LoginActivity"
+    companion object {
+        private const val TAG = "LoginActivity"
+    }
     private val viewModel: AppViewModel by viewModels()
 
     private val onBackCallback = onBackPressedDispatcher.addCallback(this) {

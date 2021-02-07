@@ -5,12 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.R
+import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 
-class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class CommentsAdapter(private val viewModel: PostDetailViewModel) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(comment: NamedItem?) {
             if (comment is Comment) {
@@ -46,10 +47,10 @@ class CommentsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return when (viewType) {
             VIEW_TYPE_PROGRESS_BIG -> ProgressViewHolder(inflate(parent, R.layout.loading_item))
             VIEW_TYPE_PROGRESS     -> ProgressViewHolder(inflate(parent, R.layout.loading_item_small))
-            VIEW_TYPE_COMMENT      -> CommentViewHolder(inflate(parent, R.layout.comment_item))
+            VIEW_TYPE_COMMENT      -> CommentViewHolder(inflate(parent, R.layout.comment_item), viewModel)
             VIEW_TYPE_HEADER       -> PostHeaderViewHolder(inflate(parent, R.layout.post_detail_header))
             VIEW_TYPE_HEADER_BIG   -> PostBigHeaderViewHolder(inflate(parent, R.layout.post_detail_header_big))
-            VIEW_TYPE_MORE         -> MoreCommentsViewHolder(inflate(parent, R.layout.more_comments_item), this)
+            VIEW_TYPE_MORE         -> MoreCommentsViewHolder(inflate(parent, R.layout.more_comments_item), this, viewModel)
             else                   -> throw IllegalArgumentException("viewType not found")
         }
     }

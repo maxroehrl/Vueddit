@@ -11,15 +11,12 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.drawable.ProgressBarDrawable
 import com.facebook.drawee.view.SimpleDraweeView
-import de.max.roehrl.vueddit2.MainActivity
 import de.max.roehrl.vueddit2.R
-import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.service.Reddit
@@ -28,9 +25,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-
 open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val TAG = "PostViewHolder"
+    companion object {
+        private const val TAG = "PostViewHolder"
+    }
     private val postHeader: RelativeLayout = itemView.findViewById(R.id.post_header)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val meta: TextView = itemView.findViewById(R.id.meta)
@@ -40,7 +38,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val downvote: TextView = itemView.findViewById(R.id.down)
     protected val progress = ProgressBarDrawable()
     protected lateinit var post: Post
-    open val highlightAuthor = false
+    protected open val highlightAuthor = false
 
     init {
         progress.backgroundColor = 0x30FFFFFF
@@ -53,15 +51,25 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     open fun onClick(view: View) {
-        val viewModel: AppViewModel by (view.context as MainActivity).viewModels()
-        viewModel.selectedPost.value = post
         try {
             view.findNavController().navigate(
-                    PostListFragmentDirections.actionPostListFragmentToPostDetailFragment(post.subreddit, post.name, null),
-                    // null, null, FragmentNavigatorExtras(postHeader to "header")
+                PostListFragmentDirections.actionPostListFragmentToPostDetailFragment(
+                    post.subreddit,
+                    post.name,
+                    null,
+                    post.getJSONString()
+                )
             )
+            // null, null, FragmentNavigatorExtras(postHeader to "header")
         } catch (error: IllegalArgumentException) {
-            view.findNavController().navigate(UserPostListFragmentDirections.actionUserPostListFragmentToPostDetailFragment(post.subreddit, post.name, null))
+            view.findNavController().navigate(
+                UserPostListFragmentDirections.actionUserPostListFragmentToPostDetailFragment(
+                    post.subreddit,
+                    post.name,
+                    null,
+                    post.getJSONString()
+                )
+            )
         }
     }
 

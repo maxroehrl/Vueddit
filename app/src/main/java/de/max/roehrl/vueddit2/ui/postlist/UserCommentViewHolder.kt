@@ -6,7 +6,7 @@ import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Url
 import de.max.roehrl.vueddit2.ui.postdetail.CommentViewHolder
 
-class UserCommentViewHolder(itemView: View) : CommentViewHolder(itemView) {
+class UserCommentViewHolder(itemView: View) : CommentViewHolder(itemView, null) {
     override val showSubreddit = true
 
     override fun onClick() {

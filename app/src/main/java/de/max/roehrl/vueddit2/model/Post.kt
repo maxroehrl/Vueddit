@@ -2,12 +2,25 @@ package de.max.roehrl.vueddit2.model
 
 import android.content.Context
 import android.text.Spanned
+import android.util.Log
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
 import org.json.JSONException
 import org.json.JSONObject
 
-class Post(json: JSONObject) : NamedItem(json.optString("name")) {
+class Post(private val json: JSONObject) : NamedItem(json.optString("name")) {
+    companion object {
+        private const val TAG = "Post"
+
+        fun fromJSONString(json: String): Post? {
+            return try {
+                Post(JSONObject(json))
+            } catch (error: JSONException) {
+                Log.e(TAG, "Failed to parse json string to post: '$json'", error)
+                null
+            }
+        }
+    }
     val name = id
     val title = json.optString("title")
     val permalink = json.optString("permalink")
@@ -55,6 +68,10 @@ class Post(json: JSONObject) : NamedItem(json.optString("name")) {
 
     fun getScore(): String {
         return Reddit.getFormattedScore(score)
+    }
+
+    fun getJSONString(): String {
+        return json.toString()
     }
 
     override fun toString(): String {

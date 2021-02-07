@@ -7,7 +7,7 @@ import androidx.appcompat.view.SupportMenuInflater
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -34,21 +34,18 @@ import de.max.roehrl.vueddit2.ui.listener.RecyclerOnTouchListener
 import kotlinx.coroutines.launch
 import java.util.*
 
-
 open class PostListFragment : Fragment() {
-    private val TAG = "PostListFragment"
-    protected val viewModel: AppViewModel by activityViewModels()
-    private var currentSubreddit: Subreddit? = null
-    protected var toolbar: MaterialToolbar? = null
-    private var collapsingToolbar: CollapsingToolbarLayout? = null
-    protected var sortingTabLayout: TabLayout? = null
+    protected open val viewModel: PostListViewModel by viewModels()
+    protected open lateinit var toolbar: MaterialToolbar
+    protected open lateinit var sortingTabLayout: TabLayout
     protected open val isGroupTabLayoutVisible = false
     protected open val sortings = listOf("best", "hot", "top", "new", "controversial", "rising")
-    private val safeArgs: PostListFragmentArgs by navArgs()
+    protected open var showGotoUser = true
     protected open val layoutId = R.layout.fragment_posts
-    protected open lateinit var sortingLiveData: LiveData<String>
-    protected open lateinit var postsLiveData: LiveData<List<NamedItem>>
-    protected open val showGotoUser = true
+    private val appViewModel: AppViewModel by activityViewModels()
+    private val safeArgs: PostListFragmentArgs by navArgs()
+    private lateinit var collapsingToolbar: CollapsingToolbarLayout
+    private var currentSubreddit: Subreddit? = null
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -69,39 +66,51 @@ open class PostListFragment : Fragment() {
         recyclerView.adapter = postsAdapter
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                onRecyclerViewScrolled(recyclerView, dx, dy, layoutManager)
+                if (!viewModel.isPostListLoading()
+                    && layoutManager.findLastVisibleItemPosition() + 2 == recyclerView.adapter?.itemCount
+                    && dy != 0
+                ) {
+                    viewModel.loadMorePosts()
+                }
             }
         })
-        recyclerView.addOnItemTouchListener(RecyclerOnTouchListener(requireContext(), recyclerView, { view, position ->
-            onItemLongPressed(view, position)
-        }, null))
+        recyclerView.addOnItemTouchListener(
+            RecyclerOnTouchListener(
+                requireContext(),
+                recyclerView,
+                { view, position ->
+                    onItemLongPressed(view, position)
+                },
+                null
+            )
+        )
         val swipeRefreshLayout: SwipeRefreshLayout = root.findViewById(R.id.swipe)
         swipeRefreshLayout.setOnRefreshListener {
             swipeRefreshLayout.post {
                 if (swipeRefreshLayout.isRefreshing) {
-                    onSwipeToRefresh {
+                    viewModel.refreshPosts(false) {
                         swipeRefreshLayout.isRefreshing = false
                     }
                 }
             }
         }
-        viewModel.isBigTemplatePreferred.observe(viewLifecycleOwner) { isBigTemplatePreferred ->
-            if (postsLiveData.value != null) {
+        appViewModel.isBigTemplatePreferred.observe(viewLifecycleOwner) { isBigTemplatePreferred ->
+            if (viewModel.posts.value != null) {
                 postsAdapter.showBigPreview = isBigTemplatePreferred
-                        ?: viewModel.shouldShowBigTemplate(postsLiveData.value!!, currentSubreddit)
+                        ?: appViewModel.shouldShowBigTemplate(viewModel.posts.value!!, currentSubreddit)
                 postsAdapter.notifyItemRangeChanged(0, postsAdapter.itemCount)
             }
         }
         initialize(postsAdapter)
 
         for (sorting in sortings) {
-            sortingTabLayout!!.addTab(sortingTabLayout!!.newTab().setText(sorting))
+            sortingTabLayout.addTab(sortingTabLayout.newTab().setText(sorting))
         }
-        val index = sortings.indexOf(sortingLiveData.value)
+        val index = sortings.indexOf(viewModel.postSorting.value)
         if (index != -1) {
-            sortingTabLayout!!.getTabAt(index)!!.select()
+            sortingTabLayout.getTabAt(index)!!.select()
         }
-        sortingTabLayout!!.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        sortingTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 onSortingSelected(tab?.text.toString())
             }
@@ -113,14 +122,13 @@ open class PostListFragment : Fragment() {
     }
 
     open fun initialize(postsAdapter: PostsAdapter) {
-        sortingLiveData = viewModel.postSorting
-        postsLiveData = viewModel.posts
+        viewModel.selectSubreddit(safeArgs.subredditName)
         viewModel.posts.observe(viewLifecycleOwner, { posts ->
             val oldSize = postsAdapter.posts.size
             val newSize = posts.size
             postsAdapter.posts = posts
             if (postsAdapter.showBigPreview == null && posts.any { item -> item != NamedItem.Loading }) {
-                postsAdapter.showBigPreview = viewModel.shouldShowBigTemplate(posts, currentSubreddit)
+                postsAdapter.showBigPreview = appViewModel.shouldShowBigTemplate(posts, currentSubreddit)
             }
             if (newSize > oldSize) {
                 if (oldSize > 0)
@@ -131,21 +139,26 @@ open class PostListFragment : Fragment() {
             }
             // (view?.parent as? ViewGroup)?.doOnPreDraw { startPostponedEnterTransition() }
         })
-        viewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
+        appViewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
             if (isLoggedIn)
                 viewModel.loadMorePosts()
         }
         viewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
-            toolbar?.title = subreddit?.name ?: Reddit.frontpage
-            if (subreddit != null && subreddit != currentSubreddit && viewModel.isLoggedIn.value == true) {
+            toolbar.title = subreddit?.name ?: Reddit.frontpage
+            if (subreddit != null && subreddit != currentSubreddit && appViewModel.isLoggedIn.value == true) {
                 postsAdapter.highlightStickied = subreddit != Subreddit.frontPage
                 postsAdapter.showBigPreview = null
                 viewModel.refreshPosts(true)
+                if (safeArgs.rootFragment) {
+                    appViewModel.selectSubreddit(subreddit.name, subreddit.isMultiReddit)
+                }
             }
             currentSubreddit = subreddit ?: currentSubreddit
         }
-        if (viewModel.subreddit.value != null && viewModel.subreddit.value!!.name != safeArgs.subredditName) {
-            viewModel.selectSubreddit(safeArgs.subredditName, false)
+        if (safeArgs.rootFragment) {
+            appViewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
+                viewModel.selectSubreddit(subreddit)
+            }
         }
     }
 
@@ -165,21 +178,10 @@ open class PostListFragment : Fragment() {
         }
     }
 
-    open fun onSwipeToRefresh(cb: () -> Unit) {
-        viewModel.refreshPosts(false, cb)
-    }
-
-    open fun onRecyclerViewScrolled(recyclerView: RecyclerView, dx: Int, dy: Int, layoutManager: LinearLayoutManager) {
-        if (!viewModel.isPostListLoading() && layoutManager.findLastVisibleItemPosition() + 2 == recyclerView.adapter?.itemCount && dy != 0) {
-            viewModel.loadMorePosts()
-        }
-    }
-
     open fun onItemLongPressed(view: View, position: Int) {
-        val post = postsLiveData.value?.get(position)
+        val post = viewModel.posts.value?.get(position)
         if (post is Post) {
-            val items = mutableListOf<String>()
-            items.add(view.context.getString(if (post.saved) R.string.unsave else R.string.save))
+            val items = mutableListOf(view.context.getString(if (post.saved) R.string.unsave else R.string.save))
             val showGotoSubreddit = post.subreddit != viewModel.subreddit.value?.name
             if (showGotoSubreddit) {
                 items.add(view.context.getString(R.string.goto_sub, post.subreddit))
@@ -190,19 +192,9 @@ open class PostListFragment : Fragment() {
             MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
                     when (which) {
-                        0 -> {
-                            viewModel.saveOrUnsave(post)
-                        }
-                        1 -> {
-                            if (showGotoSubreddit) {
-                                gotoSubreddit(post.subreddit)
-                            } else {
-                                gotoUser(post.author)
-                            }
-                        }
-                        2 -> {
-                            gotoUser(post.author)
-                        }
+                        0 -> viewModel.saveOrUnsave(post)
+                        1 -> if (showGotoSubreddit) gotoSubreddit(post.subreddit) else gotoUser(post.author)
+                        2 -> gotoUser(post.author)
                     }
                 }
                 show()
@@ -216,7 +208,7 @@ open class PostListFragment : Fragment() {
 
     open fun gotoSubreddit(subredditName: String) {
         val oldSubredditName = viewModel.subreddit.value ?: Subreddit.frontPage
-        viewModel.selectSubreddit(subredditName, false)
+        viewModel.selectSubreddit(subredditName)
         createGoBackSnackBar(oldSubredditName)
     }
 
@@ -235,13 +227,17 @@ open class PostListFragment : Fragment() {
     @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mainActivity = activity as MainActivity
-        val drawerLayout = mainActivity.drawerLayout
         val navController = findNavController()
-        val appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
-        collapsingToolbar!!.setupWithNavController(toolbar!!, navController, appBarConfiguration)
-        onCreateOptionsMenu(toolbar!!.menu, SupportMenuInflater(context))
-        toolbar!!.setOnMenuItemClickListener { onOptionsItemSelected(it) }
+        val topLevelDestinationIds = mutableSetOf<Int>()
+        if (safeArgs.rootFragment)
+            topLevelDestinationIds.add(navController.graph.startDestination)
+        val appBarConfiguration = AppBarConfiguration.Builder(topLevelDestinationIds).apply {
+            if (safeArgs.rootFragment)
+                setOpenableLayout((activity as MainActivity).drawerLayout)
+        }.build()
+        collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
+        onCreateOptionsMenu(toolbar.menu, SupportMenuInflater(context))
+        toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -270,7 +266,7 @@ open class PostListFragment : Fragment() {
                 true
             }
             R.id.action_logout -> {
-                viewModel.logoutUser()
+                appViewModel.logoutUser()
                 true
             }
             R.id.action_user_posts -> {
@@ -282,11 +278,11 @@ open class PostListFragment : Fragment() {
                 true
             }
             R.id.action_toggle_big_preview -> {
-                viewModel.toggleBigPreview(postsLiveData.value!!)
+                appViewModel.toggleBigPreview(viewModel.posts.value!!)
                 true
             }
             R.id.action_remove_visited -> {
-                viewModel.removeSubredditFromVisited(currentSubreddit!!.name)
+                appViewModel.removeSubredditFromVisited(currentSubreddit!!.name)
                 val view = activity?.findViewById<View>(R.id.nav_host_fragment)
                 val text = requireContext().getString(R.string.removed_from_visited, currentSubreddit!!.name)
                 Snackbar.make(view!!, text, 3000).apply {

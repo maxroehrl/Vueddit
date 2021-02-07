@@ -25,7 +25,9 @@ import de.max.roehrl.vueddit2.ui.postlist.PostViewHolder
 
 @SuppressLint("SetJavaScriptEnabled")
 open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
-    private val TAG = "PostHeaderViewHolder"
+    companion object {
+        private const val TAG = "PostHeaderViewHolder"
+    }
     private val selfText: TextView = itemView.findViewById(R.id.self_text)
     private val numComments: TextView = itemView.findViewById(R.id.num_comments)
     private val embeddedWebView: WebView = itemView.findViewById(R.id.embedded_web_view)
