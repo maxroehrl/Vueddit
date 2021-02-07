@@ -14,7 +14,7 @@ class Post(json: JSONObject) : NamedItem(json.optString("name")) {
     val link_flair_text = json.optString("link_flair_text")
     val link_flair_background_color = json.optString("link_flair_background_color")
     val stickied = json.optBoolean("stickied", false)
-    val domain = json.optString("domain")
+    var domain = json.optString("domain")
     val url = json.optString("url")
     val over18 = json.optBoolean("over_18", false)
     val spoiler = json.optBoolean("spoiler", false)
@@ -33,8 +33,7 @@ class Post(json: JSONObject) : NamedItem(json.optString("name")) {
     var score = json.optInt("score", 0)
     var likes: Boolean? = null
     var saved = json.optBoolean("saved", false)
-    val shown_comments = 0
-    val comments = mutableListOf<Comment>()
+    val is_gallery = json.optBoolean("is_gallery", false)
     val preview: Image = Image(json, 300)
     val image: Image = Image(json)
     val video: Video = Video(json)
@@ -44,6 +43,9 @@ class Post(json: JSONObject) : NamedItem(json.optString("name")) {
             json.getBoolean("likes")
         } catch (e: JSONException) {
             null
+        }
+        if (is_gallery) {
+            domain = "reddit/gallery"
         }
     }
 
