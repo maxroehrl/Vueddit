@@ -103,7 +103,7 @@ open class CommentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
             builder.append(" *")
         }
         if (comment.children != null) {
-            builder.append("[+] (")
+            builder.append(" [+] (")
             val num = comment.children?.size ?: 0
             builder.append(header.resources.getQuantityString(R.plurals.num_children, num, num))
             builder.append(") ")
