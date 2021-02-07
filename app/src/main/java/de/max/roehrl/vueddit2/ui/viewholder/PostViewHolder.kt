@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.ui.postlist
+package de.max.roehrl.vueddit2.ui.viewholder
 
 import android.graphics.Color
 import android.text.SpannableString
@@ -21,6 +21,8 @@ import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Util
+import de.max.roehrl.vueddit2.ui.fragment.PostListFragmentDirections
+import de.max.roehrl.vueddit2.ui.fragment.UserPostListFragmentDirections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

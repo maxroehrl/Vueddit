@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.model
+package de.max.roehrl.vueddit2.service
 
 // https://bladecoder.medium.com/kotlin-singletons-with-argument-194ef06edd9e
 open class SingletonHolder<out T: Any, in A>(creator: (A) -> T) {

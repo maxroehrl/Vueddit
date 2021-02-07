@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/postListFragment"
-        android:name="de.max.roehrl.vueddit2.ui.postlist.PostListFragment"
+        android:name="de.max.roehrl.vueddit2.ui.fragment.PostListFragment"
         android:label="@string/posts_list"
         tools:layout="@layout/fragment_posts">
         <argument
@@ -61,7 +61,7 @@
 
     <fragment
         android:id="@+id/userPostListFragment"
-        android:name="de.max.roehrl.vueddit2.ui.postlist.UserPostListFragment"
+        android:name="de.max.roehrl.vueddit2.ui.fragment.UserPostListFragment"
         android:label="@string/user_posts_list"
         tools:layout="@layout/fragment_posts">
         <argument
@@ -101,7 +101,7 @@
 
     <fragment
         android:id="@+id/postDetailFragment"
-        android:name="de.max.roehrl.vueddit2.ui.postdetail.PostDetailFragment"
+        android:name="de.max.roehrl.vueddit2.ui.fragment.PostDetailFragment"
         android:label="Post Title"
         tools:layout="@layout/fragment_post_detail">
         <argument
@@ -143,7 +143,7 @@
 
     <activity
         android:id="@+id/loginActivity"
-        android:name="de.max.roehrl.vueddit2.ui.login.LoginActivity"
+        android:name="de.max.roehrl.vueddit2.ui.activity.LoginActivity"
         android:label="Login"
         tools:layout="@layout/activity_login" />
 </navigation>

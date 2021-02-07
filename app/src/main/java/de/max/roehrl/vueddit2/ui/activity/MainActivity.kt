@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2
+package de.max.roehrl.vueddit2.ui.activity
 
 import android.os.Bundle
 import android.util.Log
@@ -23,14 +23,15 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
-import de.max.roehrl.vueddit2.model.AppViewModel
+import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Subreddit
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Url
+import de.max.roehrl.vueddit2.ui.fragment.PostListFragmentArgs
+import de.max.roehrl.vueddit2.ui.fragment.PostListFragmentDirections
 import de.max.roehrl.vueddit2.ui.listener.RecyclerOnTouchListener
-import de.max.roehrl.vueddit2.ui.postlist.PostListFragmentArgs
-import de.max.roehrl.vueddit2.ui.postlist.PostListFragmentDirections
+import de.max.roehrl.vueddit2.ui.viewmodel.AppViewModel
 
 // https://developer.android.com/guide/navigation/navigation-ui
 class MainActivity : AppCompatActivity() {
@@ -142,7 +143,9 @@ class MainActivity : AppCompatActivity() {
                         val view = findViewById<View>(R.id.nav_host_fragment)
                         val text = if (sub.isSubscribedTo) R.string.unsubscribed else R.string.subscribed
                         Snackbar.make(view!!, text, 3000).apply {
-                            setBackgroundTint(ContextCompat.getColor(context, R.color.snack_bar_background))
+                            setBackgroundTint(ContextCompat.getColor(context,
+                                R.color.snack_bar_background
+                            ))
                             setTextColor(ContextCompat.getColor(context, R.color.snack_bar_text))
                             show()
                         }

@@ -2,15 +2,7 @@ package de.max.roehrl.vueddit2.model
 
 import org.json.JSONObject
 
-enum class VideoType {
-    EMBEDDED,
-    DASH,
-    MP4,
-    NONE,
-}
-
 class Video(json: JSONObject) {
-
     var url: String? = null
     var type: VideoType = VideoType.NONE
     var width: Int = 0

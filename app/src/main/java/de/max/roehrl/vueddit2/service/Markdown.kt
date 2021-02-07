@@ -8,7 +8,6 @@ import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.view.View
 import android.widget.TextView
-import de.max.roehrl.vueddit2.model.SingletonHolder
 import io.noties.markwon.*
 import io.noties.markwon.core.CorePlugin
 import java.util.regex.Pattern

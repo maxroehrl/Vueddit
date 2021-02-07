@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.ui.postdetail
+package de.max.roehrl.vueddit2.ui.viewholder
 
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -20,7 +20,6 @@ import de.max.roehrl.vueddit2.model.VideoType
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Url
 import de.max.roehrl.vueddit2.service.Util
-import de.max.roehrl.vueddit2.ui.postlist.PostViewHolder
 
 
 @SuppressLint("SetJavaScriptEnabled")

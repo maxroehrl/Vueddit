@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.ui.postlist
+package de.max.roehrl.vueddit2.ui.fragment
 
 import android.os.Bundle
 import android.view.*
@@ -12,6 +12,8 @@ import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.service.Store
+import de.max.roehrl.vueddit2.ui.adapter.PostsAdapter
+import de.max.roehrl.vueddit2.ui.viewmodel.UserPostListViewModel
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -68,7 +70,7 @@ class UserPostListFragment : PostListFragment() {
         }
         viewModel.selectedUser.observe(viewLifecycleOwner) { userName ->
             if (userName != null && userName != "") {
-                toolbar?.title = "/u/${userName}"
+                toolbar.title = "/u/${userName}"
                 if (userName != currentUser) {
                     viewModel.refreshPosts()
                 }
@@ -78,9 +80,9 @@ class UserPostListFragment : PostListFragment() {
         viewModel.userPostGroup.observe(viewLifecycleOwner) { group ->
             if (group != currentGroup) {
                 if (listOf("overview", "submitted", "comments").contains(group)) {
-                    sortingTabLayout?.visibility = View.VISIBLE
+                    sortingTabLayout.visibility = View.VISIBLE
                 } else {
-                    sortingTabLayout?.visibility = View.GONE
+                    sortingTabLayout.visibility = View.GONE
                     viewModel.setPostSorting("new")
                 }
                 if (group == "saved") {
@@ -121,11 +123,19 @@ class UserPostListFragment : PostListFragment() {
     }
 
     override fun gotoUser(userName: String) {
-        findNavController().navigate(UserPostListFragmentDirections.actionUserPostListFragmentToUserPostListFragment(userName))
+        findNavController().navigate(
+            UserPostListFragmentDirections.actionUserPostListFragmentToUserPostListFragment(
+                userName
+            )
+        )
     }
 
     override fun gotoSubreddit(subredditName: String) {
-        findNavController().navigate(UserPostListFragmentDirections.actionUserPostListFragmentToPostListFragment(subredditName))
+        findNavController().navigate(
+            UserPostListFragmentDirections.actionUserPostListFragmentToPostListFragment(
+                subredditName
+            )
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

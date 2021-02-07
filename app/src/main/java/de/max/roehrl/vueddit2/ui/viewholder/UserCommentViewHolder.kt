@@ -1,10 +1,9 @@
-package de.max.roehrl.vueddit2.ui.postlist
+package de.max.roehrl.vueddit2.ui.viewholder
 
 import android.view.View
 import androidx.navigation.findNavController
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Url
-import de.max.roehrl.vueddit2.ui.postdetail.CommentViewHolder
 
 class UserCommentViewHolder(itemView: View) : CommentViewHolder(itemView, null) {
     override val showSubreddit = true

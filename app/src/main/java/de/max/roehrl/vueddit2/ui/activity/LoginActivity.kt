@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.ui.login
+package de.max.roehrl.vueddit2.ui.activity
 
 import android.net.Uri
 import android.os.Bundle
@@ -12,8 +12,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import de.max.roehrl.vueddit2.R
-import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.service.Reddit
+import de.max.roehrl.vueddit2.ui.viewmodel.AppViewModel
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {

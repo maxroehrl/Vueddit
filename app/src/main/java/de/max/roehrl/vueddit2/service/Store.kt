@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.createDataStore
-import de.max.roehrl.vueddit2.model.SingletonHolder
 import de.max.roehrl.vueddit2.model.Subreddit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

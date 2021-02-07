@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.ui.postdetail
+package de.max.roehrl.vueddit2.ui.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -21,11 +21,37 @@ import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
+import de.max.roehrl.vueddit2.ui.adapter.CommentsAdapter
 import de.max.roehrl.vueddit2.ui.dialog.Sidebar
+import de.max.roehrl.vueddit2.ui.viewholder.PostHeaderViewHolder
+import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
 
 class PostDetailFragment : Fragment() {
     companion object {
         private const val TAG = "PostDetailFragment"
+
+        private class CommentsDiffCallback(private val oldList: List<NamedItem>,
+                                           private val newList: List<NamedItem>) :
+                DiffUtil.Callback() {
+            override fun getOldListSize(): Int = oldList.size
+
+            override fun getNewListSize(): Int = newList.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return oldList[oldItemPosition].id == newList[newItemPosition].id
+            }
+
+            override fun areContentsTheSame(oldPosition: Int, newPosition: Int): Boolean {
+                val item1 = oldList[oldPosition]
+                val item2 = newList[newPosition]
+
+                return if (item1 is Comment && item2 is Comment) {
+                    item1.isLoading == item2.isLoading && item1.isCollapsed() == item2.isCollapsed()
+                } else {
+                    true
+                }
+            }
+        }
     }
     private lateinit var toolbar: MaterialToolbar
     private lateinit var collapsingToolbar: CollapsingToolbarLayout

@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.ui.postlist
+package de.max.roehrl.vueddit2.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +8,10 @@ import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
-import de.max.roehrl.vueddit2.ui.postdetail.CommentViewHolder
+import de.max.roehrl.vueddit2.ui.viewholder.CommentViewHolder
+import de.max.roehrl.vueddit2.ui.viewholder.PostBigViewHolder
+import de.max.roehrl.vueddit2.ui.viewholder.PostViewHolder
+import de.max.roehrl.vueddit2.ui.viewholder.UserCommentViewHolder
 
 class PostsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private inner class ProgressViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

@@ -1,10 +1,12 @@
-package de.max.roehrl.vueddit2.ui.postdetail
+package de.max.roehrl.vueddit2.ui.viewholder
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
+import de.max.roehrl.vueddit2.ui.adapter.CommentsAdapter
 import de.max.roehrl.vueddit2.ui.view.IndentedLabel
+import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
 
 class MoreCommentsViewHolder(
     itemView: View,

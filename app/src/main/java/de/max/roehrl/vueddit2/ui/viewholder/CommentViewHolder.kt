@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.ui.postdetail
+package de.max.roehrl.vueddit2.ui.viewholder
 
 import android.graphics.Color
 import android.text.SpannableString
@@ -20,7 +20,9 @@ import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Util
+import de.max.roehrl.vueddit2.ui.fragment.PostDetailFragmentDirections
 import de.max.roehrl.vueddit2.ui.view.IndentedLabel
+import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -208,7 +210,11 @@ open class CommentViewHolder(itemView: View, private val viewModel: PostDetailVi
                         viewModel?.saveOrUnsave(comment)
                     }
                     1 -> {
-                        more.findNavController().navigate(PostDetailFragmentDirections.actionPostDetailFragmentToUserPostListFragment(comment.author))
+                        more.findNavController().navigate(
+                            PostDetailFragmentDirections.actionPostDetailFragmentToUserPostListFragment(
+                                comment.author
+                            )
+                        )
                     }
                 }
             }

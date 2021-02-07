@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.ui.postlist
+package de.max.roehrl.vueddit2.ui.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -21,16 +21,18 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
-import de.max.roehrl.vueddit2.MainActivity
 import de.max.roehrl.vueddit2.R
-import de.max.roehrl.vueddit2.model.AppViewModel
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.model.Subreddit
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Store
+import de.max.roehrl.vueddit2.ui.activity.MainActivity
+import de.max.roehrl.vueddit2.ui.adapter.PostsAdapter
 import de.max.roehrl.vueddit2.ui.dialog.Sidebar
 import de.max.roehrl.vueddit2.ui.listener.RecyclerOnTouchListener
+import de.max.roehrl.vueddit2.ui.viewmodel.AppViewModel
+import de.max.roehrl.vueddit2.ui.viewmodel.PostListViewModel
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -203,7 +205,11 @@ open class PostListFragment : Fragment() {
     }
 
     open fun gotoUser(userName: String) {
-        findNavController().navigate(PostListFragmentDirections.actionPostListFragmentToUserPostListFragment(userName))
+        findNavController().navigate(
+            PostListFragmentDirections.actionPostListFragmentToUserPostListFragment(
+                userName
+            )
+        )
     }
 
     open fun gotoSubreddit(subredditName: String) {
@@ -272,7 +278,10 @@ open class PostListFragment : Fragment() {
             R.id.action_user_posts -> {
                 viewModel.viewModelScope.launch {
                     val userName = Store.getInstance(requireContext()).getUsername()
-                    val action = PostListFragmentDirections.actionPostListFragmentToUserPostListFragment(userName!!)
+                    val action =
+                        PostListFragmentDirections.actionPostListFragmentToUserPostListFragment(
+                            userName!!
+                        )
                     findNavController().navigate(action)
                 }
                 true

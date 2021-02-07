@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.ui.postlist
+package de.max.roehrl.vueddit2.ui.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*

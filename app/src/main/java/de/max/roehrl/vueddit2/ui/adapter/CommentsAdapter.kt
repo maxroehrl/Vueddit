@@ -1,4 +1,4 @@
-package de.max.roehrl.vueddit2.ui.postdetail
+package de.max.roehrl.vueddit2.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +9,11 @@ import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
+import de.max.roehrl.vueddit2.ui.viewholder.CommentViewHolder
+import de.max.roehrl.vueddit2.ui.viewholder.MoreCommentsViewHolder
+import de.max.roehrl.vueddit2.ui.viewholder.PostBigHeaderViewHolder
+import de.max.roehrl.vueddit2.ui.viewholder.PostHeaderViewHolder
+import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
 
 class CommentsAdapter(private val viewModel: PostDetailViewModel) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -79,10 +84,10 @@ class CommentsAdapter(private val viewModel: PostDetailViewModel) :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is PostHeaderViewHolder   -> holder.bind(post!!)
+            is PostHeaderViewHolder -> holder.bind(post!!)
             is MoreCommentsViewHolder -> holder.bind(comments[position - 1] as Comment)
-            is CommentViewHolder      -> holder.bind(comments[position - 1] as Comment, selectedComment == comments[position - 1])
-            is ProgressViewHolder     -> holder.bind(if (position > 0) comments[position - 1] else null)
+            is CommentViewHolder -> holder.bind(comments[position - 1] as Comment, selectedComment == comments[position - 1])
+            is ProgressViewHolder -> holder.bind(if (position > 0) comments[position - 1] else null)
         }
     }
 

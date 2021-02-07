@@ -1,8 +1,11 @@
-package de.max.roehrl.vueddit2.model
+package de.max.roehrl.vueddit2.ui.viewmodel
 
 import android.app.Application
 import android.webkit.CookieManager
 import androidx.lifecycle.*
+import de.max.roehrl.vueddit2.model.NamedItem
+import de.max.roehrl.vueddit2.model.Post
+import de.max.roehrl.vueddit2.model.Subreddit
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Store
 import kotlinx.coroutines.Dispatchers
@@ -119,7 +122,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private fun updateAllSubredditsList() {
         viewModelScope.launch(Dispatchers.Main) {
             (subreddits as MutableLiveData).value = listOfNotNull(
-                    Subreddit.defaultSubreddits,
+                Subreddit.defaultSubreddits,
                     subscribedSubreddits.value,
                     visitedSubreddits.value,
                     multiReddits.value,
