@@ -27,5 +27,7 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
-        name: App
-        path: ${{ github.workspace }}/app/build/outputs/apk/debug/app-debug.apk
+        name: Vueddit2
+        path: |
+          ${{ github.workspace }}/app/build/outputs/apk/debug/app-debug.apk
+          ${{ github.workspace }}/app/build/outputs/apk/release/app-release.apk
