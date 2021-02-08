@@ -124,7 +124,9 @@ open class PostListFragment : Fragment() {
     }
 
     open fun initialize(postsAdapter: PostsAdapter) {
-        viewModel.selectSubreddit(safeArgs.subredditName)
+        if (currentSubreddit == null) {
+            viewModel.selectSubreddit(safeArgs.subredditName)
+        }
         viewModel.posts.observe(viewLifecycleOwner, { posts ->
             val oldSize = postsAdapter.posts.size
             val newSize = posts.size
