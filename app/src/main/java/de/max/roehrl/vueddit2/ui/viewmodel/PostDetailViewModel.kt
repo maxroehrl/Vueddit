@@ -16,7 +16,7 @@ class PostDetailViewModel(application: Application) : AndroidViewModel(applicati
         private const val defaultSorting = "top"
     }
 
-    val selectedPost = MutableLiveData<Post>()
+    val selectedPost: LiveData<Post> = liveData { }
 
     val selectedComment: LiveData<Comment?> = liveData { }
 
@@ -45,7 +45,7 @@ class PostDetailViewModel(application: Application) : AndroidViewModel(applicati
                 permalink += "/$commentName"
             }
             val pair = Reddit.getPostAndComments(permalink, sorting)
-            selectedPost.postValue(pair.first)
+            (selectedPost as MutableLiveData).postValue(pair.first)
             (comments as MutableLiveData).postValue(pair.second.toMutableList())
             cb?.invoke()
         }
@@ -56,12 +56,16 @@ class PostDetailViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun refreshComments(cb: (() -> Unit)? = null) {
-        resetComments()
+        (comments as MutableLiveData).value = mutableListOf(NamedItem.Loading)
         loadComments(null, cb)
     }
 
-    fun resetComments() {
-        (comments as MutableLiveData).value = mutableListOf(NamedItem.Loading)
+    fun setCommentSorting(sorting: String) {
+        (commentSorting as MutableLiveData).value = sorting
+    }
+
+    fun setSelectedPost(post: Post) {
+        (selectedPost as MutableLiveData).value = post
     }
 
     fun loadMoreComments(comment: Comment) {

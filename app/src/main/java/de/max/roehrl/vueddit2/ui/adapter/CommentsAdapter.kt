@@ -53,8 +53,8 @@ class CommentsAdapter(private val viewModel: PostDetailViewModel) :
             VIEW_TYPE_PROGRESS_BIG -> ProgressViewHolder(inflate(parent, R.layout.loading_item))
             VIEW_TYPE_PROGRESS     -> ProgressViewHolder(inflate(parent, R.layout.loading_item_small))
             VIEW_TYPE_COMMENT      -> CommentViewHolder(inflate(parent, R.layout.comment_item), viewModel)
-            VIEW_TYPE_HEADER       -> PostHeaderViewHolder(inflate(parent, R.layout.post_detail_header))
-            VIEW_TYPE_HEADER_BIG   -> PostBigHeaderViewHolder(inflate(parent, R.layout.post_detail_header_big))
+            VIEW_TYPE_HEADER       -> PostHeaderViewHolder(inflate(parent, R.layout.post_detail_header), viewModel)
+            VIEW_TYPE_HEADER_BIG   -> PostBigHeaderViewHolder(inflate(parent, R.layout.post_detail_header_big), viewModel)
             VIEW_TYPE_MORE         -> MoreCommentsViewHolder(inflate(parent, R.layout.more_comments_item), this, viewModel)
             else                   -> throw IllegalArgumentException("viewType not found")
         }

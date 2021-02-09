@@ -13,6 +13,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.material.tabs.TabLayout
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
@@ -20,10 +21,12 @@ import de.max.roehrl.vueddit2.model.VideoType
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Url
 import de.max.roehrl.vueddit2.service.Util
+import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
 
 
 @SuppressLint("SetJavaScriptEnabled")
-open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
+open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetailViewModel) :
+    PostViewHolder(itemView) {
     companion object {
         private const val TAG = "PostHeaderViewHolder"
     }
@@ -32,6 +35,8 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
     private val embeddedWebView: WebView = itemView.findViewById(R.id.embedded_web_view)
     private val videoView: PlayerView = itemView.findViewById(R.id.video_view)
     private val videoPreviewLayout: LinearLayout = itemView.findViewById(R.id.video_preview_layout)
+    private val sortingTabLayout: TabLayout = itemView.findViewById(R.id.tab_layout)
+    private val sortings = listOf("top", "new", "controversial", "old", "random", "qa")
     override val highlightAuthor = true
 
     private inner class Client : WebViewClient() {
@@ -94,6 +99,24 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
             controllerHideOnTouch = true
             hideController()
         }
+        for (sorting in sortings) {
+            sortingTabLayout.addTab(sortingTabLayout.newTab().setText(sorting))
+        }
+        val index = sortings.indexOf(viewModel.commentSorting.value)
+        if (index != -1) {
+            sortingTabLayout.getTabAt(index)!!.select()
+        }
+        sortingTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                onSortingSelected(tab?.text.toString())
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                onTabSelected(tab)
+            }
+        })
     }
 
     fun onStop() {
@@ -148,6 +171,11 @@ open class PostHeaderViewHolder(itemView: View) : PostViewHolder(itemView) {
                 }
             }
         }
+    }
+
+    private fun onSortingSelected(sorting: String) {
+        viewModel.setCommentSorting(sorting)
+        viewModel.refreshComments()
     }
 
     /*private fun addTransitionSupport() {
