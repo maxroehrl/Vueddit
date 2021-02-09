@@ -1,5 +1,6 @@
 package de.max.roehrl.vueddit2.ui.activity
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -7,9 +8,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.addCallback
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Reddit
@@ -19,11 +18,6 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "LoginActivity"
-    }
-    private val viewModel: AppViewModel by viewModels()
-
-    private val onBackCallback = onBackPressedDispatcher.addCallback(this) {
-        finishAffinity()
     }
 
     private inner class Client : WebViewClient() {
@@ -37,9 +31,10 @@ class LoginActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     val success = Reddit.onAuthorizationSuccessful(uri)
                     if (success) {
-                        onBackCallback.isEnabled = false
-                        (viewModel.isLoggedIn as MutableLiveData).postValue(true)
-                        onBackPressed()
+                        val intent = Intent(applicationContext, MainActivity::class.java)
+                        intent.putExtra(AppViewModel.WAS_LOGGED_IN, true)
+                        startActivity(intent)
+                        finish()
                     } else {
                         webView?.goBack()
                     }
@@ -58,6 +53,10 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        onBackPressedDispatcher.addCallback(this) {
+            finishAffinity()
+        }
 
         val webView: WebView = findViewById(R.id.web_view)
         webView.webViewClient = Client()

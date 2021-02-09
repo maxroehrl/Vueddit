@@ -17,6 +17,7 @@ import kotlin.math.min
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
         private const val TAG = "AppViewModel"
+        const val WAS_LOGGED_IN = "wasLoggedIn"
     }
 
     val isLoggedIn: LiveData<Boolean> = liveData(Dispatchers.IO) {

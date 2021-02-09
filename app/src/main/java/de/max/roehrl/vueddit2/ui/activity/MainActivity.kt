@@ -15,6 +15,7 @@ import androidx.core.view.forEach
 import androidx.core.view.get
 import androidx.core.widget.doOnTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
@@ -40,8 +41,8 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
     }
     lateinit var drawerLayout: DrawerLayout
-    lateinit var navView: NavigationView
-    lateinit var navController: NavController
+    private lateinit var navView: NavigationView
+    private lateinit var navController: NavController
     private val viewModel: AppViewModel by viewModels()
     private val multiReddits = mutableListOf<MenuItem>()
     private var searchTextLength: Int = 0
@@ -60,6 +61,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.loadSubscriptions()
             } else {
                 navController.navigate(PostListFragmentDirections.actionPostListFragmentToLoginActivity())
+                finish()
             }
         }
         viewModel.subreddit.observe(this) { subreddit ->
@@ -122,6 +124,9 @@ class MainActivity : AppCompatActivity() {
                 }
             )
         )
+        if (savedInstanceState?.getBoolean(AppViewModel.WAS_LOGGED_IN, false) == true) {
+            (viewModel.isLoggedIn as MutableLiveData).value = true
+        }
     }
 
     private fun onNavItemClicked(item: MenuItem) {
