@@ -81,7 +81,7 @@ class UserPostListFragment : PostListFragment() {
             }
         }
         viewModel.userPostGroup.observe(viewLifecycleOwner) { group ->
-            if (group != currentGroup) {
+            if (group != currentGroup || group == "saved") {
                 if (listOf("overview", "submitted", "comments").contains(group)) {
                     sortingTabLayout.visibility = View.VISIBLE
                 } else {
