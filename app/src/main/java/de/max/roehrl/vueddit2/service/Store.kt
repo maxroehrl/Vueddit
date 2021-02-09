@@ -148,7 +148,8 @@ class Store private constructor(context: Context) {
     }
 
     suspend fun logoutUser() {
-        updateTokens("", 0, "")
-        updateUserName("")
+        preferenceDataStore.edit { preferences ->
+            preferences.clear()
+        }
     }
 }

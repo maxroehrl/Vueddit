@@ -52,9 +52,12 @@ object Reddit {
     @Volatile private var validUntil: Long? = null
 
     suspend fun login(context: Context): Boolean {
+        authToken = ""
+        refreshToken = null
+        validUntil = null
         store = Store.getInstance(context)
         val token = store.getAuthToken()
-        if (token != null) {
+        if (token != null && token != "") {
             authToken = token
             refreshToken = store.getRefreshToken()
             validUntil = store.getValidUntil()

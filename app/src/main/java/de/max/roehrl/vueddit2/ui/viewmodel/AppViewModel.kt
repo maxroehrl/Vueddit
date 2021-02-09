@@ -210,7 +210,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             Store.getInstance(getApplication()).logoutUser()
             (username as MutableLiveData).postValue(null)
-            Reddit.login(getApplication())
+            (isLoggedIn as MutableLiveData).postValue(Reddit.login(getApplication()))
         }
     }
 
