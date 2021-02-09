@@ -110,22 +110,6 @@ class UserPostListFragment : PostListFragment() {
         viewModel.setUserPostGroup(group)
     }
 
-    override fun onSortingSelected(sorting: String) {
-        viewModel.setPostSorting(sorting)
-        if (listOf("top", "rising").contains(sorting)) {
-            val items = listOf("Hour", "Day", "Week", "Month", "Year", "All")
-            MaterialAlertDialogBuilder(requireContext()).apply {
-                setItems(items.toTypedArray()) { _, which ->
-                    val time = items[which].toLowerCase(Locale.getDefault())
-                    viewModel.setTopPostsTime(time)
-                    viewModel.refreshPosts()
-                }
-            }.show()
-        } else {
-            viewModel.refreshPosts()
-        }
-    }
-
     override fun gotoUser(userName: String) {
         findNavController().navigate(
             UserPostListFragmentDirections.actionUserPostListFragmentToUserPostListFragment(
