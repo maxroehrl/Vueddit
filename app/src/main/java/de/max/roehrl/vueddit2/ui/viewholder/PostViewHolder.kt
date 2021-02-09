@@ -7,7 +7,6 @@ import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.util.Log
-import android.util.TypedValue
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -74,8 +73,6 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             )
         }
     }
-
-    fun Int.toDips() = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, toFloat(), postHeader.resources.displayMetrics).toInt()
 
     open fun bind(post: NamedItem, highlightSticky: Boolean = true) {
         this.post = post as Post
