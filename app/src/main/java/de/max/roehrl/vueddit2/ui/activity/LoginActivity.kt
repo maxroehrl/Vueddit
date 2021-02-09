@@ -23,7 +23,7 @@ class LoginActivity : AppCompatActivity() {
     private val viewModel: AppViewModel by viewModels()
 
     private val onBackCallback = onBackPressedDispatcher.addCallback(this) {
-        Log.d(TAG, "On back pressed")
+        finishAffinity()
     }
 
     private inner class Client : WebViewClient() {
