@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 AlertDialog.Builder(ContextThemeWrapper(this, R.style.Theme_Vueddit2_Dialog_Alert)).apply {
                     setMessage(context.getString(if (sub.isSubscribedTo) R.string.unsubscribe_confirm else R.string.subscribe_confirm, sub.name))
-                    setPositiveButton(R.string.yes) { dialog, _ ->
+                    setPositiveButton(android.R.string.ok) { dialog, _ ->
                         viewModel.subscribeToSubreddit(sub)
                         dialog.dismiss()
                         val view = findViewById<View>(R.id.nav_host_fragment)
@@ -158,7 +158,7 @@ class MainActivity : AppCompatActivity() {
                             show()
                         }
                     }
-                    setNegativeButton(R.string.no, null)
+                    setNegativeButton(android.R.string.cancel, null)
                 }.show()
             }
         }
