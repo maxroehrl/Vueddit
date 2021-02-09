@@ -134,7 +134,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             Reddit.subscribe(subreddit.name, subreddit.isSubscribedTo)
             subreddit.isSubscribedTo = !subreddit.isSubscribedTo
             updateSubscribedSubreddit(subreddit, null)
-            removeSubredditFromVisited(subreddit.name)
+            if (subreddit.isSubscribedTo) {
+                removeSubredditFromVisited(subreddit.name)
+            } else {
+                addToVisitedSubreddits(subreddit)
+            }
         }
     }
 

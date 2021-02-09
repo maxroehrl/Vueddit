@@ -20,6 +20,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -101,19 +102,26 @@ class MainActivity : AppCompatActivity() {
         }
         navView.setNavigationItemSelectedListener { true }
         val recyclerView = navView[0] as RecyclerView
-        recyclerView.addOnItemTouchListener(RecyclerOnTouchListener(this, recyclerView, null) { view, _, e ->
-            val tv = (view as ViewGroup).getChildAt(0)
-            if (tv is TextView) {
-                val outLocation = IntArray(2)
-                tv.getLocationOnScreen(outLocation)
-                val item = (view as MenuView.ItemView).itemData
-                if (e.rawX <= outLocation[0] + tv.totalPaddingLeft) {
-                    onNavItemIconClicked(item)
-                } else {
-                    onNavItemClicked(item)
+        recyclerView.addOnItemTouchListener(
+            RecyclerOnTouchListener(this, recyclerView,
+                { view, _ ->
+                    onNavItemLongPressed((view as MenuView.ItemView).itemData)
+                },
+                { view, _, e ->
+                    val tv = (view as ViewGroup).getChildAt(0)
+                    if (tv is TextView) {
+                        val outLocation = IntArray(2)
+                        tv.getLocationOnScreen(outLocation)
+                        val item = (view as MenuView.ItemView).itemData
+                        if (e.rawX <= outLocation[0] + tv.totalPaddingLeft) {
+                            onNavItemIconClicked(item)
+                        } else {
+                            onNavItemClicked(item)
+                        }
+                    }
                 }
-            }
-        })
+            )
+        )
     }
 
     private fun onNavItemClicked(item: MenuItem) {
@@ -136,7 +144,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 AlertDialog.Builder(ContextThemeWrapper(this, R.style.Theme_Vueddit2_Dialog_Alert)).apply {
-                    setMessage(context.getString(if (sub.isSubscribedTo) R.string.unsubscribe else R.string.subscribe, sub.name))
+                    setMessage(context.getString(if (sub.isSubscribedTo) R.string.unsubscribe_confirm else R.string.subscribe_confirm, sub.name))
                     setPositiveButton(R.string.yes) { dialog, _ ->
                         viewModel.subscribeToSubreddit(sub)
                         dialog.dismiss()
@@ -152,6 +160,22 @@ class MainActivity : AppCompatActivity() {
                     }
                     setNegativeButton(R.string.no, null)
                 }.show()
+            }
+        }
+    }
+
+    private fun onNavItemLongPressed(item: MenuItem) {
+        val sub = viewModel.subreddits.value?.flatten()?.find {
+            it.name == item.title && !it.isMultiReddit && !Subreddit.defaultSubreddits.contains(it)
+        }
+        if (sub?.isSubscribedTo == true) {
+            MaterialAlertDialogBuilder(this).apply {
+                setItems(listOf(getString(R.string.unsubscribe, sub.name)).toTypedArray()) { _, which ->
+                    when (which) {
+                        0 -> viewModel.subscribeToSubreddit(sub)
+                    }
+                }
+                show()
             }
         }
     }
