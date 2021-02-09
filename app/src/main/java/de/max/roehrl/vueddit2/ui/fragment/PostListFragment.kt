@@ -41,7 +41,6 @@ open class PostListFragment : Fragment() {
     protected open lateinit var toolbar: MaterialToolbar
     protected open lateinit var sortingTabLayout: TabLayout
     protected open val isGroupTabLayoutVisible = false
-    protected open val sortings = listOf("best", "hot", "top", "new", "controversial", "rising")
     protected open var showGotoUser = true
     protected open val layoutId = R.layout.fragment_posts
     private val appViewModel: AppViewModel by activityViewModels()
@@ -105,10 +104,10 @@ open class PostListFragment : Fragment() {
         }
         initialize(postsAdapter)
 
-        for (sorting in sortings) {
+        for (sorting in viewModel.sortingList) {
             sortingTabLayout.addTab(sortingTabLayout.newTab().setText(sorting))
         }
-        val index = sortings.indexOf(viewModel.postSorting.value)
+        val index = viewModel.sortingList.indexOf(viewModel.postSorting.value)
         if (index != -1) {
             sortingTabLayout.getTabAt(index)!!.select()
         }

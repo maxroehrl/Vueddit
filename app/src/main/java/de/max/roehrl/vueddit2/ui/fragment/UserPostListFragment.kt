@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class UserPostListFragment : PostListFragment() {
-    override val sortings = listOf("new", "top", "hot", "controversial")
     override val viewModel: UserPostListViewModel by viewModels()
     override val layoutId = R.layout.fragment_user_posts
     override val isGroupTabLayoutVisible = true

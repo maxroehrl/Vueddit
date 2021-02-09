@@ -12,6 +12,7 @@ class UserPostListViewModel(application: Application) : PostListViewModel(applic
         private const val defaultGroup = "overview"
         private const val defaultType = "all"
     }
+    override val sortingList = listOf("new", "top", "hot", "controversial")
     override val defaultSorting = "new"
 
     val selectedUser: LiveData<String> = liveData {}
