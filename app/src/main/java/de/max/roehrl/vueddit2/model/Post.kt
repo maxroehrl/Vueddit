@@ -5,6 +5,9 @@ import android.text.Spanned
 import android.util.Log
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -84,5 +87,12 @@ class Post(private val json: JSONObject) : NamedItem(json.optString("name")) {
 
     override fun hashCode(): Int {
         return name.hashCode()
+    }
+
+    fun saveOrUnsave() {
+        GlobalScope.launch(Dispatchers.IO) {
+            Reddit.saveOrUnsave(saved, name)
+            saved = !saved
+        }
     }
 }

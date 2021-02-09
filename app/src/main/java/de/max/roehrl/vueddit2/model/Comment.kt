@@ -4,6 +4,9 @@ import android.content.Context
 import android.text.Spanned
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -70,5 +73,12 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
 
     fun isCollapsed(): Boolean {
         return children != null
+    }
+
+    fun saveOrUnsave() {
+        GlobalScope.launch(Dispatchers.IO) {
+            Reddit.saveOrUnsave(saved, name)
+            saved = !saved
+        }
     }
 }

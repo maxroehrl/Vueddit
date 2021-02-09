@@ -207,7 +207,7 @@ open class CommentViewHolder(itemView: View, private val viewModel: PostDetailVi
             setItems(items.toTypedArray()) { _, which ->
                 when (which) {
                     0 -> {
-                        viewModel?.saveOrUnsave(comment)
+                        comment.saveOrUnsave()
                     }
                     1 -> {
                         more.findNavController().navigate(

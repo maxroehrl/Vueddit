@@ -3,7 +3,6 @@ package de.max.roehrl.vueddit2.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.*
 import de.max.roehrl.vueddit2.model.NamedItem
-import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.model.Subreddit
 import de.max.roehrl.vueddit2.service.Reddit
 import kotlinx.coroutines.Dispatchers
@@ -86,12 +85,5 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
 
     fun setTopPostsTime(time : String) {
         (topPostsTime as MutableLiveData).value = time
-    }
-
-    fun saveOrUnsave(post: Post) {
-        viewModelScope.launch(Dispatchers.IO) {
-            Reddit.saveOrUnsave(post.saved, post.name)
-            post.saved = !post.saved
-        }
     }
 }

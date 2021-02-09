@@ -129,11 +129,4 @@ class PostDetailViewModel(application: Application) : AndroidViewModel(applicati
             selectComment(newlySelectedComment as Comment)
         }
     }
-
-    fun saveOrUnsave(comment: Comment) {
-        viewModelScope.launch(Dispatchers.IO) {
-            Reddit.saveOrUnsave(comment.saved, comment.name)
-            comment.saved = !comment.saved
-        }
-    }
 }

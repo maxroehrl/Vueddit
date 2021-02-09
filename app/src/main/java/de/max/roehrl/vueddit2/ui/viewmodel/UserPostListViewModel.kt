@@ -4,12 +4,8 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
-import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.service.Reddit
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class UserPostListViewModel(application: Application) : PostListViewModel(application) {
     companion object {
@@ -45,12 +41,5 @@ class UserPostListViewModel(application: Application) : PostListViewModel(applic
         val group = userPostGroup.value ?: defaultGroup
         val type = selectedType.value ?: defaultType
         return Reddit.getUserPosts(userName, after, sorting, group, time, type)
-    }
-
-    fun saveOrUnsave(comment: Comment) {
-        viewModelScope.launch(Dispatchers.IO) {
-            Reddit.saveOrUnsave(comment.saved, comment.name)
-            comment.saved = !comment.saved
-        }
     }
 }

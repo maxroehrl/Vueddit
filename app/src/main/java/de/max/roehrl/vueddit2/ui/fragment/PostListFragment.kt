@@ -200,7 +200,7 @@ open class PostListFragment : Fragment() {
             MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
                     when (which) {
-                        0 -> viewModel.saveOrUnsave(post)
+                        0 -> post.saveOrUnsave()
                         1 -> if (showGotoSubreddit) gotoSubreddit(post.subreddit) else gotoUser(post.author)
                         2 -> gotoUser(post.author)
                     }
