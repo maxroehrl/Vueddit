@@ -224,18 +224,6 @@ open class PostListFragment : Fragment() {
         createGoBackSnackBar(oldSubredditName)
     }
 
-    private fun createGoBackSnackBar(goBackToSubreddit: Subreddit) {
-        val view = activity?.findViewById<View>(R.id.nav_host_fragment)
-        Snackbar.make(view!!, "", 8000).apply {
-            setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
-            setActionTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
-            setAction(requireContext().getString(R.string.go_back_to, goBackToSubreddit.name)) {
-                gotoSubreddit(goBackToSubreddit.name)
-            }
-            show()
-        }
-    }
-
     @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -254,7 +242,6 @@ open class PostListFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.post_list, menu)
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -264,17 +251,7 @@ open class PostListFragment : Fragment() {
                 true
             }
             R.id.action_sidebar -> {
-                if (currentSubreddit != null && currentSubreddit != Subreddit.frontPage && !currentSubreddit!!.isMultiReddit) {
-                    Sidebar(requireContext(), currentSubreddit!!.name, viewModel.viewModelScope).show()
-                } else {
-                    val view = activity?.findViewById<View>(R.id.nav_host_fragment)
-                    val text = requireContext().getString(R.string.no_sidebar)
-                    Snackbar.make(view!!, text, 3000).apply {
-                        setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
-                        setTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
-                        show()
-                    }
-                }
+                showSidebar()
                 true
             }
             R.id.action_logout -> {
@@ -282,14 +259,7 @@ open class PostListFragment : Fragment() {
                 true
             }
             R.id.action_user_posts -> {
-                viewModel.viewModelScope.launch {
-                    val userName = Store.getInstance(requireContext()).getUsername()
-                    val action =
-                        PostListFragmentDirections.actionPostListFragmentToUserPostListFragment(
-                            userName!!
-                        )
-                    findNavController().navigate(action)
-                }
+                gotoLoggedInUserPosts()
                 true
             }
             R.id.action_toggle_big_preview -> {
@@ -297,17 +267,58 @@ open class PostListFragment : Fragment() {
                 true
             }
             R.id.action_remove_visited -> {
-                appViewModel.removeSubredditFromVisited(currentSubreddit!!.name)
-                val view = activity?.findViewById<View>(R.id.nav_host_fragment)
-                val text = requireContext().getString(R.string.removed_from_visited, currentSubreddit!!.name)
-                Snackbar.make(view!!, text, 3000).apply {
-                    setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
-                    setTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
-                    show()
-                }
+                removeCurrentSubFromVisited()
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun removeCurrentSubFromVisited() {
+        appViewModel.removeSubredditFromVisited(currentSubreddit!!.name)
+        val view = activity?.findViewById<View>(R.id.nav_host_fragment)
+        val text = requireContext().getString(R.string.removed_from_visited, currentSubreddit!!.name)
+        Snackbar.make(view!!, text, 3000).apply {
+            setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
+            show()
+        }
+    }
+
+    private fun gotoLoggedInUserPosts() {
+        viewModel.viewModelScope.launch {
+            val userName = Store.getInstance(requireContext()).getUsername()
+            val action = PostListFragmentDirections.actionPostListFragmentToUserPostListFragment(userName!!)
+            findNavController().navigate(action)
+        }
+    }
+
+    private fun showSidebar() {
+        if (currentSubreddit != null
+            && currentSubreddit != Subreddit.frontPage
+            && !currentSubreddit!!.isMultiReddit
+        ) {
+            Sidebar(requireContext(), currentSubreddit!!.name, viewModel.viewModelScope).show()
+        } else {
+            val view = activity?.findViewById<View>(R.id.nav_host_fragment)
+            val text = requireContext().getString(R.string.no_sidebar)
+            Snackbar.make(view!!, text, 3000).apply {
+                setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
+                show()
+            }
+        }
+    }
+
+    private fun createGoBackSnackBar(goBackToSubreddit: Subreddit) {
+        val view = activity?.findViewById<View>(R.id.nav_host_fragment)
+        Snackbar.make(view!!, "", 8000).apply {
+            setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
+            setActionTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
+            setAction(requireContext().getString(R.string.go_back_to, goBackToSubreddit.name)) {
+                gotoSubreddit(goBackToSubreddit.name)
+            }
+            show()
         }
     }
 }

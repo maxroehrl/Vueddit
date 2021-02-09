@@ -23,7 +23,6 @@ import de.max.roehrl.vueddit2.service.Url
 import de.max.roehrl.vueddit2.service.Util
 import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
 
-
 @SuppressLint("SetJavaScriptEnabled")
 open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetailViewModel) :
     PostViewHolder(itemView) {

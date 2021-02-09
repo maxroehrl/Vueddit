@@ -12,9 +12,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UserPostListViewModel(application: Application) : PostListViewModel(application) {
+    companion object {
+        private const val defaultGroup = "overview"
+        private const val defaultType = "all"
+    }
     override val defaultSorting = "new"
-    private val defaultGroup = "overview"
-    private val defaultType = "all"
 
     val selectedUser: LiveData<String> = liveData {}
 

@@ -136,12 +136,11 @@ class UserPostListFragment : PostListFragment() {
             showGotoUser = currentUser != item.author
             super.onItemLongPressed(view, position)
         } else if (item is Comment) {
-            showGotoUser = currentUser != item.author
             val items = mutableListOf(
                 view.context.getString(if (item.saved) R.string.unsave else R.string.save),
                 view.context.getString(R.string.goto_sub, item.subreddit),
             )
-            if (showGotoUser) {
+            if (currentUser != item.author) {
                 items.add(view.context.getString(R.string.goto_user, item.author))
             }
             MaterialAlertDialogBuilder(requireContext()).apply {

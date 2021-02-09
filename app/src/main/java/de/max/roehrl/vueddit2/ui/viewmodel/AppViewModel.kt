@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.math.min
 
-// https://developer.android.com/topic/libraries/architecture/coroutines
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     val isLoggedIn: LiveData<Boolean> = liveData(Dispatchers.IO) {
         emit(Reddit.login(application))
