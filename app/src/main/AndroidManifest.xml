@@ -22,9 +22,10 @@
             <nav-graph android:value="@navigation/navigation_graph" />
         </activity>
 
-        <activity android:name=".ui.activity.LoginActivity"
+        <activity
+            android:name=".ui.activity.LoginActivity"
             android:parentActivityName=".ui.activity.MainActivity"
-            android:theme="@style/Theme.Vueddit2.NoActionBar" />
+            android:theme="@style/Theme.Vueddit2.Login" />
 
     </application>
 </manifest>

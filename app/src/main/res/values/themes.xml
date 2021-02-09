@@ -25,6 +25,10 @@
 
     <style name="Theme.Vueddit2.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="Theme.Vueddit2.Login" parent="Theme.Vueddit2.NoActionBar">
+        <item name="android:windowTranslucentStatus">false</item>
+    </style>
+
     <style name="Theme.Vueddit2.NavigationTheme">
         <!-- Color of text and icon when SELECTED -->
         <item name="colorPrimary">@color/white</item>
