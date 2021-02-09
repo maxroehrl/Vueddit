@@ -48,16 +48,13 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
 
     fun loadMorePosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            var lastPost: NamedItem? = null
-            try {
-                lastPost = posts.value?.last { post -> post != NamedItem.Loading }
-            } catch (e: NoSuchElementException) {}
+            val lastPost = posts.value?.lastOrNull { post -> post != NamedItem.Loading }
             val oldPosts = posts.value?.toMutableList() ?: mutableListOf()
             if (showLoadingIndicator) {
                 if (!isPostListLoading()) {
                     (posts as MutableLiveData).postValue(oldPosts + NamedItem)
-                } else if (oldPosts.isNotEmpty()) {
-                    oldPosts.removeLast()
+                } else {
+                    oldPosts.removeLastOrNull()
                 }
             }
             val after = lastPost?.id ?: ""
