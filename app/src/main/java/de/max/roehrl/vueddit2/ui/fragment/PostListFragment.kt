@@ -255,6 +255,7 @@ open class PostListFragment : Fragment() {
             }
             R.id.action_logout -> {
                 appViewModel.logoutUser()
+                viewModel.resetPosts()
                 true
             }
             R.id.action_user_posts -> {

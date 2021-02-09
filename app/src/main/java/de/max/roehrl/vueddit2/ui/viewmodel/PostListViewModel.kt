@@ -76,7 +76,7 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
     }
 
     fun refreshPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
-        (posts as MutableLiveData).value = emptyList()
+        resetPosts()
         loadMorePosts(showLoadingIndicator, cb)
     }
 
@@ -86,5 +86,9 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
 
     fun setTopPostsTime(time : String) {
         (topPostsTime as MutableLiveData).value = time
+    }
+
+    fun resetPosts() {
+        (posts as MutableLiveData).value = emptyList()
     }
 }
