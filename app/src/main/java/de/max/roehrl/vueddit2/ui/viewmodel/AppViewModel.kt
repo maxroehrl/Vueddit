@@ -1,6 +1,7 @@
 package de.max.roehrl.vueddit2.ui.viewmodel
 
 import android.app.Application
+import android.util.Log
 import android.webkit.CookieManager
 import androidx.lifecycle.*
 import de.max.roehrl.vueddit2.model.NamedItem
@@ -14,6 +15,10 @@ import java.util.*
 import kotlin.math.min
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
+    companion object {
+        private const val TAG = "AppViewModel"
+    }
+
     val isLoggedIn: LiveData<Boolean> = liveData(Dispatchers.IO) {
         emit(Reddit.login(application))
     }
@@ -27,28 +32,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     val subreddits: LiveData<List<List<Subreddit>>> = liveData {
-        emit(listOfNotNull(Subreddit.defaultSubreddits, subscribedSubreddits.value, multiReddits.value))
+        emit(loadCachedSubreddits())
     }
 
-    private val subscribedSubreddits: LiveData<List<Subreddit>> = liveData {
-        emit(Store.getInstance(getApplication()).getCachedSubscribedSubreddits().map {
-            Subreddit.fromName(it)
-        }.toList())
-    }
+    private val subscribedSubreddits: LiveData<List<Subreddit>> = liveData { }
 
-    private val multiReddits: LiveData<List<Subreddit>> = liveData {
-        emit(Store.getInstance(getApplication()).getCachedMultiSubreddits().map {
-            Subreddit.fromName(it).apply {
-                isMultiReddit = true
-            }
-        }.toList())
-    }
+    private val visitedSubreddits: LiveData<List<Subreddit>> = liveData { }
 
-    private val visitedSubreddits: LiveData<List<Subreddit>> = liveData {
-        emit(Store.getInstance(getApplication()).getVisitedSubreddits().map {
-            Subreddit.fromName(it)
-        }.toList())
-    }
+    private val multiReddits: LiveData<List<Subreddit>> = liveData { }
 
     val isBigTemplatePreferred: LiveData<Boolean?> = liveData {
         emit(null)
@@ -95,25 +86,58 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
+    private suspend fun loadCachedSubreddits(): List<List<Subreddit>> {
+        val store = Store.getInstance(getApplication())
+        val starred = store.getStarredSubreddits()
+        val subscriptions = sortByName(store.getCachedSubscribedSubreddits().map {
+            Subreddit.fromName(it).apply {
+                if (starred.contains(name))
+                    isStarred = true
+            }
+        })
+        Log.d(TAG, "Loaded ${subscriptions.size} cached subscribed subreddits")
+        (subscribedSubreddits as MutableLiveData).value = subscriptions
+
+        val visited = sortByName(store.getVisitedSubreddits().map {
+            Subreddit.fromName(it).apply {
+                isSubscribedTo = false
+            }
+        })
+        Log.d(TAG, "Loaded ${visited.size} visited subreddits")
+        (visitedSubreddits as MutableLiveData).value = visited
+
+        val multis = sortByName(store.getCachedMultiSubreddits().map {
+            Subreddit.fromName(it).apply {
+                isMultiReddit = true
+            }
+        })
+        Log.d(TAG, "Loaded ${multis.size} cached multi subreddits")
+        (multiReddits as MutableLiveData).value = multis
+
+        return listOfNotNull(Subreddit.defaultSubreddits, subscriptions, visited, multis)
+    }
+
     fun loadSubscriptions() {
         viewModelScope.launch(Dispatchers.IO) {
             val store = Store.getInstance(getApplication())
             val starred = store.getStarredSubreddits()
-            val subscriptions = Reddit.getSubscriptions()
-            subscriptions.forEach { subreddit ->
-                if (starred.contains(subreddit.name))
-                    subreddit.isStarred = true
-            }
-            (subscribedSubreddits as MutableLiveData).postValue(sortByName(subscriptions))
-            store.updateCachedSubscribedSubreddits(subscribedSubreddits.value ?: emptyList())
+            val subscriptions = sortByName(Reddit.getSubscriptions().map { subreddit ->
+                subreddit.apply {
+                    if (starred.contains(name))
+                        isStarred = true
+                }
+            })
+            (subscribedSubreddits as MutableLiveData).postValue(subscriptions)
+            store.updateCachedSubscribedSubreddits(subscriptions)
             (visitedSubreddits as MutableLiveData).postValue(
                     sortByName(store.getVisitedSubreddits().map { name ->
                         Subreddit.fromName(name).apply {
                             isSubscribedTo = false
                         }
                     }))
-            (multiReddits as MutableLiveData).postValue(sortByName(Reddit.getMultis()))
-            store.updateCachedMultiSubreddits(multiReddits.value ?: emptyList())
+            val multis = sortByName(Reddit.getMultis())
+            (multiReddits as MutableLiveData).postValue(multis)
+            store.updateCachedMultiSubreddits(multis)
             updateAllSubredditsList()
         }
     }
