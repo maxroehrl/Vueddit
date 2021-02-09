@@ -118,7 +118,10 @@ open class PostListFragment : Fragment() {
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                onTabSelected(tab)
+            }
         })
         return root
     }
@@ -176,7 +179,8 @@ open class PostListFragment : Fragment() {
                     viewModel.setTopPostsTime(time)
                     viewModel.refreshPosts()
                 }
-            }.show()
+                show()
+            }
         } else {
             viewModel.refreshPosts()
         }

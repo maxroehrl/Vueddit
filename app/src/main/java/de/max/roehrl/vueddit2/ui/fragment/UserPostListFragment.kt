@@ -48,7 +48,10 @@ class UserPostListFragment : PostListFragment() {
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
-                override fun onTabReselected(tab: TabLayout.Tab?) {}
+
+                override fun onTabReselected(tab: TabLayout.Tab?) {
+                    onTabSelected(tab)
+                }
             })
         }
         return root
@@ -93,7 +96,8 @@ class UserPostListFragment : PostListFragment() {
                             viewModel.setSavedPostsType(type)
                             viewModel.refreshPosts()
                         }
-                    }.show()
+                        show()
+                    }
                 } else {
                     viewModel.refreshPosts()
                 }
