@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
             updateNavItems(if (subreddits != null) {
                 listOf(subreddits)
             } else {
-                viewModel.subreddits.value!!
+                viewModel.subreddits.value
             })
         }
     }
@@ -180,23 +180,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateNavItems(subredditsGroups: List<List<Subreddit>>) {
-        multiReddits.clear()
-        navView.menu.clear()
-        var groupId = Menu.FIRST
-        for (group in subredditsGroups) {
-            for (sub in group) {
-                val item = navView.menu.add(groupId, 0, 0, sub.name)
-                item.icon = ContextCompat.getDrawable(this, sub.getIconId())
-                item.isCheckable = true
-                if (sub.isMultiReddit) {
-                    multiReddits.add(item)
+    private fun updateNavItems(subredditsGroups: List<List<Subreddit>>?) {
+        if (subredditsGroups != null) {
+            multiReddits.clear()
+            navView.menu.clear()
+            var groupId = Menu.FIRST
+            for (group in subredditsGroups) {
+                for (sub in group) {
+                    val item = navView.menu.add(groupId, 0, 0, sub.name)
+                    item.icon = ContextCompat.getDrawable(this, sub.getIconId())
+                    item.isCheckable = true
+                    if (sub.isMultiReddit) {
+                        multiReddits.add(item)
+                    }
+                    if (sub == viewModel.subreddit.value) {
+                        item.isChecked = true
+                    }
                 }
-                if (sub == viewModel.subreddit.value) {
-                    item.isChecked = true
-                }
+                groupId += 1
             }
-            groupId += 1
         }
     }
 }
