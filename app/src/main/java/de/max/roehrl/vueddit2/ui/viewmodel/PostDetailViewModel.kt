@@ -39,10 +39,17 @@ class PostDetailViewModel(application: Application) : AndroidViewModel(applicati
                      cb: (() -> Unit)? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             val sorting = commentSorting.value ?: defaultSorting
-            val post = if (postName.startsWith("t3_")) postName.substring(3) else postName
+            var post = postName
+            var comment = commentName
+            if (post.contains("/comments/")) {
+                val split = post.split("/")
+                post = split[0]
+                comment = split.getOrElse(2) { comment }
+            }
+            post = if (post.startsWith("t3_")) post.substring(3) else post
             var permalink = "/r/$subredditName/comments/$post"
-            if (commentName != null) {
-                permalink += "/$commentName"
+            if (comment != null) {
+                permalink += "/$comment"
             }
             val pair = Reddit.getPostAndComments(permalink, sorting)
             (selectedPost as MutableLiveData).postValue(pair.first)
