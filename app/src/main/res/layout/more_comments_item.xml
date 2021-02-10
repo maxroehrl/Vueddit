@@ -8,7 +8,7 @@
         android:id="@+id/more"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/more_comments_text"
+        android:textColor="@color/comments_load_more"
         android:textSize="@dimen/more_comments_text_size"
         android:paddingLeft="6px" />
 

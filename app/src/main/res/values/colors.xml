@@ -4,14 +4,18 @@
     <color name="white">#FFFFFFFF</color>
     <color name="highlight">#53ba82</color>
     <color name="danger">#bf5826</color>
-    <color name="more_comments_text">@color/highlight</color>
-    <color name="action_bar_background">#3e3e3e</color>
-    <color name="action_bar_background2">#303030</color>
-    <color name="snack_bar_background">@color/action_bar_background2</color>
-    <color name="snack_bar_text">@color/white</color>
-    <color name="sidebar_dialog_background">#222222</color>
-    <color name="nav_bar_background">@color/black</color>
-    <color name="post_title">@color/white</color>
+
+    <color name="action_bar_background">#d1d1d1</color>
+    <color name="action_bar_background2">#c3c3c3</color>
+
+    <color name="snack_bar_background">@color/action_bar_background</color>
+    <color name="snack_bar_text">@color/black</color>
+
+    <color name="sidebar_dialog_background">@color/white</color>
+
+    <color name="nav_bar_background">@color/white</color>
+
+    <color name="post_title">@color/black</color>
     <color name="post_title_sticky">@color/highlight</color>
     <color name="post_meta">#767676</color>
     <color name="post_flair_bg">@color/post_meta</color>
@@ -20,18 +24,24 @@
     <color name="post_author_highlight">@color/highlight</color>
     <color name="post_nsfw">#f00</color>
     <color name="post_spoiler">#ff0</color>
-    <color name="border_color">@color/post_meta</color>
-    <color name="self_text_color">@color/white</color>
+    <color name="post_comments_only_icon">@color/black</color>
+
+    <color name="self_text_border">@color/post_meta</color>
+    <color name="self_text_color">@color/neutral</color>
+
     <color name="sortings_bar">@color/action_bar_background2</color>
+
     <color name="downvoted">@color/danger</color>
     <color name="upvoted">@color/highlight</color>
-    <color name="neutral">#b8b8b8</color>
-    <color name="comment_indent_lines">#282828</color>
-    <color name="comment_author">#c4c4c4</color>
+    <color name="neutral">#4A4A4A</color>
+
+    <color name="comment_indent_lines">@color/action_bar_background2</color>
+    <color name="comment_author">#191919</color>
     <color name="comment_author_op">@color/highlight</color>
     <color name="comment_author_admin">#c40013</color>
     <color name="comment_author_mod">#4afff5</color>
     <color name="comment_flair_bg">@color/post_flair_bg</color>
     <color name="comment_flair_text">@color/post_flair_text</color>
     <color name="comment_selected">#1053ba82</color>
+    <color name="comments_load_more">@color/highlight</color>
 </resources>

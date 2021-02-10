@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="action_bar_background">#3e3e3e</color>
+    <color name="action_bar_background2">#303030</color>
+
+    <color name="snack_bar_text">@color/white</color>
+
+    <color name="sidebar_dialog_background">#222222</color>
+
+    <color name="nav_bar_background">@color/black</color>
+
+    <color name="self_text_color">@color/white</color>
+
+    <color name="post_title">@color/white</color>
+    <color name="post_comments_only_icon">@color/white</color>
+
+    <color name="neutral">#b8b8b8</color>
+
+    <color name="comment_indent_lines">#282828</color>
+    <color name="comment_author">#c4c4c4</color>
+</resources>
