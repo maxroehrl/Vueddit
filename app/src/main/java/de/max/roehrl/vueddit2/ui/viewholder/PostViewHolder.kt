@@ -137,7 +137,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         metaBuilder.append(authorString)
         metaBuilder.append(" ")
 
-        if (highlightAuthor && post.author_flair_text != "" && post.author_flair_text != "null") {
+        if (highlightAuthor && post.author_flair_text != "" && post.author_flair_text != "null" && post.author_flair_background_color != "null") {
             val authorFlairString = SpannableString(post.author_flair_text)
             var color = ContextCompat.getColor(meta.context, R.color.post_flair_bg)
             try {

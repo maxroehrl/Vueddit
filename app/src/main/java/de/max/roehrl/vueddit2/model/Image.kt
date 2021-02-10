@@ -2,11 +2,13 @@ package de.max.roehrl.vueddit2.model
 
 import android.util.Log
 import de.max.roehrl.vueddit2.service.Util
+import org.json.JSONException
 import org.json.JSONObject
 import kotlin.math.absoluteValue
 
 class Image(post: JSONObject, preferredWidth: Int = Util.getScreenWidth()) {
     companion object {
+        private const val TAG = "Image"
         private val noThumbnails = listOf("default", "self", "")
 
         private fun getPreferredImage(
@@ -44,20 +46,24 @@ class Image(post: JSONObject, preferredWidth: Int = Util.getScreenWidth()) {
                 Log.d("Image", "Failed to load image for post: '${post.optString("title")}'")
             }
         } else if (mediaEmbedded != null) {
-            for (key in mediaEmbedded.keys()) {
-                val galleryImage = mediaEmbedded.getJSONObject(key)
-                val resolutions = mutableListOf(galleryImage.getJSONObject("s"))
-                val previews = galleryImage.getJSONArray("p")
-                for (i in 0 until previews.length()) {
-                    resolutions.add(previews.getJSONObject(i))
+            try {
+                for (key in mediaEmbedded.keys()) {
+                    val galleryImage = mediaEmbedded.getJSONObject(key)
+                    val resolutions = mutableListOf(galleryImage.getJSONObject("s"))
+                    val previews = galleryImage.getJSONArray("p")
+                    for (i in 0 until previews.length()) {
+                        resolutions.add(previews.getJSONObject(i))
+                    }
+                    val preferredImage = getPreferredImage(resolutions, preferredWidth, "x")
+                    if (preferredImage != null) {
+                        url = preferredImage.optString("u")
+                        height = preferredImage.optInt("y")
+                        width = preferredImage.optInt("x")
+                        break
+                    }
                 }
-                val preferredImage = getPreferredImage(resolutions, preferredWidth, "x")
-                if (preferredImage != null) {
-                    url = preferredImage.optString("u")
-                    height = preferredImage.optInt("y")
-                    width = preferredImage.optInt("x")
-                    break
-                }
+            } catch (error: JSONException) {
+                Log.w(TAG, "Failed to load media embedded preview for '${post.optString("title")}'")
             }
         } else if (!noThumbnails.contains(thumbnail) && post.has("thumbnail_height")) {
             url = thumbnail

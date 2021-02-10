@@ -122,7 +122,7 @@ open class CommentViewHolder(itemView: View, private val viewModel: PostDetailVi
         if (comment.gid_3 != null && comment.gid_3 > 0) {
             builder.append("\uD83E\uDD49x${comment.gid_3} ")
         }
-        if (comment.author_flair_text != "" && comment.author_flair_text != "null") {
+        if (comment.author_flair_text != "" && comment.author_flair_text != "null" && comment.author_flair_background_color != "null") {
             builder.append(" ")
             val flairString = SpannableString(comment.author_flair_text)
             var color = ContextCompat.getColor(header.context, R.color.comment_flair_bg)
