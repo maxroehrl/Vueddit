@@ -15,7 +15,7 @@ import java.util.regex.Pattern
 class Markdown private constructor(context: Context) {
     private val markwon: Markwon
     var urlOpenCallback = { url : String -> Url.openUrl(context, null, url) }
-    private val malformedHadingRegex = Regex("^#+(?=[^#\\s])", RegexOption.MULTILINE)
+    private val malformedHeadingRegex = Regex("^#+(?=[^#\\s])", RegexOption.MULTILINE)
 
     init {
         markwon = Markwon.builder(context)
@@ -97,18 +97,20 @@ class Markdown private constructor(context: Context) {
     }
 
     fun setMarkdown(tv: TextView, text: String) {
-        markwon.setMarkdown(tv, fixMarkdownHeadings(text))
+        markwon.setMarkdown(tv, fixMarkdownSpacing(text))
     }
 
     fun toMarkDown(text: String) : Spanned {
-        return markwon.toMarkdown(fixMarkdownHeadings(text))
+        return markwon.toMarkdown(fixMarkdownSpacing(text))
     }
 
     fun setMarkdown(tv: TextView, markdown: Spanned?) {
         markwon.setParsedMarkdown(tv, markdown!!)
     }
 
-    private fun fixMarkdownHeadings(text: String) : String {
-        return text.replace(malformedHadingRegex) { it.value + " " }
+    private fun fixMarkdownSpacing(text: String): String {
+        return text
+                .replace(malformedHeadingRegex) { it.value + " " }
+                .replace("]\n(", "](")
     }
 }
