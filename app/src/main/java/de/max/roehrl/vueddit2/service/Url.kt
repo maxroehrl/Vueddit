@@ -21,9 +21,9 @@ object Url {
             path = path.replace(Regex(redditUrlPrefix), "")
         }
         if (navController != null
-            && (Regex("^/r/[^\\s;.]+/comments/[^\\s;.]+/[^\\s;.]+$").matches(path)
-                    || Regex("^/r/[^\\s;.]+$").matches(path)
-                    || Regex("^/u(ser)?/[^\\s;.]+$").matches(path))
+            && (Regex("^/r/[^\\s;./]+/comments/[^\\s;./]+/[^\\s;./]+$").matches(path)
+                    || Regex("^/r/[^\\s;./]+$").matches(path)
+                    || Regex("^/u(ser)?/[^\\s;./]+$").matches(path))
         ) {
             try {
                 openDeepLink(path, navController)
