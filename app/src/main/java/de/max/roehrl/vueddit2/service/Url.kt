@@ -14,9 +14,9 @@ object Url {
 
     fun openUrl(context: Context, navController: NavController?, url: String) {
         val redditUrlPrefix = "^https?://(www\\.)?(old\\.|new\\.|m\\.)?reddit\\.com"
-        var path = url
-        if (Regex("${redditUrlPrefix}.*").matches(url)
-            && !Regex("$redditUrlPrefix/gallery/.*").matches(url)
+        var path = url.trim()
+        if (Regex("${redditUrlPrefix}.*").matches(path)
+            && !Regex("$redditUrlPrefix/gallery/.*").matches(path)
         ) {
             path = path.replace(Regex(redditUrlPrefix), "")
         }
@@ -30,8 +30,8 @@ object Url {
             } catch (error: IllegalStateException) {
                 Log.e(TAG, "Error finding nav controller'", error)
             }
-        } else if (Patterns.WEB_URL.matcher(url).matches()) {
-            CustomTabs.openInCustomTabs(context, url)
+        } else if (Patterns.WEB_URL.matcher(url.trim()).matches()) {
+            CustomTabs.openInCustomTabs(context, url.trim())
         } else {
             Log.e(TAG, "Invalid url: '$url'")
         }
