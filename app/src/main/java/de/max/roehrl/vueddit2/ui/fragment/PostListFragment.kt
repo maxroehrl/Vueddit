@@ -229,7 +229,7 @@ open class PostListFragment : Fragment() {
         val navController = findNavController()
         val topLevelDestinationIds = mutableSetOf<Int>()
         if (safeArgs.rootFragment)
-            topLevelDestinationIds.add(navController.graph.startDestination)
+            topLevelDestinationIds.add(R.id.postListFragment)
         val appBarConfiguration = AppBarConfiguration.Builder(topLevelDestinationIds).apply {
             if (safeArgs.rootFragment)
                 setOpenableLayout((activity as MainActivity).drawerLayout)
