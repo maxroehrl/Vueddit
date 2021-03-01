@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.createDataStore
+import androidx.datastore.preferences.preferencesDataStore
 import de.max.roehrl.vueddit2.model.Subreddit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(Store.PREFERENCE_NAME)
 
 // https://developer.android.com/topic/libraries/architecture/datastore
-class Store private constructor(context: Context) {
-    private val preferenceDataStore: DataStore<Preferences> = context.createDataStore(PREFERENCE_NAME)
+class Store private constructor(val context: Context) {
     private val username: Flow<String?> = getFlow(USERNAME)
     private val authToken: Flow<String?> = getFlow(AUTH_TOKEN)
     private val validUntil: Flow<Long?> = getFlow(VALID_UNTIL)
@@ -27,7 +27,7 @@ class Store private constructor(context: Context) {
 
     companion object : SingletonHolder<Store, Context>(::Store) {
         private const val TAG = "Store"
-        private const val PREFERENCE_NAME = "reddit"
+        const val PREFERENCE_NAME = "reddit"
         private val USERNAME = stringPreferencesKey("username")
         private val AUTH_TOKEN = stringPreferencesKey("authToken")
         private val VALID_UNTIL = longPreferencesKey("validUntil")
@@ -39,7 +39,7 @@ class Store private constructor(context: Context) {
     }
 
     private fun <T> getFlow(key: Preferences.Key<T>): Flow<T?> {
-        return preferenceDataStore.data
+        return context.dataStore.data
                 .catch { exception ->
                     // dataStore.data throws an IOException when an error is encountered when reading data
                     if (exception is IOException) {
@@ -85,7 +85,7 @@ class Store private constructor(context: Context) {
     }
 
     suspend fun updateTokens(authToken: String, validUntil: Long, refreshToken: String?) {
-        preferenceDataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             preferences[AUTH_TOKEN] = authToken
             preferences[VALID_UNTIL] = validUntil
             if (refreshToken != null) {
@@ -98,7 +98,7 @@ class Store private constructor(context: Context) {
     }
 
     suspend fun addToStarredSubreddits(name: String) {
-        preferenceDataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             val starred = preferences[STARRED_SUBS]?.toMutableSet() ?: mutableSetOf()
             starred.add(name)
             preferences[STARRED_SUBS] = starred
@@ -106,7 +106,7 @@ class Store private constructor(context: Context) {
     }
 
     suspend fun removeFromStarredSubreddits(name: String) {
-        preferenceDataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             val starred = preferences[STARRED_SUBS]?.toMutableSet() ?: mutableSetOf()
             starred.remove(name)
             preferences[STARRED_SUBS] = starred
@@ -114,7 +114,7 @@ class Store private constructor(context: Context) {
     }
 
     suspend fun addToVisitedSubreddits(name: String) {
-        preferenceDataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             val visited = preferences[VISITED_SUBS]?.toMutableSet() ?: mutableSetOf()
             visited.add(name)
             preferences[VISITED_SUBS] = visited.filter { !Subreddit.defaultSubreddits.contains(Subreddit.fromName(it)) }.toSet()
@@ -122,7 +122,7 @@ class Store private constructor(context: Context) {
     }
 
     suspend fun removeFromVisitedSubreddits(name: String) {
-        preferenceDataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             val visited = preferences[VISITED_SUBS]?.toMutableSet() ?: mutableSetOf()
             visited.remove(name)
             preferences[VISITED_SUBS] = visited
@@ -130,25 +130,25 @@ class Store private constructor(context: Context) {
     }
 
     suspend fun updateCachedSubscribedSubreddits(subreddits: List<Subreddit>) {
-        preferenceDataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             preferences[CACHED_SUBSCRIBED_SUBS] = subreddits.map { it.name }.toSet()
         }
     }
 
     suspend fun updateCachedMultiSubreddits(subreddits: List<Subreddit>) {
-        preferenceDataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             preferences[CACHED_MULTI_SUBS] = subreddits.map { it.name }.toSet()
         }
     }
 
     suspend fun updateUserName(username: String) {
-        preferenceDataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             preferences[USERNAME] = username
         }
     }
 
     suspend fun logoutUser() {
-        preferenceDataStore.edit { preferences ->
+        context.dataStore.edit { preferences ->
             preferences.clear()
         }
     }
