@@ -22,7 +22,7 @@ class Sidebar(
         setContentView(R.layout.sidebar)
         val tv = findViewById<TextView>(R.id.sidebar)
         scope.launch(Dispatchers.IO) {
-            val text = Reddit.getSidebar(subredditName)
+            val text = Reddit.getInstance(context).getSidebar(subredditName)
             scope.launch(Dispatchers.Main) {
                 Markdown.getInstance(context).setMarkdown(tv, text)
             }

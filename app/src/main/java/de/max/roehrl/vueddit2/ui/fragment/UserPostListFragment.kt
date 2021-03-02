@@ -145,7 +145,7 @@ class UserPostListFragment : PostListFragment() {
             MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
                     when (which) {
-                        0 -> item.saveOrUnsave()
+                        0 -> item.saveOrUnsave(context)
                         1 -> gotoSubreddit(item.subreddit)
                         2 -> gotoUser(item.author)
                     }

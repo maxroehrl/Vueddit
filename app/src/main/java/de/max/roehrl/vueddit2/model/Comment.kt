@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.Spanned
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
+import de.max.roehrl.vueddit2.service.Util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -60,7 +61,7 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
     }
 
     fun getScore(): String {
-        return Reddit.getFormattedScore(ups)
+        return Util.getFormattedScore(ups)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -75,9 +76,9 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
         return children != null
     }
 
-    fun saveOrUnsave() {
+    fun saveOrUnsave(context: Context) {
         GlobalScope.launch(Dispatchers.IO) {
-            Reddit.saveOrUnsave(saved, name)
+            Reddit.getInstance(context).saveOrUnsave(saved, name)
             saved = !saved
         }
     }

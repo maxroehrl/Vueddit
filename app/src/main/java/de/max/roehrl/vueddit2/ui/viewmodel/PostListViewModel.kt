@@ -77,7 +77,7 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
         } else {
             subreddit.value?.name ?: Subreddit.frontPage.name
         }
-        return Reddit.getSubredditPosts(subredditName, after, sorting, time, count)
+        return Reddit.getInstance(getApplication()).getSubredditPosts(subredditName, after, sorting, time, count)
     }
 
     fun refreshPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {

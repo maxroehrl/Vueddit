@@ -226,7 +226,7 @@ class PostDetailFragment : Fragment() {
             MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
                     when (which) {
-                        0 -> post.saveOrUnsave()
+                        0 -> post.saveOrUnsave(context)
                         1 -> gotoSubreddit(post.subreddit)
                         2 -> gotoUser(post.author)
                     }

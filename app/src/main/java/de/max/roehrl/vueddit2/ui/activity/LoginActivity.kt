@@ -29,7 +29,7 @@ class LoginActivity : AppCompatActivity() {
             val uri = Uri.parse(url)
             if (url != null && url.contains("code=") && url.contains("state=")) {
                 lifecycleScope.launch {
-                    val success = Reddit.onAuthorizationSuccessful(uri)
+                    val success = Reddit.getInstance(applicationContext).onAuthorizationSuccessful(uri)
                     if (success) {
                         val intent = Intent(applicationContext, MainActivity::class.java)
                         intent.putExtra(AppViewModel.WAS_LOGGED_IN, true)

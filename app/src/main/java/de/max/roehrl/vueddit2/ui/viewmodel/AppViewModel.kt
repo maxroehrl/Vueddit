@@ -21,11 +21,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     val isLoggedIn: LiveData<Boolean> = liveData(Dispatchers.IO) {
-        emit(Reddit.login(application))
+        emit(Reddit.getInstance(getApplication()).login())
     }
 
     val username: LiveData<String?> = liveData(Dispatchers.IO) {
-        emit(Store.getInstance(application).getUsername())
+        emit(Store.getInstance(getApplication()).getUsername())
     }
 
     val subreddit: LiveData<Subreddit> = liveData {
@@ -52,7 +52,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateSearchText(text: CharSequence?) {
         viewModelScope.launch(Dispatchers.IO) {
-            val results = if (text.isNullOrEmpty()) null else Reddit.searchForSubreddit(text.toString())
+            val results = if (text.isNullOrEmpty()) null else Reddit.getInstance(getApplication()).searchForSubreddit(text.toString())
             results?.forEach { subreddit ->
                 subreddit.isSubscribedTo = subscribedSubreddits.value?.contains(subreddit) ?: false
             }
@@ -122,7 +122,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val store = Store.getInstance(getApplication())
             val starred = store.getStarredSubreddits()
-            val subscriptions = sortByName(Reddit.getSubscriptions().map { subreddit ->
+            val subscriptions = sortByName(Reddit.getInstance(getApplication()).getSubscriptions().map { subreddit ->
                 subreddit.apply {
                     if (starred.contains(name))
                         isStarred = true
@@ -136,7 +136,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             isSubscribedTo = false
                         }
                     }))
-            val multis = sortByName(Reddit.getMultis())
+            val multis = sortByName(Reddit.getInstance(getApplication()).getMultis())
             (multiReddits as MutableLiveData).postValue(multis)
             store.updateCachedMultiSubreddits(multis)
             updateAllSubredditsList()
@@ -156,7 +156,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun subscribeToSubreddit(subreddit: Subreddit) {
         viewModelScope.launch(Dispatchers.IO) {
-            Reddit.subscribe(subreddit.name, subreddit.isSubscribedTo)
+            Reddit.getInstance(getApplication()).subscribe(subreddit.name, subreddit.isSubscribedTo)
             subreddit.isSubscribedTo = !subreddit.isSubscribedTo
             updateSubscribedSubreddit(subreddit, null)
             if (subreddit.isSubscribedTo) {
@@ -212,7 +212,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             Store.getInstance(getApplication()).logoutUser()
             (username as MutableLiveData).postValue(null)
             (subreddits as MutableLiveData).postValue(emptyList())
-            (isLoggedIn as MutableLiveData).postValue(Reddit.login(getApplication()))
+            (isLoggedIn as MutableLiveData).postValue(Reddit.getInstance(getApplication()).login())
         }
     }
 

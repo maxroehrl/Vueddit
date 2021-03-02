@@ -26,36 +26,36 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.random.Random
 
-
-object Reddit {
-    private const val TAG = "Reddit"
-    const val api = "https://www.reddit.com"
-    private const val oauthApi = "https://oauth.reddit.com"
-    private const val userAgent = "${BuildConfig.APPLICATION_ID}:${BuildConfig.VERSION_NAME} (by /u/MaxRoehrl)"
-    private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-    private val randomState = (1..10)
-            .map { Random.nextInt(0, charPool.size) }
-            .map(charPool::get)
-            .joinToString("")
-    private const val clientId = "m_gI8cFDcqC7uA"
-    const val redirectUri = "http://localhost:8080"
-    private val redirectUriEncoded = URLEncoder.encode(redirectUri, "utf-8")
-    private val scope = URLEncoder.encode("mysubreddits read vote save subscribe wikiread identity history flair", "utf-8")
-    const val frontpage = "reddit front page"
-    private val requestQueue = RequestQueue(NoCache(), BasicNetwork(HurlStack())).apply {
-        start()
+class Reddit private constructor(val context: Context) {
+    companion object : SingletonHolder<Reddit, Context>(::Reddit) {
+        private const val TAG = "Reddit"
+        const val api = "https://www.reddit.com"
+        private const val oauthApi = "https://oauth.reddit.com"
+        private const val userAgent = "${BuildConfig.APPLICATION_ID}:${BuildConfig.VERSION_NAME} (by /u/MaxRoehrl)"
+        private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+        private val randomState = (1..10)
+                .map { Random.nextInt(0, charPool.size) }
+                .map(charPool::get)
+                .joinToString("")
+        private const val clientId = "m_gI8cFDcqC7uA"
+        const val redirectUri = "http://localhost:8080"
+        private val redirectUriEncoded = URLEncoder.encode(redirectUri, "utf-8")
+        private val scope = URLEncoder.encode("mysubreddits read vote save subscribe wikiread identity history flair", "utf-8")
+        const val frontpage = "reddit front page"
+        val oAuthLoginUrl = "${api}/api/v1/authorize.compact?client_id=${clientId}&response_type=code&state=${randomState}&redirect_uri=${redirectUriEncoded}&scope=${scope}&duration=permanent"
+        private val requestQueue = RequestQueue(NoCache(), BasicNetwork(HurlStack())).apply {
+            start()
+        }
+        @Volatile private var authToken: String = ""
+        @Volatile private var refreshToken: String? = ""
+        @Volatile private var validUntil: Long? = null
     }
-    val oAuthLoginUrl = "${api}/api/v1/authorize.compact?client_id=${clientId}&response_type=code&state=${randomState}&redirect_uri=${redirectUriEncoded}&scope=${scope}&duration=permanent"
-    @Volatile private lateinit var store: Store
-    @Volatile private var authToken: String = ""
-    @Volatile private var refreshToken: String? = ""
-    @Volatile private var validUntil: Long? = null
 
-    suspend fun login(context: Context): Boolean {
+    suspend fun login(): Boolean {
         authToken = ""
         refreshToken = null
         validUntil = null
-        store = Store.getInstance(context)
+        val store = Store.getInstance(context)
         val token = store.getAuthToken()
         if (token != null && token != "") {
             authToken = token
@@ -279,10 +279,6 @@ object Reddit {
         return post("/api/${if (saved) "un" else ""}save?id=$name")
     }
 
-    fun getFormattedScore(score: Int): String {
-        return if (score >= 10000) String.format("%.1fk", score.toFloat() / 1000f) else score.toString()
-    }
-
     private suspend fun post(url: String, bodyText: String? = null): String {
         refreshAuthToken()
         return suspendCoroutine { continuation ->
@@ -344,7 +340,7 @@ object Reddit {
             validUntil = response.getLong("expires_in") + Util.getUnixTime()
             val optRefreshToken = response.optString("refresh_token")
             refreshToken = if (optRefreshToken.isNullOrEmpty()) refreshToken else optRefreshToken
-            store.updateTokens(authToken, validUntil!!, refreshToken)
+            Store.getInstance(context).updateTokens(authToken, validUntil!!, refreshToken)
             return true
         } catch (error: JSONException) {
             Log.e(TAG, "Failed to get auth token", error)

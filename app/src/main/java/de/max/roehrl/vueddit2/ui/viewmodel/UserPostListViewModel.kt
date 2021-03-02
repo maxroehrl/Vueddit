@@ -46,6 +46,6 @@ class UserPostListViewModel(application: Application) : PostListViewModel(applic
         val userName = selectedUser.value!!
         val group = userPostGroup.value ?: defaultGroup
         val type = selectedType.value ?: defaultType
-        return Reddit.getUserPosts(userName, after, sorting, group, time, type, count)
+        return Reddit.getInstance(getApplication()).getUserPosts(userName, after, sorting, group, time, type, count)
     }
 }

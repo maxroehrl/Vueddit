@@ -185,7 +185,7 @@ open class CommentViewHolder(itemView: View, private val viewModel: PostDetailVi
                 comment.likes = up
                 comment.ups += dir
             }
-            Reddit.vote(comment.name, dir.toString())
+            Reddit.getInstance(header.context).vote(comment.name, dir.toString())
             GlobalScope.launch(Dispatchers.Main) {
                 updateVotes()
             }
@@ -207,7 +207,7 @@ open class CommentViewHolder(itemView: View, private val viewModel: PostDetailVi
             setItems(items.toTypedArray()) { _, which ->
                 when (which) {
                     0 -> {
-                        comment.saveOrUnsave()
+                        comment.saveOrUnsave(context)
                     }
                     1 -> {
                         more.findNavController().navigate(

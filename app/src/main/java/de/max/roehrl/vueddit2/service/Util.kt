@@ -21,4 +21,8 @@ object Util {
     }
 
     fun getScreenWidth() : Int = Resources.getSystem().displayMetrics.widthPixels
+
+    fun getFormattedScore(score: Int): String {
+        return if (score >= 10000) String.format("%.1fk", score.toFloat() / 1000f) else score.toString()
+    }
 }

@@ -5,6 +5,7 @@ import android.text.Spanned
 import android.util.Log
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
+import de.max.roehrl.vueddit2.service.Util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -70,7 +71,7 @@ class Post(private val json: JSONObject) : NamedItem(json.optString("name")) {
     }
 
     fun getScore(): String {
-        return Reddit.getFormattedScore(score)
+        return Util.getFormattedScore(score)
     }
 
     fun getJSONString(): String {
@@ -89,9 +90,9 @@ class Post(private val json: JSONObject) : NamedItem(json.optString("name")) {
         return name.hashCode()
     }
 
-    fun saveOrUnsave() {
+    fun saveOrUnsave(context: Context) {
         GlobalScope.launch(Dispatchers.IO) {
-            Reddit.saveOrUnsave(saved, name)
+            Reddit.getInstance(context).saveOrUnsave(saved, name)
             saved = !saved
         }
     }

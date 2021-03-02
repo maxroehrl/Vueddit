@@ -51,7 +51,7 @@ class PostDetailViewModel(application: Application) : AndroidViewModel(applicati
             if (comment != null) {
                 permalink += "/$comment"
             }
-            val pair = Reddit.getPostAndComments(permalink, sorting)
+            val pair = Reddit.getInstance(getApplication()).getPostAndComments(permalink, sorting)
             (selectedPost as MutableLiveData).postValue(pair.first)
             (comments as MutableLiveData).postValue(pair.second.toMutableList())
             cb?.invoke()
@@ -81,7 +81,7 @@ class PostDetailViewModel(application: Application) : AndroidViewModel(applicati
             loadComments(subtreeCommentName)
         } else {
             viewModelScope.launch(Dispatchers.IO) {
-                val newComments = Reddit.getMoreComments(selectedPost.value!!.name, comment.moreChildren)
+                val newComments = Reddit.getInstance(getApplication()).getMoreComments(selectedPost.value!!.name, comment.moreChildren)
                 val index = comments.value?.indexOf(comment)
                 if (index != null && index >= 0) {
                     val oldComments = comments.value!!

@@ -207,7 +207,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                 post.likes = up
                 post.score += dir
             }
-            Reddit.vote(post.name, dir.toString())
+            Reddit.getInstance(title.context).vote(post.name, dir.toString())
             GlobalScope.launch(Dispatchers.Main) {
                 updateVotes()
             }
