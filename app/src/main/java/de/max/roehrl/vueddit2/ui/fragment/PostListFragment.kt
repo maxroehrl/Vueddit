@@ -266,22 +266,7 @@ open class PostListFragment : Fragment() {
                 appViewModel.toggleBigPreview(viewModel.posts.value!!)
                 true
             }
-            R.id.action_remove_visited -> {
-                removeCurrentSubFromVisited()
-                true
-            }
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun removeCurrentSubFromVisited() {
-        appViewModel.removeSubredditFromVisited(currentSubreddit!!.name)
-        val view = activity?.findViewById<View>(R.id.nav_host_fragment)
-        val text = requireContext().getString(R.string.removed_from_visited, currentSubreddit!!.name)
-        Snackbar.make(view!!, text, 3000).apply {
-            setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.snack_bar_background))
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.snack_bar_text))
-            show()
         }
     }
 

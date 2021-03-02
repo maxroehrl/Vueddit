@@ -19,11 +19,6 @@
         android:title="@string/menu_toggle_big_post_preview" />
 
     <item
-        android:id="@+id/action_remove_visited"
-        android:orderInCategory="170"
-        android:title="@string/menu_remove_visited" />
-
-    <item
         android:id="@+id/action_user_posts"
         android:orderInCategory="180"
         android:title="@string/menu_user_profile" />

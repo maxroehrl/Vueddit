@@ -13,12 +13,12 @@
     <string name="menu_user_profile">Goto user profile</string>
     <string name="menu_toggle_big_post_preview">Toggle post preview size</string>
     <string name="user_posts_list">User posts list</string>
-    <string name="menu_remove_visited">Remove from visited subreddits</string>
     <string name="subscribe_confirm">Do you really want to subscribe to "/r/%s"</string>
     <string name="unsubscribe_confirm">Do you really want to unsubscribe from "/r/%s"</string>
     <string name="unsubscribe">Unsubscribe from "/r/%s"</string>
     <string name="subscribed">Subscription was added</string>
     <string name="unsubscribed">Subscription was removed</string>
+    <string name="remove_from_visited">Remove "/r/%s" from visited subreddits</string>
     <string name="removed_from_visited">"/r/%s" was removed from visited subreddits</string>
     <string name="showing">Showing </string>
     <plurals name="num_comments">

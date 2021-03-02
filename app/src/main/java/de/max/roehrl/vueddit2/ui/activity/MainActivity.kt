@@ -182,6 +182,24 @@ class MainActivity : AppCompatActivity() {
                 }
                 show()
             }
+        } else if (sub?.isVisited == true) {
+            MaterialAlertDialogBuilder(this).apply {
+                setItems(listOf(getString(R.string.remove_from_visited, sub.name)).toTypedArray()) { _, which ->
+                    when (which) {
+                        0 -> {
+                            viewModel.removeSubredditFromVisited(sub.name)
+                            val view = findViewById<View>(R.id.nav_host_fragment)
+                            val text = getString(R.string.removed_from_visited, sub.name)
+                            Snackbar.make(view!!, text, 3000).apply {
+                                setBackgroundTint(ContextCompat.getColor(context, R.color.snack_bar_background))
+                                setTextColor(ContextCompat.getColor(context, R.color.snack_bar_text))
+                                show()
+                            }
+                        }
+                    }
+                }
+                show()
+            }
         }
     }
 
