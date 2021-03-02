@@ -327,46 +327,39 @@ object Reddit {
     suspend fun onAuthorizationSuccessful(uri: Uri): Boolean {
         if (uri.getQueryParameter("state") == randomState) {
             val code = uri.getQueryParameter("code")
-            val url = "$api/api/v1/access_token"
             val bodyText = "grant_type=authorization_code&code=$code&redirect_uri=$redirectUriEncoded"
-            try {
-                val response = makeTokenRequest(url, bodyText)
-                updateToken(JSONObject(response))
-                Log.i(TAG, "User was successfully logged in")
-                return true
-            } catch (error: VolleyError) {
-                Log.e(TAG, "Refreshing auth token failed", error)
-            }
+            return updateToken(bodyText)
         } else {
             Log.e(TAG, "Random state mismatch")
         }
         return false
     }
 
-    private suspend fun updateToken(response: JSONObject) {
+    private suspend fun updateToken(bodyText: String) : Boolean {
         try {
+            val url = "$api/api/v1/access_token"
+            val responseString = makeTokenRequest(url, bodyText)
+            val response = JSONObject(responseString)
             authToken = response.getString("access_token")
             validUntil = response.getLong("expires_in") + Util.getUnixTime()
             val optRefreshToken = response.optString("refresh_token")
             refreshToken = if (optRefreshToken.isNullOrEmpty()) refreshToken else optRefreshToken
             store.updateTokens(authToken, validUntil!!, refreshToken)
+            return true
         } catch (error: JSONException) {
             Log.e(TAG, "Failed to get auth token", error)
+        } catch (error: VolleyError) {
+            Log.e(TAG, "Refreshing auth token failed", error)
         }
+        return false
     }
 
     private suspend fun refreshAuthToken() {
         val unixTime = Util.getUnixTime()
         if (validUntil != null && validUntil!! <= unixTime) {
             if (refreshToken != null && refreshToken != "") {
-                val url = "${api}/api/v1/access_token"
                 val bodyText = "grant_type=refresh_token&refresh_token=$refreshToken"
-                try {
-                    val response = makeTokenRequest(url, bodyText)
-                    updateToken(JSONObject(response))
-                } catch (error: VolleyError) {
-                    Log.e(TAG, "Refreshing auth token failed", error)
-                }
+                updateToken(bodyText)
             } else {
                 Log.w(TAG, "No refresh token")
             }
