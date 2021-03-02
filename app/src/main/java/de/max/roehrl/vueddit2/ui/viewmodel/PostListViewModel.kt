@@ -60,19 +60,24 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
             val after = lastPost?.id ?: ""
             val sorting = postSorting.value ?: defaultSorting
             val time = topPostsTime.value ?: defaultTopPostTime
-            val p = getMorePosts(after, sorting, time)
+            val p = getMorePosts(after, sorting, time, getPostCount())
             (posts as MutableLiveData).postValue(oldPosts + p)
             cb?.invoke()
         }
     }
 
-    protected open suspend fun getMorePosts(after: String, sorting: String, time: String): List<NamedItem> {
+    protected open suspend fun getMorePosts(
+            after: String,
+            sorting: String,
+            time: String,
+            count: Int,
+    ): List<NamedItem> {
         val subredditName = if (subreddit.value?.isMultiReddit == true) {
             subreddit.value!!.subreddits
         } else {
             subreddit.value?.name ?: Subreddit.frontPage.name
         }
-        return Reddit.getSubredditPosts(subredditName, after, sorting, time)
+        return Reddit.getSubredditPosts(subredditName, after, sorting, time, count)
     }
 
     fun refreshPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
@@ -90,5 +95,10 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
 
     fun resetPosts() {
         (posts as MutableLiveData).value = emptyList()
+    }
+
+    private fun getPostCount(): Int {
+        val size = posts.value?.size ?: 0
+        return 25 * (size / 25 + 1)
     }
 }

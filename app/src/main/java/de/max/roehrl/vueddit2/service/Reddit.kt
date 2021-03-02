@@ -118,9 +118,10 @@ object Reddit {
             after: String = "",
             sorting: String = "best",
             time: String? = null,
+            count: Int,
     ): MutableList<NamedItem> {
         val url = "${if (subreddit == frontpage) "" else "/r/$subreddit"}/$sorting.json?raw_json=1"
-        return getPosts(url, after, sorting, time)
+        return getPosts(url, after, sorting, time, count)
     }
 
     suspend fun getUserPosts(
@@ -130,10 +131,11 @@ object Reddit {
             group: String = "submitted",
             time: String = "all",
             type: String = "all",
+            count: Int,
     ): MutableList<NamedItem> {
         var url = "/user/$user/$group.json?raw_json=1&sort=$sorting"
         url += if (type != "all") "&type=$type" else ""
-        return getPosts(url, after, sorting, time)
+        return getPosts(url, after, sorting, time, count)
     }
 
     private suspend fun getPosts(
@@ -141,9 +143,9 @@ object Reddit {
             after: String?,
             sorting: String,
             time: String?,
-            limit: Int = 25,
+            count: Int,
     ): MutableList<NamedItem> {
-        var url = url2 + "&limit=$limit" + (if (after != null && after != "") "&after=$after" else "")
+        var url = url2 + "&count=$count" + (if (after != null && after != "") "&after=$after" else "")
         if (time != null && setOf("top", "rising").contains(sorting)) {
             url += "&t=$time"
         }

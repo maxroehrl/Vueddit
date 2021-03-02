@@ -37,10 +37,15 @@ class UserPostListViewModel(application: Application) : PostListViewModel(applic
         (userPostGroup as MutableLiveData).value = group
     }
 
-    override suspend fun getMorePosts(after: String, sorting: String, time: String): List<NamedItem> {
+    override suspend fun getMorePosts(
+            after: String,
+            sorting: String,
+            time: String,
+            count: Int,
+    ): List<NamedItem> {
         val userName = selectedUser.value!!
         val group = userPostGroup.value ?: defaultGroup
         val type = selectedType.value ?: defaultType
-        return Reddit.getUserPosts(userName, after, sorting, group, time, type)
+        return Reddit.getUserPosts(userName, after, sorting, group, time, type, count)
     }
 }
