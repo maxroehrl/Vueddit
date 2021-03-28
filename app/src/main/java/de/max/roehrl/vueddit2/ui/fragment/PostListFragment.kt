@@ -263,7 +263,7 @@ open class PostListFragment : Fragment() {
                 true
             }
             R.id.action_toggle_big_preview -> {
-                appViewModel.toggleBigPreview(viewModel.posts.value!!)
+                appViewModel.toggleBigPreview(viewModel.posts.value!!, currentSubreddit)
                 true
             }
             else -> super.onOptionsItemSelected(item)

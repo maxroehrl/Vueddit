@@ -216,11 +216,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun toggleBigPreview(postList: List<NamedItem>) {
+    fun toggleBigPreview(postList: List<NamedItem>, subreddit: Subreddit?) {
         (isBigTemplatePreferred as MutableLiveData).value = !if (isBigTemplatePreferred.value != null) {
             isBigTemplatePreferred.value!!
         } else {
-            shouldShowBigTemplate(postList, null)
+            shouldShowBigTemplate(postList, subreddit)
         }
     }
 
