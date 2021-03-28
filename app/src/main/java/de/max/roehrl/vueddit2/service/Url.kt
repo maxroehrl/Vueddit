@@ -21,10 +21,13 @@ object Url {
             path = path.replace(Regex(redditUrlPrefix), "")
         }
         if (navController != null
-            && (Regex("^/r/[^\\s;./]+/comments/[^\\s;./]+/[^\\s;./]+$").matches(path)
+            && (Regex("^/r/[^\\s;./]+/comments/[^\\s;./]+/[^\\s;./]+/?.*$").matches(path)
                     || Regex("^/r/[^\\s;./]+$").matches(path)
                     || Regex("^/u(ser)?/[^\\s;./]+$").matches(path))
         ) {
+            if (Regex("^/r/[^\\s;./]+/comments/[^\\s;./]+/[^\\s;./]+/.*$").matches(path)) {
+                path = path.substringBeforeLast("/")
+            }
             try {
                 openDeepLink(path, navController)
             } catch (error: IllegalStateException) {

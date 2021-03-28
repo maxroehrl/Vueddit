@@ -112,6 +112,7 @@
             app:argType="string" />
         <argument
             android:name="comment_name"
+            android:defaultValue="null"
             app:argType="string"
             app:nullable="true" />
         <argument
@@ -139,6 +140,9 @@
         <deepLink
             android:id="@+id/post_deep_link"
             app:uri="www.reddit.com/r/{subreddit_name}/comments/{post_name}/{post_title}/{comment_name}" />
+        <deepLink
+            android:id="@+id/post_deep_link2"
+            app:uri="www.reddit.com/r/{subreddit_name}/comments/{post_name}/{post_title}" />
     </fragment>
 
     <activity
