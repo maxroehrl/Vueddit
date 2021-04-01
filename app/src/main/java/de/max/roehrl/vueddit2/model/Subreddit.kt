@@ -16,10 +16,18 @@ class Subreddit(json: JSONObject, var isMultiReddit: Boolean = false) : NamedIte
         fun fromName(name: String) : Subreddit {
             return Subreddit(JSONObject("{\"display_name\": \"$name\"}"))
         }
+
+        fun fromUser(name: String) : Subreddit {
+            return fromName(name).apply {
+                user = name
+                isSubscribedTo = false
+            }
+        }
     }
 
     val name = json.optString("display_name")
     val subreddits = getSubreddits(json)
+    var user: String? = null
     var isSubscribedTo = true
     var isStarred = false
     var isVisited = true
@@ -41,6 +49,7 @@ class Subreddit(json: JSONObject, var isMultiReddit: Boolean = false) : NamedIte
 
     fun getIconId(): Int {
         return when {
+            user != null -> R.drawable.ic_person
             isMultiReddit -> R.drawable.ic_folder_multiple
             defaultSubreddits.contains(this) ->  R.drawable.ic_home_outline
             isStarred -> R.drawable.ic_star

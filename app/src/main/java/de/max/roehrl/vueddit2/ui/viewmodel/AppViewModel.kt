@@ -39,6 +39,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private val visitedSubreddits: LiveData<List<Subreddit>> = liveData { }
 
+    private val visitedUsers: LiveData<List<Subreddit>> = liveData { }
+
     private val multiReddits: LiveData<List<Subreddit>> = liveData { }
 
     val isBigTemplatePreferred: LiveData<Boolean?> = liveData {
@@ -75,9 +77,23 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun selectUser(user: String) {
+        if (visitedUsers.value?.find { sub ->sub.user == user} == null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                addToVisitedUsers(Subreddit.fromUser(user))
+            }
+        }
+    }
+
     private suspend fun addToVisitedSubreddits(sub: Subreddit) {
         Store.getInstance(getApplication()).addToVisitedSubreddits(sub.name)
         (visitedSubreddits as MutableLiveData).postValue(sortByName((visitedSubreddits.value!! + listOf(sub))))
+        updateAllSubredditsList()
+    }
+
+    private suspend fun addToVisitedUsers(sub: Subreddit) {
+        Store.getInstance(getApplication()).addToVisitedUsers(sub.user!!)
+        (visitedUsers as MutableLiveData).postValue(sortByName((visitedUsers.value!! + listOf(sub))))
         updateAllSubredditsList()
     }
 
@@ -108,6 +124,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         Log.d(TAG, "Loaded ${visited.size} visited subreddits")
         (visitedSubreddits as MutableLiveData).value = visited
 
+        val users = sortByName(store.getVisitedUsers().map {
+            Subreddit.fromUser(it)
+        })
+        Log.d(TAG, "Loaded ${users.size} visited users")
+        (visitedUsers as MutableLiveData).value = users
+
         val multis = sortByName(store.getCachedMultiSubreddits().map {
             Subreddit.fromName(it).apply {
                 isMultiReddit = true
@@ -137,6 +159,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             isSubscribedTo = false
                         }
                     }))
+            (visitedUsers as MutableLiveData).postValue(
+                    sortByName(store.getVisitedUsers().map { name ->
+                        Subreddit.fromUser(name)
+                    }))
             val multis = sortByName(Reddit.getInstance(getApplication()).getMultis())
             (multiReddits as MutableLiveData).postValue(multis)
             store.updateCachedMultiSubreddits(multis)
@@ -150,6 +176,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 Subreddit.defaultSubreddits,
                     subscribedSubreddits.value,
                     visitedSubreddits.value,
+                    visitedUsers.value,
                     multiReddits.value,
             )
         }
@@ -173,6 +200,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             Store.getInstance(getApplication()).removeFromVisitedSubreddits(name)
             (visitedSubreddits as MutableLiveData).postValue(visitedSubreddits.value?.filter {
+                it.name != name
+            })
+            updateAllSubredditsList()
+        }
+    }
+
+    fun removeUserFromVisited(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Store.getInstance(getApplication()).removeFromVisitedUsers(name)
+            (visitedUsers as MutableLiveData).postValue(visitedUsers.value?.filter {
                 it.name != name
             })
             updateAllSubredditsList()
@@ -228,15 +265,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun toggleBigPreview(postList: List<NamedItem>, subreddit: Subreddit?) {
+    fun toggleBigPreview(postList: List<NamedItem>) {
         (isBigTemplatePreferred as MutableLiveData).value = !if (isBigTemplatePreferred.value != null) {
             isBigTemplatePreferred.value!!
         } else {
-            shouldShowBigTemplate(postList, subreddit)
+            shouldShowBigTemplate(postList)
         }
     }
 
-    fun shouldShowBigTemplate(postList: List<NamedItem>, currentSubreddit: Subreddit?): Boolean {
+    fun shouldShowBigTemplate(postList: List<NamedItem>): Boolean {
         return if (isBigTemplatePreferred.value != null) {
             isBigTemplatePreferred.value!!
         } else {

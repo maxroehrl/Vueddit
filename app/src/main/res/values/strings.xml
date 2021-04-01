@@ -18,8 +18,8 @@
     <string name="unsubscribe">Unsubscribe from "/r/%s"</string>
     <string name="subscribed">Subscription was added</string>
     <string name="unsubscribed">Subscription was removed</string>
-    <string name="remove_from_visited">Remove "/r/%s" from visited subreddits</string>
-    <string name="removed_from_visited">"/r/%s" was removed from visited subreddits</string>
+    <string name="remove_from_visited">Remove "%s" from visited</string>
+    <string name="removed_from_visited">"%s" was removed from visited</string>
     <string name="showing">Showing </string>
     <plurals name="num_comments">
         <item quantity="one">%d comment</item>

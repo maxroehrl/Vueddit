@@ -58,6 +58,7 @@ class UserPostListFragment : PostListFragment() {
 
     override fun initialize(postsAdapter: PostsAdapter) {
         viewModel.setSelectedUser(safeArgs.userName)
+        appViewModel.selectUser(safeArgs.userName)
         viewModel.selectedUser.observe(viewLifecycleOwner) { userName ->
             if (userName != null && userName != "") {
                 toolbar.title = "/u/${userName}"

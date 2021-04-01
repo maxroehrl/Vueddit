@@ -44,7 +44,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private lateinit var navController: NavController
     private val viewModel: AppViewModel by viewModels()
-    private val multiReddits = mutableListOf<MenuItem>()
+    private val multiRedditMenuItems = mutableListOf<MenuItem>()
+    private val userRedditMenuItems = mutableListOf<MenuItem>()
     private var searchTextLength: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.subreddit.observe(this) { subreddit ->
             if (subreddit != null) {
                 navView.menu.forEach { item ->
-                    if (item.title == subreddit.name && (subreddit.isMultiReddit == multiReddits.contains(item))) {
+                    if (item.title == subreddit.name && (subreddit.isMultiReddit == multiRedditMenuItems.contains(item))) {
                         item.isChecked = true
                     }
                 }
@@ -130,8 +131,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onNavItemClicked(item: MenuItem) {
-        Log.d(TAG, "Selecting subreddit: '${item.title}'")
-        viewModel.selectSubreddit(item.title.toString(), multiReddits.contains(item))
+        if (userRedditMenuItems.contains(item)) {
+            Log.d(TAG, "Selecting user: '${item.title}'")
+            viewModel.selectUser(item.title.toString())
+            Url.openDeepLink("/u/${item.title}", navController)
+        } else {
+            Log.d(TAG, "Selecting subreddit: '${item.title}'")
+            viewModel.selectSubreddit(item.title.toString(), multiRedditMenuItems.contains(item))
+        }
         drawerLayout.close()
         (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(currentFocus?.windowToken, 0)
     }
@@ -187,14 +194,23 @@ class MainActivity : AppCompatActivity() {
                 }
                 show()
             }
-        } else if (sub?.isVisited == true) {
+        } else if (sub?.isVisited == true || sub?.user != null) {
             MaterialAlertDialogBuilder(this).apply {
-                setItems(listOf(getString(R.string.remove_from_visited, sub.name)).toTypedArray()) { _, which ->
+                val subText = if (sub.user != null) {
+                    "/u/${sub.user}"
+                } else {
+                    "/r/${sub.name}"
+                }
+                setItems(listOf(getString(R.string.remove_from_visited, subText)).toTypedArray()) { _, which ->
                     when (which) {
                         0 -> {
-                            viewModel.removeSubredditFromVisited(sub.name)
+                            if (sub.user != null) {
+                                viewModel.removeUserFromVisited(sub.user!!)
+                            } else {
+                                viewModel.removeSubredditFromVisited(sub.name)
+                            }
                             val view = findViewById<View>(R.id.nav_host_fragment)
-                            val text = getString(R.string.removed_from_visited, sub.name)
+                            val text = getString(R.string.removed_from_visited, subText)
                             Snackbar.make(view!!, text, 3000).apply {
                                 setBackgroundTint(ContextCompat.getColor(context, R.color.snack_bar_background))
                                 setTextColor(ContextCompat.getColor(context, R.color.snack_bar_text))
@@ -210,7 +226,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateNavItems(subredditsGroups: List<List<Subreddit>>?) {
         if (subredditsGroups != null) {
-            multiReddits.clear()
+            multiRedditMenuItems.clear()
+            userRedditMenuItems.clear()
             navView.menu.clear()
             var groupId = Menu.FIRST
             for (group in subredditsGroups) {
@@ -219,7 +236,9 @@ class MainActivity : AppCompatActivity() {
                     item.icon = ContextCompat.getDrawable(this, sub.getIconId())
                     item.isCheckable = true
                     if (sub.isMultiReddit) {
-                        multiReddits.add(item)
+                        multiRedditMenuItems.add(item)
+                    } else if (sub.user != null) {
+                        userRedditMenuItems.add(item)
                     }
                     if (sub == viewModel.subreddit.value) {
                         item.isChecked = true

@@ -42,12 +42,12 @@ open class PostListFragment : Fragment() {
         private const val TAG = "PostListFragment"
     }
     protected open val viewModel: PostListViewModel by viewModels()
+    protected open val appViewModel: AppViewModel by activityViewModels()
     protected open lateinit var toolbar: MaterialToolbar
     protected open lateinit var sortingTabLayout: TabLayout
     protected open val isGroupTabLayoutVisible = false
     protected open var showGotoUser = true
     protected open val layoutId = R.layout.fragment_posts
-    private val appViewModel: AppViewModel by activityViewModels()
     private val safeArgs: PostListFragmentArgs by navArgs()
     private lateinit var collapsingToolbar: CollapsingToolbarLayout
     private var currentSubreddit: Subreddit? = null
@@ -102,7 +102,7 @@ open class PostListFragment : Fragment() {
         appViewModel.isBigTemplatePreferred.observe(viewLifecycleOwner) { isBigTemplatePreferred ->
             if (viewModel.posts.value != null) {
                 postsAdapter.showBigPreview = isBigTemplatePreferred
-                        ?: appViewModel.shouldShowBigTemplate(viewModel.posts.value!!, currentSubreddit)
+                        ?: appViewModel.shouldShowBigTemplate(viewModel.posts.value!!)
                 postsAdapter.notifyItemRangeChanged(0, postsAdapter.itemCount)
             }
         }
@@ -114,7 +114,7 @@ open class PostListFragment : Fragment() {
                 postsAdapter.showBigPreview = if (currentSubreddit == Subreddit.frontPage)
                     false
                 else
-                    appViewModel.shouldShowBigTemplate(posts, currentSubreddit)
+                    appViewModel.shouldShowBigTemplate(posts)
                 Log.i(TAG, "Showing ${if (postsAdapter.showBigPreview == true) "big" else "small"} preview")
             }
             if (newSize > oldSize) {
@@ -273,7 +273,7 @@ open class PostListFragment : Fragment() {
                 true
             }
             R.id.action_toggle_big_preview -> {
-                appViewModel.toggleBigPreview(viewModel.posts.value!!, currentSubreddit)
+                appViewModel.toggleBigPreview(viewModel.posts.value!!)
                 true
             }
             else -> super.onOptionsItemSelected(item)

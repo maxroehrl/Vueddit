@@ -21,6 +21,7 @@ class Store private constructor(val context: Context) {
     private val validUntil: Flow<Long?> = getFlow(VALID_UNTIL)
     private val refreshToken: Flow<String?> = getFlow(REFRESH_TOKEN)
     private val visitedSubreddits: Flow<Set<String>?> = getFlow(VISITED_SUBS)
+    private val visitedUsers: Flow<Set<String>?> = getFlow(VISITED_USERS)
     private val starredSubreddits: Flow<Set<String>?> = getFlow(STARRED_SUBS)
     private val cachedSubscribedSubreddits: Flow<Set<String>?> = getFlow(CACHED_SUBSCRIBED_SUBS)
     private val cachedMultiSubreddits: Flow<Set<String>?> = getFlow(CACHED_MULTI_SUBS)
@@ -33,6 +34,7 @@ class Store private constructor(val context: Context) {
         private val VALID_UNTIL = longPreferencesKey("validUntil")
         private val REFRESH_TOKEN = stringPreferencesKey("refreshToken")
         private val VISITED_SUBS = stringSetPreferencesKey("visitedSubs")
+        private val VISITED_USERS = stringSetPreferencesKey("visitedUsers")
         private val STARRED_SUBS = stringSetPreferencesKey("starredSubs")
         private val CACHED_SUBSCRIBED_SUBS = stringSetPreferencesKey("cachedSubscribedSubs")
         private val CACHED_MULTI_SUBS = stringSetPreferencesKey("cachedMultiSubs")
@@ -70,6 +72,10 @@ class Store private constructor(val context: Context) {
 
     suspend fun getVisitedSubreddits(): Set<String> {
         return visitedSubreddits.first() ?: emptySet()
+    }
+
+    suspend fun getVisitedUsers(): Set<String> {
+        return visitedUsers.first() ?: emptySet()
     }
 
     suspend fun getStarredSubreddits(): Set<String> {
@@ -126,6 +132,22 @@ class Store private constructor(val context: Context) {
             val visited = preferences[VISITED_SUBS]?.toMutableSet() ?: mutableSetOf()
             visited.remove(name)
             preferences[VISITED_SUBS] = visited
+        }
+    }
+
+    suspend fun addToVisitedUsers(name: String) {
+        context.dataStore.edit { preferences ->
+            val visited = preferences[VISITED_USERS]?.toMutableSet() ?: mutableSetOf()
+            visited.add(name)
+            preferences[VISITED_USERS] = visited.filter { it != preferences[USERNAME] }.toSet()
+        }
+    }
+
+    suspend fun removeFromVisitedUsers(name: String) {
+        context.dataStore.edit { preferences ->
+            val visited = preferences[VISITED_USERS]?.toMutableSet() ?: mutableSetOf()
+            visited.remove(name)
+            preferences[VISITED_USERS] = visited
         }
     }
 
