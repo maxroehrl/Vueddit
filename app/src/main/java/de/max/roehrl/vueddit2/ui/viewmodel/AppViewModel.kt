@@ -69,7 +69,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 sub.isSubscribedTo = false
                 addToVisitedSubreddits(sub)
             }
-            (subreddit as MutableLiveData).postValue(sub)
+            if (sub != null) {
+                (subreddit as MutableLiveData).postValue(sub)
+            }
         }
     }
 

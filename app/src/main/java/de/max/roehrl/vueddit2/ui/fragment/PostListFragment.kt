@@ -170,6 +170,7 @@ open class PostListFragment : Fragment() {
             currentSubreddit = subreddit ?: currentSubreddit
         }
         if (safeArgs.rootFragment) {
+            appViewModel.selectSubreddit(Subreddit.frontPage.name, false)
             appViewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
                 viewModel.selectSubreddit(subreddit)
             }
