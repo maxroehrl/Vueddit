@@ -12,7 +12,6 @@ import de.max.roehrl.vueddit2.service.Store
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.math.min
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
@@ -228,12 +227,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         return if (isBigTemplatePreferred.value != null) {
             isBigTemplatePreferred.value!!
         } else {
-            val subHasMoreThanHalfPictures = postList
-                    .subList(min(2, postList.size), min(10, postList.size))
-                    .map { item -> if (item is Post && item.image.url != null) 1 else 0 }
-                    .fold(0) { acc, it -> acc + it } > 4
-            val isNotFrontPage = currentSubreddit != null && currentSubreddit != Subreddit.frontPage
-            subHasMoreThanHalfPictures && isNotFrontPage
+            val numberOfPreviewPictures = postList
+                .filterIsInstance<Post>()
+                .take(10)
+                .map { item -> if (item.image.url != null) 1 else 0 }
+                .fold(0) { acc, it -> acc + it }
+            Log.d(TAG, "$numberOfPreviewPictures of the first 10 posts have a preview")
+            numberOfPreviewPictures > 4
         }
     }
 }

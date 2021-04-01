@@ -2,6 +2,7 @@ package de.max.roehrl.vueddit2.ui.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.core.content.ContextCompat
@@ -37,6 +38,9 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 open class PostListFragment : Fragment() {
+    companion object {
+        private const val TAG = "PostListFragment"
+    }
     protected open val viewModel: PostListViewModel by viewModels()
     protected open lateinit var toolbar: MaterialToolbar
     protected open lateinit var sortingTabLayout: TabLayout
@@ -102,6 +106,26 @@ open class PostListFragment : Fragment() {
                 postsAdapter.notifyItemRangeChanged(0, postsAdapter.itemCount)
             }
         }
+        viewModel.posts.observe(viewLifecycleOwner) { posts ->
+            val oldSize = postsAdapter.posts.size
+            val newSize = posts.size
+            postsAdapter.posts = posts
+            if (postsAdapter.showBigPreview == null && posts.any { item -> item != NamedItem.Loading }) {
+                postsAdapter.showBigPreview = if (currentSubreddit == Subreddit.frontPage)
+                    false
+                else
+                    appViewModel.shouldShowBigTemplate(posts, currentSubreddit)
+                Log.i(TAG, "Showing ${if (postsAdapter.showBigPreview == true) "big" else "small"} preview")
+            }
+            if (newSize > oldSize) {
+                if (oldSize > 0)
+                    postsAdapter.notifyItemChanged(oldSize - 1)
+                postsAdapter.notifyItemRangeInserted(oldSize, newSize - oldSize)
+            } else {
+                postsAdapter.notifyDataSetChanged()
+            }
+            // (view?.parent as? ViewGroup)?.doOnPreDraw { startPostponedEnterTransition() }
+        }
         initialize(postsAdapter)
 
         for (sorting in viewModel.sortingList) {
@@ -113,7 +137,7 @@ open class PostListFragment : Fragment() {
         }
         sortingTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                onSortingSelected(tab?.text.toString())
+                onSortingSelected(tab?.text.toString(), postsAdapter)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -129,22 +153,6 @@ open class PostListFragment : Fragment() {
         if (currentSubreddit == null) {
             viewModel.selectSubreddit(safeArgs.subredditName)
         }
-        viewModel.posts.observe(viewLifecycleOwner, { posts ->
-            val oldSize = postsAdapter.posts.size
-            val newSize = posts.size
-            postsAdapter.posts = posts
-            if (postsAdapter.showBigPreview == null && posts.any { item -> item != NamedItem.Loading }) {
-                postsAdapter.showBigPreview = appViewModel.shouldShowBigTemplate(posts, currentSubreddit)
-            }
-            if (newSize > oldSize) {
-                if (oldSize > 0)
-                    postsAdapter.notifyItemChanged(oldSize - 1)
-                postsAdapter.notifyItemRangeInserted(oldSize, newSize - oldSize)
-            } else {
-                postsAdapter.notifyDataSetChanged()
-            }
-            // (view?.parent as? ViewGroup)?.doOnPreDraw { startPostponedEnterTransition() }
-        })
         appViewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
             if (isLoggedIn)
                 viewModel.loadMorePosts()
@@ -168,7 +176,7 @@ open class PostListFragment : Fragment() {
         }
     }
 
-    open fun onSortingSelected(sorting: String) {
+    open fun onSortingSelected(sorting: String, adapter: PostsAdapter) {
         viewModel.setPostSorting(sorting)
         if (listOf("top", "rising").contains(sorting)) {
             val items = listOf("Hour", "Day", "Week", "Month", "Year", "All")
@@ -176,6 +184,7 @@ open class PostListFragment : Fragment() {
                 setItems(items.toTypedArray()) { _, which ->
                     val time = items[which].toLowerCase(Locale.getDefault())
                     viewModel.setTopPostsTime(time)
+                    adapter.showBigPreview = null
                     viewModel.refreshPosts()
                 }
                 show()

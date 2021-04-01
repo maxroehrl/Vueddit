@@ -58,18 +58,6 @@ class UserPostListFragment : PostListFragment() {
 
     override fun initialize(postsAdapter: PostsAdapter) {
         viewModel.setSelectedUser(safeArgs.userName)
-        viewModel.posts.observe(viewLifecycleOwner) { posts ->
-            val oldSize = postsAdapter.itemCount
-            val newSize = posts.size
-            postsAdapter.posts = posts
-            if (newSize > oldSize) {
-                if (oldSize > 0)
-                    postsAdapter.notifyItemChanged(oldSize - 1)
-                postsAdapter.notifyItemRangeInserted(oldSize, newSize - oldSize)
-            } else {
-                postsAdapter.notifyDataSetChanged()
-            }
-        }
         viewModel.selectedUser.observe(viewLifecycleOwner) { userName ->
             if (userName != null && userName != "") {
                 toolbar.title = "/u/${userName}"
@@ -87,6 +75,7 @@ class UserPostListFragment : PostListFragment() {
                     sortingTabLayout.visibility = View.GONE
                     viewModel.setPostSorting("new")
                 }
+                postsAdapter.showBigPreview = null
                 if (group == "saved") {
                     val items = listOf("All", "Comments", "Links")
                     MaterialAlertDialogBuilder(requireContext()).apply {
