@@ -137,8 +137,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onNavItemIconClicked(item: MenuItem) {
-        val sub = viewModel.subreddits.value?.flatten()?.find {
+        var sub = viewModel.subreddits.value?.flatten()?.find {
             it.name == item.title && !it.isMultiReddit
+        }
+        if (sub == null) {
+            sub = viewModel.searchResults.value?.find {
+                it.name == item.title && !it.isMultiReddit
+            }
         }
         if (sub != null) {
             if (sub.isSubscribedTo) {

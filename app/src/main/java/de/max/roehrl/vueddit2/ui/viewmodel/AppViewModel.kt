@@ -163,6 +163,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             if (subreddit.isSubscribedTo) {
                 removeSubredditFromVisited(subreddit.name)
             } else {
+                subreddit.isStarred = false
                 addToVisitedSubreddits(subreddit)
             }
         }
@@ -202,6 +203,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             } else {
                 subscriptions.add(subreddit)
             }
+        }
+        if (!searchResults.value.isNullOrEmpty()) {
+            val results = searchResults.value!!.map { sub ->
+                if (sub == subreddit) {
+                    sub.isSubscribedTo = subreddit.isSubscribedTo
+                    sub.isStarred = isStarred ?: sub.isStarred
+                }
+                sub
+            }
+            (searchResults as MutableLiveData).postValue(results)
         }
         (subscribedSubreddits as MutableLiveData).postValue(sortByName(subscriptions))
         updateAllSubredditsList()
