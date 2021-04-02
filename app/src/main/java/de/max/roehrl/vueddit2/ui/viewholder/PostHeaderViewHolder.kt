@@ -36,45 +36,19 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
     private val videoPreviewLayout: LinearLayout = itemView.findViewById(R.id.video_preview_layout)
     private val sortingTabLayout: TabLayout = itemView.findViewById(R.id.tab_layout)
     private val sortings = listOf("top", "new", "controversial", "old", "random", "qa")
+    private var currentUrl: String? = null
     override val highlightAuthor = true
 
-    private inner class Client : WebViewClient() {
-        override fun onPageFinished(view: WebView?, url: String?) {
-            view?.zoomOut()
-        }
-    }
+    init {
+        embeddedWebView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                view?.zoomOut()
+            }
 
-    /*private inner class ChromeClient : WebChromeClient() {
-        var view: View? = null
-        var callback: CustomViewCallback? = null
-        var originalSystemUiVisibility: Int? = null
-
-        override fun onHideCustomView() {
-            val decorView = (itemView.context as Activity).window.decorView as ViewGroup
-            decorView.removeView(this.view)
-            view = null
-            decorView.systemUiVisibility = originalSystemUiVisibility!!
-            callback?.onCustomViewHidden()
-            callback = null
-        }
-
-        override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
-            if (this.view != null) {
-                this.onHideCustomView()
-            } else {
-                this.view = view
-                val decorView = (itemView.context as Activity).window.decorView as ViewGroup
-                this.originalSystemUiVisibility = decorView.systemUiVisibility
-                decorView.addView(this.view, FrameLayout.LayoutParams(-1, -1))
-                decorView.systemUiVisibility = 3846 or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                this.callback = callback
+            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                return !url.equals(currentUrl)
             }
         }
-    }*/
-
-    init {
-        embeddedWebView.webViewClient = Client()
-        // embeddedWebView.webChromeClient = ChromeClient()
         embeddedWebView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -146,27 +120,29 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
         } else {
             videoPreviewLayout.visibility = View.VISIBLE
             videoPreviewLayout.layoutParams.height = Util.getAspectFixHeight(post.video.width, post.video.height)
+            currentUrl = post.video.url!!
             when (post.video.type) {
                 VideoType.DASH, VideoType.MP4 -> {
                     videoView.visibility = View.VISIBLE
                     embeddedWebView.visibility = View.GONE
                     try {
-                        videoView.player!!.setMediaItem(MediaItem.fromUri(post.video.url!!))
+                        videoView.player!!.setMediaItem(MediaItem.fromUri(currentUrl!!))
                         videoView.player!!.prepare()
                     } catch (e: Exception) {
-                        Log.e(TAG, "Failed to load ${post.video.type} video from '${post.video.url}'", e)
+                        Log.e(TAG, "Failed to load ${post.video.type} video from '$currentUrl'", e)
                     }
                 }
                 VideoType.EMBEDDED -> {
                     videoView.visibility = View.GONE
                     embeddedWebView.visibility = View.VISIBLE
                     try {
-                        embeddedWebView.loadUrl(post.video.url!!)
+                        embeddedWebView.loadUrl(currentUrl!!)
                     } catch (e: Exception) {
-                        Log.e(TAG, "Failed to load embedded video from '${post.video.url}'", e)
+                        Log.e(TAG, "Failed to load embedded video from '$currentUrl'", e)
                     }
                 }
                 else -> {
+                    Log.e(TAG, "Unsupported url: '$currentUrl'")
                 }
             }
         }
