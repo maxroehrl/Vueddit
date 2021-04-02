@@ -10,6 +10,6 @@
 
     <include layout="@layout/self_text" />
 
-    <include layout="@layout/num_commtents" />
+    <include layout="@layout/num_comments" />
 
 </LinearLayout>
