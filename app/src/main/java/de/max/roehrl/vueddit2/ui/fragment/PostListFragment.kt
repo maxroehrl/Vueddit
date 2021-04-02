@@ -235,7 +235,6 @@ open class PostListFragment : Fragment() {
     @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val navController = findNavController()
         val topLevelDestinationIds = mutableSetOf<Int>()
         if (safeArgs.rootFragment)
             topLevelDestinationIds.add(R.id.postListFragment)
@@ -243,7 +242,11 @@ open class PostListFragment : Fragment() {
             if (safeArgs.rootFragment)
                 setOpenableLayout((activity as MainActivity).drawerLayout)
         }.build()
-        collapsingToolbar.setupWithNavController(toolbar, navController, appBarConfiguration)
+        try {
+            collapsingToolbar.setupWithNavController(toolbar, findNavController(), appBarConfiguration)
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "Failed to setup collapsing toolbar with nav controller", e)
+        }
         onCreateOptionsMenu(toolbar.menu, SupportMenuInflater(context))
         toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
     }

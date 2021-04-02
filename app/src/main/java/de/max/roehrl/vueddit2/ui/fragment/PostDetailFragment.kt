@@ -172,7 +172,11 @@ class PostDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // postponeEnterTransition()
-        collapsingToolbar.setupWithNavController(toolbar, findNavController())
+        try {
+            collapsingToolbar.setupWithNavController(toolbar, findNavController())
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "Failed to setup collapsing toolbar with nav controller", e)
+        }
         onCreateOptionsMenu(toolbar.menu, SupportMenuInflater(context))
         toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
     }
