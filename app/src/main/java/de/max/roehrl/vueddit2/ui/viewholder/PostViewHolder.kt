@@ -61,7 +61,6 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                     post.getJSONString()
                 )
             )
-            // null, null, FragmentNavigatorExtras(postHeader to "header")
         } catch (error: IllegalArgumentException) {
             view.findNavController().navigate(
                 UserPostListFragmentDirections.actionUserPostListFragmentToPostDetailFragment(
@@ -76,7 +75,6 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     open fun bind(post: NamedItem, highlightSticky: Boolean = true) {
         this.post = post as Post
-        // ViewCompat.setTransitionName(postHeader, post.name)
         val builder = SpannableStringBuilder()
 
         if (post.link_flair_text != "" && post.link_flair_text != "null") {

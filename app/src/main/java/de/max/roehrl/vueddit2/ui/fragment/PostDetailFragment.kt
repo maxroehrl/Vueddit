@@ -171,7 +171,6 @@ class PostDetailFragment : Fragment() {
     @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // postponeEnterTransition()
         try {
             collapsingToolbar.setupWithNavController(toolbar, findNavController())
         } catch (e: IllegalStateException) {

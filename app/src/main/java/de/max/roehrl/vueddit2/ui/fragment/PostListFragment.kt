@@ -57,7 +57,6 @@ open class PostListFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        // postponeEnterTransition()
         val root = inflater.inflate(layoutId, container, false)
         val postsAdapter = PostsAdapter()
         val layoutManager = LinearLayoutManager(context)
@@ -124,7 +123,6 @@ open class PostListFragment : Fragment() {
             } else {
                 postsAdapter.notifyDataSetChanged()
             }
-            // (view?.parent as? ViewGroup)?.doOnPreDraw { startPostponedEnterTransition() }
         }
         initialize(postsAdapter)
 

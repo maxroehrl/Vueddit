@@ -177,18 +177,6 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
         viewModel.refreshComments()
     }
 
-    /*private fun addTransitionSupport() {
-        val postHeader = view.findViewById<RelativeLayout>(R.id.header)
-        ViewCompat.setTransitionName(postHeader, "header")
-
-        val imageView: SimpleDraweeView = itemView.findViewById(R.id.preview)
-        imageView.controller = Fresco.newDraweeControllerBuilder().setControllerListener(object : BaseControllerListener<ImageInfo>() {
-            override fun onFinalImageSet(id: String?, imageInfo: ImageInfo?, animatable: Animatable?) {
-                startPostponedEnterTransition()
-            }
-        }).build()
-    }*/
-
     override fun onClick(view: View) {
         Url.openUrl(selfText.context, selfText.findNavController(), post.url)
     }
