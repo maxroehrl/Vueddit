@@ -100,7 +100,7 @@ open class PostListFragment : Fragment() {
             }
         }
         appViewModel.isBigTemplatePreferred.observe(viewLifecycleOwner) { isBigTemplatePreferred ->
-            if (viewModel.posts.value != null) {
+            if (viewModel.posts.value != null && postsAdapter.showBigPreview != isBigTemplatePreferred) {
                 postsAdapter.showBigPreview = isBigTemplatePreferred
                         ?: appViewModel.shouldShowBigTemplate(viewModel.posts.value!!)
                 postsAdapter.notifyItemRangeChanged(0, postsAdapter.itemCount)
@@ -170,7 +170,6 @@ open class PostListFragment : Fragment() {
             currentSubreddit = subreddit ?: currentSubreddit
         }
         if (safeArgs.rootFragment) {
-            appViewModel.selectSubreddit(Subreddit.frontPage.name, false)
             appViewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
                 viewModel.selectSubreddit(subreddit)
             }

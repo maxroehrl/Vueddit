@@ -128,6 +128,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState?.getBoolean(AppViewModel.WAS_LOGGED_IN, false) == true) {
             (viewModel.isLoggedIn as MutableLiveData).value = true
         }
+        viewModel.selectSubreddit(Subreddit.frontPage.name, false)
     }
 
     private fun onNavItemClicked(item: MenuItem) {
