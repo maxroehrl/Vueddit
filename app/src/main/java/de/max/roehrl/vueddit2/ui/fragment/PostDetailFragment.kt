@@ -107,6 +107,8 @@ class PostDetailFragment : Fragment() {
                         commentsAdapter.notifyItemRangeRemoved(2, oldSize - 1)
                     }
                     commentsAdapter.notifyItemChanged(1)
+                } else {
+                    commentsAdapter.notifyItemChanged(0)
                 }
             } else if (newSize == 0) {
                 commentsAdapter.notifyItemRangeRemoved(1, oldSize)
