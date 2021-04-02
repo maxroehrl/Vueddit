@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.util.Log
 import android.view.View
+import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
@@ -28,6 +29,7 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
     PostViewHolder(itemView) {
     companion object {
         private const val TAG = "PostHeaderViewHolder"
+        private const val INTERFACE_NAME = "JsInterface"
     }
     private val selfText: TextView = itemView.findViewById(R.id.self_text)
     private val numComments: TextView = itemView.findViewById(R.id.num_comments)
@@ -38,11 +40,35 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
     private val sortings = listOf("top", "new", "controversial", "old", "random", "qa")
     private var currentUrl: String? = null
     override val highlightAuthor = true
+    private inner class JsInterface(private val view: WebView?) {
+        @JavascriptInterface @Suppress("unused")
+        fun resize(heightInDp: String) {
+            val heightInPx = Util.dpToPx(heightInDp.toInt())
+            Log.d(TAG, "Setting new embedded web view height: $heightInDp dp = $heightInPx px")
+            view?.post {
+                videoPreviewLayout.visibility = View.GONE
+                videoPreviewLayout.layoutParams.height = heightInPx
+                embeddedWebView.visibility = View.VISIBLE
+                videoPreviewLayout.visibility = View.VISIBLE
+            }
+        }
+    }
 
     init {
         embeddedWebView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 view?.zoomOut()
+                val code = """
+                    var scrollHeight = 0;
+                    setInterval(function() {
+                        var newScrollHeight = document.body.scrollHeight;
+                        if (scrollHeight !== newScrollHeight) {
+                            scrollHeight = newScrollHeight;
+                            $INTERFACE_NAME.resize(scrollHeight);
+                        }
+                    }, 1000);
+                """.trimIndent()
+                view?.loadUrl("javascript:$code")
             }
 
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
@@ -58,6 +84,7 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
             builtInZoomControls = true
             mediaPlaybackRequiresUserGesture = false
         }
+        embeddedWebView.addJavascriptInterface(JsInterface(embeddedWebView), INTERFACE_NAME)
         videoView.player = SimpleExoPlayer.Builder(itemView.context).build().apply {
             repeatMode = Player.REPEAT_MODE_ONE
             playWhenReady = true
@@ -118,13 +145,13 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
         if (post.video.height == 0) {
             videoPreviewLayout.visibility = View.GONE
         } else {
-            videoPreviewLayout.visibility = View.VISIBLE
-            videoPreviewLayout.layoutParams.height = Util.getAspectFixHeight(post.video.width, post.video.height)
             currentUrl = post.video.url!!
             when (post.video.type) {
                 VideoType.DASH, VideoType.MP4 -> {
+                    videoPreviewLayout.layoutParams.height = Util.getAspectFixHeight(post.video.width, post.video.height)
                     videoView.visibility = View.VISIBLE
                     embeddedWebView.visibility = View.GONE
+                    videoPreviewLayout.visibility = View.VISIBLE
                     try {
                         videoView.player!!.setMediaItem(MediaItem.fromUri(currentUrl!!))
                         videoView.player!!.prepare()
@@ -134,7 +161,8 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
                 }
                 VideoType.EMBEDDED -> {
                     videoView.visibility = View.GONE
-                    embeddedWebView.visibility = View.VISIBLE
+                    embeddedWebView.visibility = View.GONE
+                    @Suppress("unused")
                     try {
                         embeddedWebView.loadUrl(currentUrl!!)
                     } catch (e: Exception) {
