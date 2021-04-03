@@ -2,7 +2,7 @@
   <StackLayout class="comment"
                :style="{borderWidth: selected ? '6px' : '0 6px',
                         borderColor: selected ? '#53ba82' : '#53ba82 #080808'}">
-    <FlexboxLayout v-if="selected" class="button-bar">
+    <FlexboxLayout :hidden="!selected" class="button-bar">
       <Votes class="button-bar-child" :voteable="comment" />
       <Ripple v-for="i in buttonBar"
               :key="i.$index"

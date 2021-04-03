@@ -34,7 +34,7 @@
           </FormattedString>
         </Label>
       </Ripple>
-      <Ripple v-if="!bigPreview"
+      <Ripple :hidden="bigPreview"
               height="300px"
               width="20%"
               @longPress="onLongPress(post)"
@@ -44,7 +44,7 @@
                      width="100%" />
       </Ripple>
     </StackLayout>
-    <Ripple v-if="bigPreview"
+    <Ripple :hidden="!bigPreview"
             :height="getImageHeight(post)"
             width="100%"
             @longPress="onLongPress(post)"
