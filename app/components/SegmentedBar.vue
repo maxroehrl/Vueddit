@@ -34,7 +34,7 @@ export default {
     padding: {
       type: String,
       required: false,
-      default: '70px',
+      default: '50px',
     },
   },
   data() {
