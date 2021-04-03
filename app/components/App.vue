@@ -317,10 +317,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-  ActionBar {
-    background-color: #3e3e3e;
-    color: #ffffff;
-  }
-</style>
