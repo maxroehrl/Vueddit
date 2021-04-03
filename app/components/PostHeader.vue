@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import Reddit from '../services/Reddit';
+import Util from '../services/Util';
 import Votes from './Votes';
 
 export default {
@@ -93,22 +93,22 @@ export default {
   },
   methods: {
     getPreview(post) {
-      const preview = Reddit.getPreview(post);
+      const preview = Util.getPreview(post);
       return preview ? preview.url: '';
     },
 
     getTimeFromNow(post) {
-      return Reddit.getTimeFromNow(post.created_utc) + (post.edited ? ' *' : '');
+      return Util.getTimeFromNow(post.created_utc) + (post.edited ? ' *' : '');
     },
 
     getImage(post) {
-      const preview = Reddit.getImage(post);
+      const preview = Util.getImage(post);
       return preview ? preview.url: '';
     },
 
     getImageHeight(post) {
-      const image = Reddit.getImage(post);
-      return image ? Reddit.getAspectFixHeight(image) : '0px';
+      const image = Util.getImage(post);
+      return image ? Util.getAspectFixHeight(image) : '0px';
     },
   },
 };

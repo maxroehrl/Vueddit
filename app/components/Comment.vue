@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import Reddit from '../services/Reddit';
+import Util from '../services/Util';
 import Markdown from '../services/Markdown';
 import Votes from './Votes';
 
@@ -180,7 +180,7 @@ export default {
     },
 
     getTimeFromNow(comment) {
-      return Reddit.getTimeFromNow(comment.created_utc) + (comment.edited ? '* ' : ' ');
+      return Util.getTimeFromNow(comment.created_utc) + (comment.edited ? '* ' : ' ');
     },
 
     getUserColor(comment) {

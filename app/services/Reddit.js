@@ -1,9 +1,8 @@
 import * as app from '@nativescript/core/application';
 import {getJSON} from '@nativescript/core/http';
-import {Screen} from '@nativescript/core/platform';
-import moment from 'moment';
 import Login from '../components/Login';
 import store from '../store';
+import Util from './Util';
 
 export default class Reddit {
   static api = 'https://www.reddit.com';
@@ -80,7 +79,7 @@ export default class Reddit {
       if (response.expires_in) {
         const payload = {
           authToken: response.access_token,
-          validUntil: response.expires_in + this.getUnixTime(),
+          validUntil: response.expires_in + Util.getUnixTime(),
           refreshToken: response.refresh_token || store.state.reddit.refreshToken,
         };
         return store.dispatch('login', payload);
@@ -176,38 +175,6 @@ export default class Reddit {
   }
 
   static refreshTokenIfNecessary() {
-    return store.state.reddit.validUntil <= this.getUnixTime() ? this.refreshAuthToken() : Promise.resolve();
-  }
-
-  static getImage(post) {
-    return this.getPreview(post, Screen.mainScreen.widthPixels, {url: ''});
-  }
-
-  static getPreview(post, preferredWidth=300, noPreview={url: 'res://ic_comment_text_multiple_outline_white_48dp'}) {
-    if (post?.preview?.images?.[0]?.resolutions) {
-      const resolutions = post.preview.images[0].resolutions;
-      const distArr = resolutions.map((resolution) => Math.abs(resolution.width - preferredWidth));
-      return resolutions[distArr.indexOf(Math.min(...distArr))];
-    } else if (post.thumbnail && !['self', 'default'].includes(post.thumbnail)) {
-      return {url: post.thumbnail, height: post.thumbnail_height, width: post.thumbnail_width};
-    } else {
-      return noPreview;
-    }
-  }
-
-  static getAspectFixHeight({height, width}) {
-    if (height && width) {
-      return (height * Screen.mainScreen.widthPixels / width).toFixed(0) + 'px';
-    } else {
-      return '0px';
-    }
-  }
-
-  static getTimeFromNow(unixTime) {
-    return moment(unixTime * 1000).fromNow();
-  }
-
-  static getUnixTime() {
-    return Math.round(new Date().getTime() / 1000);
+    return store.state.reddit.validUntil <= Util.getUnixTime() ? this.refreshAuthToken() : Promise.resolve();
   }
 }

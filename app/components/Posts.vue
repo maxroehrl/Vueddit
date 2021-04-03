@@ -35,6 +35,7 @@ import {ObservableArray} from '@nativescript/core/data/observable-array';
 import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
 import {action} from '@nativescript/core/ui/dialogs';
 import Reddit from '../services/Reddit';
+import Util from '../services/Util';
 import PostHeader from './PostHeader';
 import Comment from './Comment';
 import showSnackbar from './Snackbar';
@@ -96,7 +97,7 @@ export default {
     },
 
     shouldShowBigPreview(post) {
-      return !!(Reddit.getPreview(post, 300, false) && this.getDefaultTemplate() === 'big');
+      return !!(Util.getPreview(post, 300, false) && this.getDefaultTemplate() === 'big');
     },
 
     getDefaultTemplate() {

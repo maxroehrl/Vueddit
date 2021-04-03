@@ -29,7 +29,7 @@
 
 <script>
 import MarkdownView from './MarkdownView';
-import Reddit from '../services/Reddit';
+import Util from '../services/Util';
 import PostHeader from './PostHeader';
 
 export default {
@@ -69,20 +69,20 @@ export default {
     },
 
     getPreview(post) {
-      return Reddit.getPreview(post)?.url ?? '';
+      return Util.getPreview(post)?.url ?? '';
     },
 
     shouldShowBigPreview(post) {
-      return !!Reddit.getPreview(post, 300, false);
+      return !!Util.getPreview(post, 300, false);
     },
 
     getImage(post) {
-      return Reddit.getImage(post)?.url ?? '';
+      return Util.getImage(post)?.url ?? '';
     },
 
     getImageHeight(post) {
-      const image = Reddit.getImage(post);
-      return image ? Reddit.getAspectFixHeight(image) : '0px';
+      const image = Util.getImage(post);
+      return image ? Util.getAspectFixHeight(image) : '0px';
     },
 
     hasEmbeddedVideo(post) {
@@ -130,7 +130,7 @@ export default {
 
     getVideoHeight(post) {
       const video = this.getVideo(post);
-      return video ? Reddit.getAspectFixHeight(video) : '0px';
+      return video ? Util.getAspectFixHeight(video) : '0px';
     },
 
     openUrl(post) {
