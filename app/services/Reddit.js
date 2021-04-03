@@ -38,24 +38,20 @@ export default class Reddit {
   }
 
   static getRefreshToken(page, responseUrl) {
-    const state = responseUrl.match(/state=([^&]+)/)[1];
+    const state = responseUrl.match(/state=([^&#]+)/)[1];
     if (state === this.randomState) {
       if (responseUrl.includes('code=')) {
-        const code = responseUrl.match(/code=([^&]+)/)[1];
-        return getJSON({
-          url: `${this.api}/api/v1/access_token`,
-          method: 'POST',
-          content: `grant_type=authorization_code&code=${code}&redirect_uri=${this.redirectUriEncoded}`,
-          headers: {'Authorization': `Basic ${btoa(this.clientId + ':')}`},
-        }).then(this.updateToken.bind(this)).then(() => {
-          if (page) {
-            page.$navigateBack({
-              transition: 'slide',
-            });
-          }
+        const code = responseUrl.match(/code=([^&#]+)/)[1];
+        const content = `grant_type=authorization_code&code=${code}&redirect_uri=${this.redirectUriEncoded}`;
+        return this.updateToken(content).then(() => {
+          page?.$navigateBack({
+            transition: 'slide',
+          });
+        }).catch((error) => {
+          console.error('Get refresh token error', error);
         });
       } else {
-        const error = responseUrl.match(/error=([^&]+)/)[1];
+        const error = responseUrl.match(/error=([^&#]+)/)[1];
         if (error === 'access_denied') {
           app.android.foregroundActivity.finish();
         } else {
@@ -67,24 +63,31 @@ export default class Reddit {
 
   static refreshAuthToken() {
     if (store.state.reddit.refreshToken) {
-      return getJSON({
-        url: `${this.api}/api/v1/access_token`,
-        method: 'POST',
-        content: `grant_type=refresh_token&refresh_token=${store.state.reddit.refreshToken}`,
-        headers: {'Authorization': `Basic ${btoa(this.clientId + ':')}`},
-      }).then(this.updateToken.bind(this));
+      const content = `grant_type=refresh_token&refresh_token=${store.state.reddit.refreshToken}`;
+      return this.updateToken(content);
     } else {
       return Promise.reject(new Error('No refresh token'));
     }
   }
 
-  static updateToken(response) {
-    const payload = {
-      authToken: response.access_token,
-      validUntil: response.expires_in + this.getUnixTime(),
-      refreshToken: response.refresh_token || store.state.reddit.refreshToken,
-    };
-    return store.dispatch('login', payload);
+  static updateToken(content) {
+    return getJSON({
+      url: `${this.api}/api/v1/access_token`,
+      method: 'POST',
+      content,
+      headers: {'Authorization': `Basic ${btoa(this.clientId + ':')}`},
+    }).then((response) => {
+      if (response.expires_in) {
+        const payload = {
+          authToken: response.access_token,
+          validUntil: response.expires_in + this.getUnixTime(),
+          refreshToken: response.refresh_token || store.state.reddit.refreshToken,
+        };
+        return store.dispatch('login', payload);
+      } else {
+        return Promise.reject(new Error(response.error));
+      }
+    });
   }
 
   static getUser() {
