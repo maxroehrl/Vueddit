@@ -5,7 +5,7 @@
         "es6": true
     },
     "extends": [
-      "google",
+      "plugin:@nativescript/recommended",
       "plugin:vue/recommended"
     ],
     "globals": {
@@ -14,12 +14,13 @@
     },
     "parserOptions": {
         "parser": "babel-eslint",
-        "ecmaVersion": 2018,
+        "ecmaVersion": 2015,
         "sourceType": "module"
     },
     "plugins": [
         "vue",
-        "babel"
+        "babel",
+        "@nativescript"
     ],
     "rules": {
       "no-invalid-this": 0,

@@ -1,5 +1,4 @@
 import Vue from 'nativescript-vue';
-import VueDevtools from 'nativescript-vue-devtools';
 import RadSideDrawerPlugin from 'nativescript-ui-sidedrawer/vue';
 import RadListViewPlugin from 'nativescript-ui-listview/vue';
 import {decode, encode} from 'base-64';
@@ -17,13 +16,6 @@ if (!global.btoa) {
 if (!global.atob) {
   global.atob = decode;
 }
-
-if (TNS_ENV !== 'production') {
-  Vue.use(VueDevtools);
-}
-
-Vue.config.silent = (TNS_ENV === 'production');
-Vue.config.suppressRenderLogs = true;
 
 RadSideDrawerPlugin.install(Vue);
 RadListViewPlugin.install(Vue, {});

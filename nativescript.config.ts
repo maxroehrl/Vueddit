@@ -6,6 +6,7 @@ export default {
   android: {
     v8Flags: '--expose_gc',
     markingMode: 'none',
+    maxLogcatObjectSize: 9999,
   },
   appPath: 'app',
 } as NativeScriptConfig
