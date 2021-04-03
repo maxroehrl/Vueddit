@@ -8,7 +8,7 @@ const shouldOverrideUrlLoadingProperty = new Property({
 
 shouldOverrideUrlLoadingProperty.register(WebView);
 
-export default class LoginWebView extends WebView {
+export default class AdvancedWebView extends WebView {
   callback;
 
   initNativeView() {

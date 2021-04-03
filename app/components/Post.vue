@@ -6,12 +6,20 @@
                 width="100%"
                 :onLongPress="showMoreOptions"
                 :onTab="openUrl" />
-    <WebView v-if="getVideo(post)"
-             :height="getVideoHeight(post)"
-             :src="getVideo(post).src"
-             @loadFinished="onVideoPreviewLoadFinished"
-             @loaded="onVideoPreviewLoaded" />
-    <MarkdownView v-if="post.selftext !== ''"
+    <AdvancedWebView :hidden="!hasEmbeddedVideo(post)"
+                     :height="getVideoHeight(post) + 'px'"
+                     :src="getVideoSource(post)"
+                     :shouldOverrideUrlLoading="shouldOverrideUrlLoading"
+                     @loadFinished="onVideoPreviewLoadFinished"
+                     @loaded="onVideoPreviewLoaded" />
+    <ExoPlayer ref="exoplayer"
+               :hidden="!hasExoPlayerVideo(post)"
+               controls="true"
+               autoplay="true"
+               :src="getVideoSource(post)"
+               :height="getVideoHeight(post)"
+               loop="true" />
+    <MarkdownView :hidden="post.selftext === ''"
                   :text="post.selftext"
                   class="post-text" />
     <Label class="num-comments"
@@ -20,8 +28,6 @@
 </template>
 
 <script>
-import * as app from '@nativescript/core/application';
-import {Screen} from '@nativescript/core/platform';
 import MarkdownView from './MarkdownView';
 import Reddit from '../services/Reddit';
 import PostHeader from './PostHeader';
@@ -49,39 +55,13 @@ export default {
         androidWebView.getSettings().setUseWideViewPort(false);
         androidWebView.getSettings().setDisplayZoomControls(false);
         androidWebView.getSettings().setBuiltInZoomControls(true);
-        androidWebView.getSettings().setAllowFileAccessFromFileURLs(true);
-        androidWebView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         androidWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
         androidWebView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-        const ChromeClient = android.webkit.WebChromeClient.extend({
-          view: null,
-          callback: null,
-          originalSystemUiVisibility: null,
-
-          onHideCustomView() {
-            const decorView = app.android.foregroundActivity.getWindow().getDecorView();
-            decorView.removeView(this.view);
-            this.view = null;
-            decorView.setSystemUiVisibility(this.originalSystemUiVisibility);
-            this.callback.onCustomViewHidden();
-            this.callback = null;
-          },
-
-          onShowCustomView(view, callback) {
-            if (this.view != null) {
-              this.onHideCustomView();
-            } else {
-              this.view = view;
-              const decorView = app.android.foregroundActivity.getWindow().getDecorView();
-              this.originalSystemUiVisibility = decorView.getSystemUiVisibility();
-              decorView.addView(this.view, new android.widget.FrameLayout.LayoutParams(-1, -1));
-              decorView.setSystemUiVisibility(3846 | android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-              this.callback = callback;
-            }
-          },
-        });
-        androidWebView.setWebChromeClient(new ChromeClient());
       }
+    },
+
+    shouldOverrideUrlLoading(url) {
+      return url !== this.getVideo(this.post).src;
     },
 
     onVideoPreviewLoadFinished(args) {
@@ -105,11 +85,21 @@ export default {
       return image ? Reddit.getAspectFixHeight(image) : '0px';
     },
 
+    hasEmbeddedVideo(post) {
+      const video = this.getVideo(post);
+      return video && video.type === 'media_domain_url';
+    },
+
+    hasExoPlayerVideo(post) {
+      const video = this.getVideo(post);
+      return video && ['dash_url', 'url'].includes(video.type);
+    },
+
     getVideo(post) {
       if (post.secure_media?.reddit_video) {
-        return this.getVideoObject(post.secure_media.reddit_video, 'hls_url');
+        return this.getVideoObject(post.secure_media.reddit_video, 'dash_url');
       } else if (post.preview?.reddit_video_preview) {
-        return this.getVideoObject(post.preview.reddit_video_preview, 'hls_url');
+        return this.getVideoObject(post.preview.reddit_video_preview, 'dash_url');
       } else if (post.preview?.images?.[0]?.variants?.mp4) {
         return this.getVideoObject(post.preview.images[0].variants.mp4.source, 'url');
       } else if (post.secure_media_embed?.media_domain_url) {
@@ -119,58 +109,28 @@ export default {
       }
     },
 
-    getVideoObject(source, srcProp='src', heightProp='height', widthProp='width') {
-      let src = source[srcProp];
-      if (['hls_url', 'url'].includes(srcProp)) {
-        const type = srcProp === 'hls_url' ? 'application/x-mpegURL' : 'video/mp4';
-        src = this.getRedditDashVideoPlayerHtml(source[srcProp], type);
-      }
-      return {
-        src,
-        height: source[heightProp],
-        width: source[widthProp],
-      };
+    getVideoSource(post) {
+      return this.getVideo(post)?.src;
     },
 
-    getRedditDashVideoPlayerHtml(src, type) {
-      return `
-        <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Video Player</title>
-            <style>
-              body {
-                margin: 0;
-                background-color: black;
-              }
-
-              .vjs-default-skin .vjs-control-bar {
-                background-color: rgba(62, 62, 62, 0.5) !important;
-              }
-
-              .vjs-default-skin .vjs-progress-control .vjs-load-progress > div {
-                background: rgba(0, 0, 0, 0.2);
-              }
-            </style>
-            <link href="https://unpkg.com/video.js/dist/video-js.min.css" rel="stylesheet">
-          </head>
-          <body>
-            <video-js id="vid1" class="video-js vjs-default-skin" muted autoplay controls loop width="${Screen.mainScreen.widthDIPs}">
-              <source src="${src}" type="${type}" />
-            </video-js>
-            <script src="https://unpkg.com/video.js/dist/video.min.js"><` + `/script>
-            <script src="https://unpkg.com/@videojs/http-streaming/dist/videojs-http-streaming.min.js"><` + `/script>
-            <script>
-              const player = videojs('vid1');
-            <` + `/script>
-          </body>
-        </html>`;
+    getVideoObject(source, srcProp) {
+      if (source) {
+        const src = source[srcProp];
+        if (src && src !== '') {
+          return {
+            src,
+            type: srcProp,
+            height: source.height ?? 0,
+            width: source.width ?? 0,
+          };
+        }
+      }
+      return null;
     },
 
     getVideoHeight(post) {
-      return Reddit.getAspectFixHeight(this.getVideo(post));
+      const video = this.getVideo(post);
+      return video ? Reddit.getAspectFixHeight(video) : '0px';
     },
 
     openUrl(post) {

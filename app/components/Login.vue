@@ -3,10 +3,10 @@
         @loaded="loaded($event)"
         @unloaded="unloaded($event)">
     <StackLayout>
-      <LoginWebView :src="url"
-                    :shouldOverrideUrlLoading="onShouldOverrideUrlLoading"
-                    @loadFinished="onLoadFinished"
-                    @loadStarted="onLoadStarted" />
+      <AdvancedWebView :src="url"
+                       :shouldOverrideUrlLoading="onShouldOverrideUrlLoading"
+                       @loadFinished="onLoadFinished"
+                       @loadStarted="onLoadStarted" />
     </StackLayout>
   </Page>
 </template>
