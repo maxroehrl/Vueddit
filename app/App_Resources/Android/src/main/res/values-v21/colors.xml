@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<color name="ns_accent">#53ba82</color>
-  <color name="status_bar">#000000</color>
+  <color name="status_bar">#3e3e3e</color>
   <color name="navigation_bar">#000000</color>
 </resources>
