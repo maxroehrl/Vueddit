@@ -1,4 +1,5 @@
 import {Screen} from '@nativescript/core/platform';
+import {RESOURCE_PREFIX} from "@nativescript/core/utils/utils";
 import moment from 'moment';
 
 export default class Util {
@@ -6,7 +7,7 @@ export default class Util {
     return this.getPreview(post, Screen.mainScreen.widthPixels, {url: ''});
   }
 
-  static getPreview(post, preferredWidth=300, noPreview={url: 'res://ic_comment_text_multiple_outline_white_48dp'}) {
+  static getPreview(post, preferredWidth = 300, noPreview = {url: RESOURCE_PREFIX + 'ic_comment_text_multiple_outline'}) {
     if (post?.preview?.images?.[0]?.resolutions) {
       const resolutions = post.preview.images[0].resolutions;
       const distArr = resolutions.map((resolution) => Math.abs(resolution.width - preferredWidth));

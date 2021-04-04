@@ -36,8 +36,10 @@ export default class CachedImage extends CachedImageBase {
 
   [srcProperty.setNative](value) {
     if (value.startsWith(RESOURCE_PREFIX)) {
-      value = 'res:/' + ad.resources.getDrawableId(value.substr(RESOURCE_PREFIX.length));
+      const id = ad.resources.getDrawableId(value.substr(RESOURCE_PREFIX.length));
+      this._android.setImageResource(id);
+    } else {
+      this._android.setImageURI(value);
     }
-    this._android.setImageURI(android.net.Uri.parse(value), null);
   }
 }
