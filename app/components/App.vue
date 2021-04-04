@@ -10,9 +10,6 @@
       <ActionItem text="Show sidebar"
                   android.position="popup"
                   @tap="showSidebar(subreddit)" />
-      <ActionItem text="Remove from visited"
-                  android.position="popup"
-                  @tap="clearVisited" />
       <ActionItem text="Toggle list item size"
                   android.position="popup"
                   @tap="toggleTemplate" />
@@ -288,13 +285,6 @@ export default {
           .concat(this.$refs.subredditList.defaultSubreddits.map((s) => s.display_name))
           .includes(subreddit.display_name)) {
         store.dispatch('visitSubreddit', {subreddit})
-            .then(() => this.refreshSubredditList());
-      }
-    },
-
-    clearVisited() {
-      if (this.subreddit && !this.subreddit.subreddits) {
-        store.dispatch('unVisitSubreddit', {subreddit: this.subreddit})
             .then(() => this.refreshSubredditList());
       }
     },

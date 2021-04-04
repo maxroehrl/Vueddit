@@ -17,7 +17,9 @@
           <Ripple width="20%" @tap="star(subreddit)">
             <Label :text="getSubredditIcon(subreddit)" class="subreddit-icon" />
           </Ripple>
-          <Ripple width="80%" @tap="selectSubreddit(subreddit)">
+          <Ripple width="80%"
+                  @tap="selectSubreddit(subreddit)"
+                  @longPress="onLongPress(subreddit)">
             <Label :text="subreddit.display_name" class="subreddit-label" />
           </Ripple>
         </StackLayout>
@@ -30,6 +32,7 @@
 import Reddit from '../services/Reddit';
 import {ObservableArray} from '@nativescript/core/data/observable-array';
 import store from '../store';
+import {action} from "@nativescript/core/ui/dialogs";
 
 export default {
   name: 'Subreddits',
@@ -176,6 +179,18 @@ export default {
         return 1;
       }
       return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase());
+    },
+
+    onLongPress(subreddit) {
+      if (!this.isMultireddit(subreddit) && !this.isSubscribedTo(subreddit)) {
+        const actions = [`Remove /r/${subreddit.display_name} from visited subreddits`];
+        action({actions}).then((action) => {
+          if (action.startsWith('Remove')) {
+            store.dispatch('unVisitSubreddit', {subreddit})
+              .then(() => this.displaySubscriptions());
+          }
+        });
+      }
     },
   },
 };
