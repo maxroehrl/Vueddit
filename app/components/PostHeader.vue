@@ -94,7 +94,7 @@ export default {
   methods: {
     getPreview(post) {
       const preview = Util.getPreview(post);
-      return preview ? preview.url: '';
+      return preview && !this.bigPreview ? preview.url: '';
     },
 
     getTimeFromNow(post) {
@@ -102,13 +102,13 @@ export default {
     },
 
     getImage(post) {
-      const preview = Util.getImage(post);
-      return preview ? preview.url: '';
+      const image = Util.getImage(post);
+      return image && this.bigPreview ? image.url: '';
     },
 
     getImageHeight(post) {
       const image = Util.getImage(post);
-      return image ? Util.getAspectFixHeight(image) : '0px';
+      return image && this.bigPreview ? Util.getAspectFixHeight(image) : '0px';
     },
   },
 };
