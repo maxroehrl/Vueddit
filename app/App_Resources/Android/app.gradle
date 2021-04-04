@@ -1,5 +1,8 @@
-// Add your native dependencies here:
-
+android {
+  defaultConfig {
+    minSdkVersion 21
+  }
+}
 dependencies {
   // https://github.com/saschpe/android-customtabs/releases
   implementation 'saschpe.android:customtabs:3.0.2'
@@ -9,22 +12,4 @@ dependencies {
   implementation 'com.balysv:material-ripple:1.0.2'
   // https://github.com/facebook/fresco/releases
   implementation 'com.facebook.fresco:fresco:2.4.0'
-  implementation "androidx.multidex:multidex:2.0.1"
-}
-
-// If you want to add something to be applied before applying plugins' include.gradle files
-// e.g. project.ext.googlePlayServicesVersion = "15.0.1"
-// create a file named before-plugins.gradle in the current directory and place it there
-
-android {
-  defaultConfig {
-    minSdkVersion 17
-    generatedDensities = []
-  }
-  aaptOptions {
-    additionalParameters "--no-version-vectors"
-  }
-  defaultConfig {
-    multiDexEnabled true
-  }
 }
