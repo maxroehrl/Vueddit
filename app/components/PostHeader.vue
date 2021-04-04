@@ -2,7 +2,7 @@
   <StackLayout padding="0">
     <StackLayout orientation="horizontal" padding="0">
       <Votes :voteable="post" width="14%" />
-      <Ripple :width="bigPreview ? '86%' : '66%'"
+      <Ripple :width="bigPreview ? '86%' : '61%'"
               @longPress="onLongPress(post)"
               @tap="onTab(post)">
         <Label textWrap="true"
@@ -35,12 +35,12 @@
         </Label>
       </Ripple>
       <Ripple :hidden="bigPreview"
-              height="300px"
-              width="20%"
+              height="200px"
+              width="25%"
               @longPress="onLongPress(post)"
               @tap="onTab(post)">
         <CachedImage :src="getPreview(post)"
-                     height="300px"
+                     height="100%"
                      width="100%" />
       </Ripple>
     </StackLayout>
