@@ -2,7 +2,10 @@ package de.max.roehrl.vueddit2.ui.fragment
 
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -15,14 +18,12 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.ui.adapter.CommentsAdapter
 import de.max.roehrl.vueddit2.ui.dialog.Sidebar
-import de.max.roehrl.vueddit2.ui.listener.RecyclerOnTouchListener
 import de.max.roehrl.vueddit2.ui.viewholder.PostHeaderViewHolder
 import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
 
@@ -79,16 +80,6 @@ class PostDetailFragment : Fragment() {
             }
         }
         recyclerView.adapter = commentsAdapter
-        recyclerView.addOnItemTouchListener(
-            RecyclerOnTouchListener(
-                requireContext(),
-                recyclerView,
-                { view, position ->
-                    onItemLongPressed(view, position)
-                },
-                null
-            )
-        )
         viewModel.comments.observe(viewLifecycleOwner) { comments ->
             val oldSize = commentsAdapter.comments.size
             val newSize = comments.size
@@ -175,6 +166,9 @@ class PostDetailFragment : Fragment() {
         toolbar.inflateMenu(R.menu.post_detail)
         toolbar.subtitle = "/r/${post.subreddit}"
         toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
+        toolbar.menu.findItem(R.id.action_save).title = requireContext().getString(if (post.saved) R.string.unsave else R.string.save)
+        toolbar.menu.findItem(R.id.action_goto_subreddit).title = requireContext().getString(R.string.goto_sub, post.subreddit)
+        toolbar.menu.findItem(R.id.action_goto_user).title = requireContext().getString(R.string.goto_user, post.author)
     }
 
     override fun onPause() {
@@ -207,44 +201,36 @@ class PostDetailFragment : Fragment() {
                 ).show()
                 true
             }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun onItemLongPressed(view: View, position: Int) {
-        val post = viewModel.selectedPost.value
-        if (position == 0 && post != null) {
-            val items = mutableListOf(
-                view.context.getString(if (post.saved) R.string.unsave else R.string.save),
-                view.context.getString(R.string.goto_sub, post.subreddit),
-                view.context.getString(R.string.goto_user, post.author),
-            )
-            MaterialAlertDialogBuilder(requireContext()).apply {
-                setItems(items.toTypedArray()) { _, which ->
-                    when (which) {
-                        0 -> post.saveOrUnsave(context)
-                        1 -> gotoSubreddit(post.subreddit)
-                        2 -> gotoUser(post.author)
-                    }
-                }
-                show()
+            R.id.action_save -> {
+                viewModel.selectedPost.value?.saveOrUnsave(requireContext())
+                toolbar.menu
+                true
             }
+            R.id.action_goto_subreddit -> {
+                gotoSubreddit(viewModel.selectedPost.value!!.subreddit)
+                true
+            }
+            R.id.action_goto_user -> {
+                gotoUser(viewModel.selectedPost.value!!.author)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun gotoUser(userName: String) {
         findNavController().navigate(
-            PostDetailFragmentDirections.actionPostDetailFragmentToUserPostListFragment(
-                userName
-            )
+                PostDetailFragmentDirections.actionPostDetailFragmentToUserPostListFragment(
+                        userName
+                )
         )
     }
 
     private fun gotoSubreddit(subreddit: String) {
         findNavController().navigate(
-            PostDetailFragmentDirections.actionPostDetailFragmentToPostListFragment(
-                subreddit
-            )
+                PostDetailFragmentDirections.actionPostDetailFragmentToPostListFragment(
+                        subreddit
+                )
         )
     }
 }

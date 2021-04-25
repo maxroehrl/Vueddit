@@ -14,4 +14,19 @@
         android:orderInCategory="110"
         android:title="@string/menu_show_sidebar" />
 
+    <item
+        android:id="@+id/action_save"
+        android:orderInCategory="150"
+        android:title="@string/save" />
+
+    <item
+        android:id="@+id/action_goto_subreddit"
+        android:orderInCategory="200"
+        android:title="@string/goto_sub" />
+
+    <item
+        android:id="@+id/action_goto_user"
+        android:orderInCategory="300"
+        android:title="@string/goto_user" />
+
 </menu>
