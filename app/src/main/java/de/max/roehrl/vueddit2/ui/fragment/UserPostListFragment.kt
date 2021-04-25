@@ -1,7 +1,9 @@
 package de.max.roehrl.vueddit2.ui.fragment
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
@@ -21,6 +23,7 @@ class UserPostListFragment : PostListFragment() {
     override val viewModel: UserPostListViewModel by viewModels()
     override val layoutId = R.layout.fragment_user_posts
     override val isGroupTabLayoutVisible = true
+    override val menuId = R.menu.user_post_list
     override var showGotoUser = false
     private val safeArgs: UserPostListFragmentArgs by navArgs()
     private var currentUser: String? = null
@@ -113,10 +116,6 @@ class UserPostListFragment : PostListFragment() {
                 subredditName
             )
         )
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.user_post_list, menu)
     }
 
     override fun onItemLongPressed(view: View, position: Int) {

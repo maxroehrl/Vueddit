@@ -1,10 +1,8 @@
 package de.max.roehrl.vueddit2.ui.fragment
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.view.SupportMenuInflater
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
@@ -32,9 +30,10 @@ class PostDetailFragment : Fragment() {
     companion object {
         private const val TAG = "PostDetailFragment"
 
-        private class CommentsDiffCallback(private val oldList: List<NamedItem>,
-                                           private val newList: List<NamedItem>) :
-                DiffUtil.Callback() {
+        private class CommentsDiffCallback(
+                private val oldList: List<NamedItem>,
+                private val newList: List<NamedItem>,
+        ) : DiffUtil.Callback() {
             override fun getOldListSize(): Int = oldList.size
 
             override fun getNewListSize(): Int = newList.size
@@ -61,15 +60,10 @@ class PostDetailFragment : Fragment() {
     private val viewModel: PostDetailViewModel by viewModels()
     private val safeArgs: PostDetailFragmentArgs by navArgs()
 
-    /*override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(R.transition.shared_header)
-    }*/
-
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_post_detail, container, false)
         toolbar = root.findViewById(R.id.toolbar)
@@ -170,7 +164,6 @@ class PostDetailFragment : Fragment() {
         return root
     }
 
-    @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         try {
@@ -178,7 +171,7 @@ class PostDetailFragment : Fragment() {
         } catch (e: IllegalStateException) {
             Log.e(TAG, "Failed to setup collapsing toolbar with nav controller", e)
         }
-        onCreateOptionsMenu(toolbar.menu, SupportMenuInflater(context))
+        toolbar.inflateMenu(R.menu.post_detail)
         toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
     }
 
@@ -198,10 +191,6 @@ class PostDetailFragment : Fragment() {
         super.onDestroyView()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.post_detail, menu)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_refresh -> {
@@ -210,9 +199,9 @@ class PostDetailFragment : Fragment() {
             }
             R.id.action_sidebar -> {
                 Sidebar(
-                    requireContext(),
-                    viewModel.selectedPost.value!!.subreddit,
-                    viewModel.viewModelScope
+                        requireContext(),
+                        viewModel.selectedPost.value!!.subreddit,
+                        viewModel.viewModelScope
                 ).show()
                 true
             }

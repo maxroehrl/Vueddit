@@ -1,10 +1,11 @@
 package de.max.roehrl.vueddit2.ui.fragment
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import androidx.appcompat.view.SupportMenuInflater
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -46,8 +47,9 @@ open class PostListFragment : Fragment() {
     protected open lateinit var toolbar: MaterialToolbar
     protected open lateinit var sortingTabLayout: TabLayout
     protected open val isGroupTabLayoutVisible = false
-    protected open var showGotoUser = true
     protected open val layoutId = R.layout.fragment_posts
+    protected open val menuId = R.menu.post_list
+    protected open var showGotoUser = true
     private val safeArgs: PostListFragmentArgs by navArgs()
     private lateinit var collapsingToolbar: CollapsingToolbarLayout
     private var currentSubreddit: Subreddit? = null
@@ -230,7 +232,6 @@ open class PostListFragment : Fragment() {
         createGoBackSnackBar(oldSubredditName)
     }
 
-    @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val topLevelDestinationIds = mutableSetOf<Int>()
@@ -245,12 +246,8 @@ open class PostListFragment : Fragment() {
         } catch (e: IllegalStateException) {
             Log.e(TAG, "Failed to setup collapsing toolbar with nav controller", e)
         }
-        onCreateOptionsMenu(toolbar.menu, SupportMenuInflater(context))
+        toolbar.inflateMenu(menuId)
         toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.post_list, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
