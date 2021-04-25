@@ -171,7 +171,9 @@ class PostDetailFragment : Fragment() {
         } catch (e: IllegalStateException) {
             Log.e(TAG, "Failed to setup collapsing toolbar with nav controller", e)
         }
+        val post = viewModel.selectedPost.value!!
         toolbar.inflateMenu(R.menu.post_detail)
+        toolbar.subtitle = "/r/${post.subreddit}"
         toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
     }
 
