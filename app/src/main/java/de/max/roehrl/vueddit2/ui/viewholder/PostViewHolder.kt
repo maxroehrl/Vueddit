@@ -129,7 +129,8 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         if (post.edited) {
             metaBuilder.append(" *")
         }
-        val authorString = SpannableString(" by /u/${post.author}")
+        metaBuilder.append(" by ")
+        val authorString = SpannableString("/u/${post.author}")
         val authorColor = ContextCompat.getColor (meta.context, if (highlightAuthor) R.color.post_author_highlight else R.color.post_author)
         authorString.setSpan(ForegroundColorSpan(authorColor), 0, authorString.length, 0)
         metaBuilder.append(authorString)
