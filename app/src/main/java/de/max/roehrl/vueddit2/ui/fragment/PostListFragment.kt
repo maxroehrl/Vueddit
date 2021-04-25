@@ -133,7 +133,7 @@ open class PostListFragment : Fragment() {
         }
         val index = viewModel.sortingList.indexOf(viewModel.postSorting.value)
         if (index != -1) {
-            sortingTabLayout.getTabAt(index)!!.select()
+            sortingTabLayout.selectTab(sortingTabLayout.getTabAt(index), true)
         }
         sortingTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
