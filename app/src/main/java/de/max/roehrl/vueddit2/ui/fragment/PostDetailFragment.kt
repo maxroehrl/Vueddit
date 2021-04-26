@@ -122,6 +122,12 @@ class PostDetailFragment : Fragment() {
             if (comment != null && comment is Comment) {
                 viewModel.selectComment(comment)
             }
+            if (newSize > 0 && oldSize == 1) {
+                val first = comments[0]
+                if (first is Comment && first.distinguished == "moderator") {
+                    viewModel.collapse(first)
+                }
+            }
         }
         viewModel.selectedComment.observe(viewLifecycleOwner) { comment ->
             Log.d(TAG, "Selecting comment ${safeArgs.commentName}")
