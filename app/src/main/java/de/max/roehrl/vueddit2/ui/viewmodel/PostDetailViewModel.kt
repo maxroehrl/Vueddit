@@ -51,9 +51,13 @@ class PostDetailViewModel(application: Application) : AndroidViewModel(applicati
             if (comment != null) {
                 permalink += "/$comment"
             }
-            val pair = Reddit.getInstance(getApplication()).getPostAndComments(permalink, sorting)
-            (selectedPost as MutableLiveData).postValue(pair.first)
-            (comments as MutableLiveData).postValue(pair.second.toMutableList())
+             try {
+                 val pair = Reddit.getInstance(getApplication()).getPostAndComments(permalink, sorting)
+                 (selectedPost as MutableLiveData).postValue(pair.first)
+                 (comments as MutableLiveData).postValue(pair.second.toMutableList())
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting comments and post", e)
+            }
             cb?.invoke()
         }
     }

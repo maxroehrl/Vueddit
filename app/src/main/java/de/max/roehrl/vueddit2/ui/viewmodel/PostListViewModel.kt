@@ -1,6 +1,7 @@
 package de.max.roehrl.vueddit2.ui.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Subreddit
@@ -60,8 +61,13 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
             val after = lastPost?.id ?: ""
             val sorting = postSorting.value ?: defaultSorting
             val time = topPostsTime.value ?: defaultTopPostTime
-            val p = getMorePosts(after, sorting, time, getPostCount())
-            (posts as MutableLiveData).postValue(oldPosts + p)
+            val newPosts = try {
+                getMorePosts(after, sorting, time, getPostCount())
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting posts", e)
+                emptyList()
+            }
+            (posts as MutableLiveData).postValue(oldPosts + newPosts)
             cb?.invoke()
         }
     }
