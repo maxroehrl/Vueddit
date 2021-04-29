@@ -47,5 +47,5 @@
         android:layout_width="100dp"
         android:layout_height="90dp"
         android:layout_alignParentEnd="true"
-        app:failureImage="@drawable/ic_comment_text_multiple_outline" />
+        app:failureImage="@drawable/ic_broken_image" />
 </RelativeLayout>
