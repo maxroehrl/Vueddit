@@ -144,7 +144,16 @@ class PostDetailFragment : Fragment() {
             }
         }
         viewModel.selectedPost.observe(viewLifecycleOwner) { post ->
-            toolbar.title = post?.title ?: ""
+            if (post != null) {
+                toolbar.title = post.title
+                toolbar.subtitle = "/r/${post.subreddit}"
+                toolbar.menu.findItem(R.id.action_save).title = requireContext().getString(if (post.saved) R.string.unsave else R.string.save)
+                toolbar.menu.findItem(R.id.action_goto_subreddit).title = requireContext().getString(R.string.goto_sub, post.subreddit)
+                toolbar.menu.findItem(R.id.action_goto_user).title = requireContext().getString(R.string.goto_user, post.author)
+            } else {
+                toolbar.title = ""
+                toolbar.subtitle = ""
+            }
             commentsAdapter.post = post
         }
         val swipeRefreshLayout: SwipeRefreshLayout = root.findViewById(R.id.swipe)
@@ -168,13 +177,8 @@ class PostDetailFragment : Fragment() {
         } catch (e: IllegalStateException) {
             Log.e(TAG, "Failed to setup collapsing toolbar with nav controller", e)
         }
-        val post = viewModel.selectedPost.value!!
         toolbar.inflateMenu(R.menu.post_detail)
-        toolbar.subtitle = "/r/${post.subreddit}"
         toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
-        toolbar.menu.findItem(R.id.action_save).title = requireContext().getString(if (post.saved) R.string.unsave else R.string.save)
-        toolbar.menu.findItem(R.id.action_goto_subreddit).title = requireContext().getString(R.string.goto_sub, post.subreddit)
-        toolbar.menu.findItem(R.id.action_goto_user).title = requireContext().getString(R.string.goto_user, post.author)
     }
 
     override fun onPause() {
