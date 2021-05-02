@@ -11,10 +11,15 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.drawable.ProgressBarDrawable
 import com.facebook.drawee.view.SimpleDraweeView
+import com.facebook.imagepipeline.image.ImageInfo
+import com.facebook.imagepipeline.request.ImageRequestBuilder
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
@@ -172,7 +177,18 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val preview = post.image.url
         if (preview != null) {
             imageView.hierarchy.setProgressBarImage(progress)
-            imageView.setImageURI(preview)
+            val request = ImageRequestBuilder.newBuilderWithSource(preview.toUri())
+                .setProgressiveRenderingEnabled(true)
+                .build()
+            imageView.controller = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(request)
+                .setOldController(imageView.controller)
+                .setControllerListener(object : BaseControllerListener<ImageInfo>() {
+                    override fun onFailure(id: String?, throwable: Throwable?) {
+                        Log.w(TAG, "Failed to load image with id '$id'", throwable)
+                    }
+                })
+                .build()
         } else {
             imageView.hierarchy.setProgressBarImage(null)
             imageView.setActualImageResource(R.drawable.ic_comment_text_multiple_outline)
