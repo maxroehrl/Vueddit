@@ -2,7 +2,6 @@ package de.max.roehrl.vueddit2.service
 
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -18,7 +17,7 @@ object CustomTabs {
     private const val TAG = "CustomTabs"
 
     fun openInCustomTabs(context: Context, url: String) {
-        val backArrow : Bitmap = ContextCompat.getDrawable(context, R.drawable.ic_arror_left)!!.toBitmap()
+        val backArrow = ContextCompat.getDrawable(context, R.drawable.ic_arror_left)!!.toBitmap()
         val customTabsIntent = Builder()
             .setShareState(SHARE_STATE_ON)
             .setShowTitle(true)
