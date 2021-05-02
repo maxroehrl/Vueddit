@@ -22,7 +22,6 @@ class PostBigViewHolder(itemView: View) : PostViewHolder(itemView) {
             imageView.visibility = View.VISIBLE
             val aspectFixHeight = Util.getAspectFixHeight(post.image.width!!, post.image.height!!)
             imageView.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, aspectFixHeight)
-            imageView.hierarchy.setProgressBarImage(progress)
             val request = ImageRequestBuilder.newBuilderWithSource(image.toUri())
                 .setProgressiveRenderingEnabled(true)
                 .build()

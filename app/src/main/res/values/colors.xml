@@ -15,6 +15,9 @@
 
     <color name="nav_bar_background">@color/white</color>
 
+    <color name="progress_bg">#30FFFFFF</color>
+    <color name="progress_color">#8053BA82</color>
+
     <color name="post_title">@color/black</color>
     <color name="post_title_sticky">@color/highlight</color>
     <color name="post_meta">#767676</color>

@@ -8,6 +8,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -17,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.drawable.ProgressBarDrawable
+import com.facebook.drawee.drawable.ScalingUtils
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
 import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequestBuilder
@@ -42,16 +45,23 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val votes: TextView = itemView.findViewById(R.id.votes)
     private val upvote: TextView = itemView.findViewById(R.id.up)
     private val downvote: TextView = itemView.findViewById(R.id.down)
-    protected val progress = ProgressBarDrawable()
     protected lateinit var post: Post
     protected open val highlightAuthor = false
 
     init {
-        progress.backgroundColor = 0x30FFFFFF
-        progress.color = 0x8053BA82.toInt()
         title.setOnClickListener { view -> onClick(view) }
         meta.setOnClickListener { view -> onClick(view) }
         imageView.setOnClickListener { view -> onClick(view) }
+        imageView.hierarchy = GenericDraweeHierarchyBuilder.newInstance(itemView.resources).apply {
+            progressBarImage = ProgressBarDrawable().apply {
+                backgroundColor = ContextCompat.getColor(itemView.context, R.color.progress_bg)
+                color = ContextCompat.getColor(itemView.context, R.color.progress_color)
+            }
+            setPlaceholderImage(R.drawable.ic_image)
+            placeholderImageScaleType = ScalingUtils.ScaleType.CENTER_INSIDE
+            setFailureImage(R.drawable.ic_broken_image)
+            failureImageScaleType = ScalingUtils.ScaleType.CENTER_INSIDE
+        }.build()
         upvote.setOnClickListener { vote(true) }
         downvote.setOnClickListener { vote(false) }
     }
@@ -176,7 +186,6 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     open fun updatePreviewImage(post: Post) {
         val preview = post.image.url
         if (preview != null) {
-            imageView.hierarchy.setProgressBarImage(progress)
             val request = ImageRequestBuilder.newBuilderWithSource(preview.toUri())
                 .setProgressiveRenderingEnabled(true)
                 .build()
@@ -190,8 +199,9 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                 })
                 .build()
         } else {
-            imageView.hierarchy.setProgressBarImage(null)
-            imageView.setActualImageResource(R.drawable.ic_comment_text_multiple_outline)
+            imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+            @Suppress("DEPRECATION")
+            imageView.setImageResource(R.drawable.ic_comment_text_multiple_outline)
         }
     }
 
