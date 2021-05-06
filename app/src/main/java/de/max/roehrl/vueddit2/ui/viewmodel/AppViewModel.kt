@@ -11,7 +11,6 @@ import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Store
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
@@ -100,7 +99,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private fun sortByName(list: List<Subreddit>): List<Subreddit> {
         return list.sortedWith(
                 compareBy { sub: Subreddit -> !sub.isStarred }
-                        .thenBy { it.name.toLowerCase(Locale.getDefault()) }
+                        .thenBy { it.name.lowercase() }
         )
     }
 

@@ -17,7 +17,6 @@ import de.max.roehrl.vueddit2.service.Store
 import de.max.roehrl.vueddit2.ui.adapter.PostsAdapter
 import de.max.roehrl.vueddit2.ui.viewmodel.UserPostListViewModel
 import kotlinx.coroutines.launch
-import java.util.*
 
 class UserPostListFragment : PostListFragment() {
     override val viewModel: UserPostListViewModel by viewModels()
@@ -84,7 +83,7 @@ class UserPostListFragment : PostListFragment() {
                     val items = listOf("All", "Comments", "Links")
                     MaterialAlertDialogBuilder(requireContext()).apply {
                         setItems(items.toTypedArray()) { _, which ->
-                            val type = items[which].toLowerCase(Locale.getDefault())
+                            val type = items[which].lowercase()
                             viewModel.setSavedPostsType(type)
                             viewModel.refreshPosts()
                         }

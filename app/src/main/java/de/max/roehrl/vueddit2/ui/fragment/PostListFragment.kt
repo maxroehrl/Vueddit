@@ -36,7 +36,6 @@ import de.max.roehrl.vueddit2.ui.listener.RecyclerOnTouchListener
 import de.max.roehrl.vueddit2.ui.viewmodel.AppViewModel
 import de.max.roehrl.vueddit2.ui.viewmodel.PostListViewModel
 import kotlinx.coroutines.launch
-import java.util.*
 
 open class PostListFragment : Fragment() {
     companion object {
@@ -182,7 +181,7 @@ open class PostListFragment : Fragment() {
             val items = listOf("Hour", "Day", "Week", "Month", "Year", "All")
             MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
-                    val time = items[which].toLowerCase(Locale.getDefault())
+                    val time = items[which].lowercase()
                     viewModel.setTopPostsTime(time)
                     adapter.showBigPreview = null
                     viewModel.refreshPosts()
