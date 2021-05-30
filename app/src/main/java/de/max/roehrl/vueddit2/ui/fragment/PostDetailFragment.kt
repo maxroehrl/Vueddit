@@ -204,11 +204,9 @@ class PostDetailFragment : Fragment() {
                 true
             }
             R.id.action_sidebar -> {
-                Sidebar(
-                        requireContext(),
-                        viewModel.selectedPost.value!!.subreddit,
-                        viewModel.viewModelScope
-                ).show()
+                Sidebar.show(requireContext(),
+                    viewModel.selectedPost.value!!.subreddit,
+                    viewModel.viewModelScope)
                 true
             }
             R.id.action_save -> {

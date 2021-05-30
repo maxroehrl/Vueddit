@@ -289,7 +289,7 @@ open class PostListFragment : Fragment() {
             && currentSubreddit != Subreddit.frontPage
             && !currentSubreddit!!.isMultiReddit
         ) {
-            Sidebar(requireContext(), currentSubreddit!!.name, viewModel.viewModelScope).show()
+            Sidebar.show(requireContext(), currentSubreddit!!.name, viewModel.viewModelScope)
         } else {
             val view = activity?.findViewById<View>(R.id.nav_host_fragment)
             val text = requireContext().getString(R.string.no_sidebar)
