@@ -21,5 +21,6 @@
         <item name="colorPrimary">@color/white</item>
         <!-- Background color when SELECTED -->
         <item name="colorControlHighlight">@color/highlight</item>
+        <item name="android:listDivider">@color/action_bar_background</item>
     </style>
 </resources>

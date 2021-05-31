@@ -22,7 +22,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_search"
-        app:theme="@style/Theme.Vueddit2.NavigationTheme" />
+        android:theme="@style/Theme.Vueddit2.NavigationTheme"
+        app:headerLayout="@layout/nav_search" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
