@@ -16,7 +16,7 @@ class MoreCommentsViewHolder(
     private val tv: IndentedLabel = itemView.findViewById(R.id.more)
 
     fun bind(comment: Comment) {
-        tv.setDepth(comment.depth, 10)
+        tv.setDepth(comment.depth)
         tv.text = if (comment.count == 0) {
             "continue this thread →"
         } else {

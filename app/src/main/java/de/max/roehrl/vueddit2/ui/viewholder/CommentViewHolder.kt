@@ -138,14 +138,14 @@ open class CommentViewHolder(itemView: View, private val viewModel: PostDetailVi
             builder.append(" ")
         }
         header.setText(builder, TextView.BufferType.SPANNABLE)
-        header.setDepth(comment.depth, 30)
+        header.setDepth(comment.depth, 10, 0)
 
         if (comment.children != null) {
             body.visibility = View.GONE
         } else {
             body.visibility = View.VISIBLE
             Markdown.getInstance(body.context).setMarkdown(body, comment.getSpannedBody(body.context))
-            body.setDepth(comment.depth, 10)
+            body.setDepth(comment.depth, 0, 30)
         }
     }
 
