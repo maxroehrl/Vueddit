@@ -11,7 +11,6 @@
     <RadListView ref="subredditList" for="subreddit in subredditList">
       <v-template>
         <StackLayout orientation="horizontal"
-                     class="subreddit-item"
                      padding="0"
                      :style="{backgroundColor: isSelected(subreddit) ? '#53ba82': '#2d2d2d'}">
           <Ripple width="20%" @tap="star(subreddit)">
@@ -197,17 +196,13 @@ export default {
 </script>
 
 <style scoped>
-  .subreddit-item {
-    height: 150px;
-  }
-
   .subreddit-label {
     font-size: 14px;
     margin: 20px;
   }
 
   .subreddit-icon {
-    font-size: 25px;
+    font-size: 20px;
     text-align: center;
     margin: 20px;
   }
