@@ -10,9 +10,9 @@ import android.webkit.WebViewClient
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.navigation.findNavController
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.material.tabs.TabLayout
 import de.max.roehrl.vueddit2.R
@@ -85,9 +85,10 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
             mediaPlaybackRequiresUserGesture = false
         }
         embeddedWebView.addJavascriptInterface(JsInterface(embeddedWebView), INTERFACE_NAME)
-        videoView.player = SimpleExoPlayer.Builder(itemView.context).build().apply {
+        videoView.player = ExoPlayer.Builder(itemView.context).build().apply {
             repeatMode = Player.REPEAT_MODE_ONE
             playWhenReady = true
+
         }
         videoView.apply {
             setShowNextButton(false)
