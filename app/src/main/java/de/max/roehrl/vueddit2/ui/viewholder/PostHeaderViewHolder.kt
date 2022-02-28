@@ -13,7 +13,7 @@ import androidx.navigation.findNavController
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.material.tabs.TabLayout
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
@@ -34,7 +34,7 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
     private val selfText: TextView = itemView.findViewById(R.id.self_text)
     private val numComments: TextView = itemView.findViewById(R.id.num_comments)
     private val embeddedWebView: WebView = itemView.findViewById(R.id.embedded_web_view)
-    private val videoView: PlayerView = itemView.findViewById(R.id.video_view)
+    private val videoView: StyledPlayerView = itemView.findViewById(R.id.video_view)
     private val videoPreviewLayout: LinearLayout = itemView.findViewById(R.id.video_preview_layout)
     private val sortingTabLayout: TabLayout = itemView.findViewById(R.id.tab_layout)
     private val sortings = listOf("top", "new", "controversial", "old", "random", "qa")
@@ -95,7 +95,7 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
             setShowFastForwardButton(false)
             setShowPreviousButton(false)
             setShowRewindButton(false)
-            setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
+            setShowBuffering(StyledPlayerView.SHOW_BUFFERING_ALWAYS)
             setShutterBackgroundColor(Color.TRANSPARENT)
             controllerHideOnTouch = true
             hideController()
