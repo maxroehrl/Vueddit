@@ -3,6 +3,10 @@ android {
     minSdkVersion 21
   }
 }
+repositories {
+  jcenter()
+}
+
 dependencies {
   // https://github.com/saschpe/android-customtabs/releases
   implementation 'saschpe.android:customtabs:3.0.3'
@@ -12,4 +16,6 @@ dependencies {
   implementation 'com.balysv:material-ripple:1.0.2'
   // https://github.com/facebook/fresco/releases
   implementation 'com.facebook.fresco:fresco:2.6.0'
+  // https://github.com/google/ExoPlayer/releases
+  // implementation 'com.google.android.exoplayer:exoplayer:2.17.1'
 }
