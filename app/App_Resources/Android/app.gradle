@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
   // https://github.com/saschpe/android-customtabs/releases
-  implementation 'saschpe.android:customtabs:3.0.3'
+  implementation 'saschpe.android:customtabs:3.0.2'
   // https://github.com/noties/Markwon/releases
   implementation 'io.noties.markwon:core:4.6.2'
   // https://github.com/balysv/material-ripple/releases
