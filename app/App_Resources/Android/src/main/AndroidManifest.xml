@@ -23,6 +23,7 @@
 
 		<activity
 			android:name="com.tns.NativeScriptActivity"
+      android:exported="true"
 			android:label="@string/app_name"
 			android:configChanges="keyboard|keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|locale|uiMode"
 			android:theme="@style/LaunchScreenTheme">
