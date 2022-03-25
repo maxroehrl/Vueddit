@@ -30,11 +30,10 @@
       }],
       "vue/max-attributes-per-line": ["error", {
         "singleline": 2,
-        "multiline": {
-          "max": 1,
-          "allowFirstLine": true
-        }
+        "multiline": 1
       }],
+      "vue/multi-word-component-names": "off",
+      "vue/first-attribute-linebreak": "off",
       "vue/no-v-html": 0,
       "max-len": 0,
       "linebreak-style": 0,
