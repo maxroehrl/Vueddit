@@ -12,7 +12,6 @@
         android:theme="@style/Theme.Vueddit2">
         <activity
             android:name=".ui.activity.MainActivity"
-            android:label="@string/app_name"
             android:theme="@style/Theme.Vueddit2.NoActionBar"
             android:exported="true">
             <intent-filter>
