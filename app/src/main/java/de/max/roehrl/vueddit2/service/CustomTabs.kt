@@ -10,8 +10,6 @@ import androidx.browser.customtabs.CustomTabsIntent.SHARE_STATE_ON
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import de.max.roehrl.vueddit2.R
-import saschpe.android.customtabs.CustomTabsHelper
-import saschpe.android.customtabs.WebViewFallback
 
 object CustomTabs {
     private const val TAG = "CustomTabs"
@@ -26,10 +24,9 @@ object CustomTabs {
             .setCloseButtonIcon(backArrow)
             .setUrlBarHidingEnabled(true)
             .build()
-        CustomTabsHelper.addKeepAliveExtra(context, customTabsIntent.intent)
         val uri = Uri.parse(url)
         try {
-            CustomTabsHelper.openCustomTab(context, customTabsIntent, uri, WebViewFallback())
+            customTabsIntent.launchUrl(context, uri)
         } catch (error: ActivityNotFoundException) {
             Log.e(TAG, "Failed to open custom tab", error)
             Toast.makeText(context, "You don't have any browser to open the web page", Toast.LENGTH_LONG).show()
