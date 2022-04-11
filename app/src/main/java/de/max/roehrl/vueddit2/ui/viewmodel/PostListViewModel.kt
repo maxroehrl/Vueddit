@@ -14,8 +14,8 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
         protected const val TAG = "PostListViewModel"
         private const val defaultTopPostTime = "all"
     }
-    protected open val defaultSorting = "best"
-    open val sortingList = listOf("best", "hot", "top", "new", "controversial", "rising")
+    protected open val defaultSorting = "hot"
+    open val sortingList = listOf("hot", "top", "new", "best", "controversial", "rising")
 
     val subreddit: LiveData<Subreddit> = liveData { }
 
