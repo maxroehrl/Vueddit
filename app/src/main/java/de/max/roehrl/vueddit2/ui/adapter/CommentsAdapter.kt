@@ -3,6 +3,7 @@ package de.max.roehrl.vueddit2.ui.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import de.max.roehrl.vueddit2.R
@@ -52,7 +53,7 @@ class CommentsAdapter(private val viewModel: PostDetailViewModel) :
         return when (viewType) {
             VIEW_TYPE_PROGRESS_BIG -> ProgressViewHolder(inflate(parent, R.layout.loading_item))
             VIEW_TYPE_PROGRESS     -> ProgressViewHolder(inflate(parent, R.layout.loading_item_small))
-            VIEW_TYPE_COMMENT      -> CommentViewHolder(inflate(parent, R.layout.comment_item), viewModel)
+            VIEW_TYPE_COMMENT      -> CommentViewHolder(inflate(parent, R.layout.comment_item), viewModel, viewModel.viewModelScope)
             VIEW_TYPE_HEADER       -> PostHeaderViewHolder(inflate(parent, R.layout.post_detail_header), viewModel)
             VIEW_TYPE_HEADER_BIG   -> PostBigHeaderViewHolder(inflate(parent, R.layout.post_detail_header_big), viewModel)
             VIEW_TYPE_MORE         -> MoreCommentsViewHolder(inflate(parent, R.layout.more_comments_item), this, viewModel)

@@ -10,8 +10,9 @@ import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.service.Util
+import kotlinx.coroutines.CoroutineScope
 
-class PostBigViewHolder(itemView: View) : PostViewHolder(itemView) {
+class PostBigViewHolder(itemView: View, scope: CoroutineScope) : PostViewHolder(itemView, scope) {
     companion object {
         private const val TAG = "PostBigViewHolder"
     }

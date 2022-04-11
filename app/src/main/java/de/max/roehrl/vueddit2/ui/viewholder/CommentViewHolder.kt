@@ -23,15 +23,21 @@ import de.max.roehrl.vueddit2.service.Util
 import de.max.roehrl.vueddit2.ui.fragment.PostDetailFragmentDirections
 import de.max.roehrl.vueddit2.ui.view.IndentedLabel
 import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-open class CommentViewHolder(itemView: View, private val viewModel: PostDetailViewModel?) :
+open class CommentViewHolder(
+    itemView: View,
+    private val viewModel: PostDetailViewModel?,
+    private val scope: CoroutineScope
+) :
     RecyclerView.ViewHolder(itemView) {
     companion object {
         private const val TAG = "CommentViewHolder"
     }
+
     protected val header: IndentedLabel = itemView.findViewById(R.id.comment_header)
     private val body: IndentedLabel = itemView.findViewById(R.id.comment_body)
     private val votes: TextView = itemView.findViewById(R.id.votes)
@@ -175,7 +181,7 @@ open class CommentViewHolder(itemView: View, private val viewModel: PostDetailVi
     }
 
     private fun vote(up: Boolean) {
-        GlobalScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             var dir = if (up) 1 else -1
             if (comment.likes == up) {
                 comment.likes = null
@@ -186,7 +192,7 @@ open class CommentViewHolder(itemView: View, private val viewModel: PostDetailVi
                 comment.ups += dir
             }
             Reddit.getInstance(header.context).vote(comment.name, dir.toString())
-            GlobalScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 updateVotes()
             }
         }
@@ -207,7 +213,7 @@ open class CommentViewHolder(itemView: View, private val viewModel: PostDetailVi
             setItems(items.toTypedArray()) { _, which ->
                 when (which) {
                     0 -> {
-                        comment.saveOrUnsave(context)
+                        comment.saveOrUnsave(context, scope)
                     }
                     1 -> {
                         more.findNavController().navigate(

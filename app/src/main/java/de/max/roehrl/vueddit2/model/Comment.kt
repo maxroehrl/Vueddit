@@ -5,8 +5,8 @@ import android.text.Spanned
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Util
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
@@ -76,8 +76,8 @@ class Comment(json: JSONObject) : NamedItem(json.optString("name")) {
         return children != null
     }
 
-    fun saveOrUnsave(context: Context) {
-        GlobalScope.launch(Dispatchers.IO) {
+    fun saveOrUnsave(context: Context, scope: CoroutineScope) {
+        scope.launch(Dispatchers.IO) {
             Reddit.getInstance(context).saveOrUnsave(saved, name)
             saved = !saved
         }

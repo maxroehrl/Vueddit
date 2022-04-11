@@ -210,7 +210,8 @@ class PostDetailFragment : Fragment() {
                 true
             }
             R.id.action_save -> {
-                viewModel.selectedPost.value?.saveOrUnsave(requireContext())
+                viewModel.selectedPost.value?.saveOrUnsave(requireContext(),
+                    viewModel.viewModelScope)
                 toolbar.menu
                 true
             }

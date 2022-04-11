@@ -59,7 +59,7 @@ open class PostListFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(layoutId, container, false)
-        val postsAdapter = PostsAdapter()
+        val postsAdapter = PostsAdapter(viewModel.viewModelScope)
         val layoutManager = LinearLayoutManager(context)
 
         toolbar = root.findViewById(R.id.toolbar)
@@ -207,7 +207,7 @@ open class PostListFragment : Fragment() {
             MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
                     when (which) {
-                        0 -> post.saveOrUnsave(context)
+                        0 -> post.saveOrUnsave(context, viewModel.viewModelScope)
                         1 -> if (showGotoSubreddit) gotoSubreddit(post.subreddit) else gotoUser(post.author)
                         2 -> gotoUser(post.author)
                     }

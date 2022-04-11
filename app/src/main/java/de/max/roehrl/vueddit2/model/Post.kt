@@ -6,8 +6,8 @@ import android.util.Log
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Util
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONException
 import org.json.JSONObject
@@ -90,8 +90,8 @@ class Post(private val json: JSONObject) : NamedItem(json.optString("name")) {
         return name.hashCode()
     }
 
-    fun saveOrUnsave(context: Context) {
-        GlobalScope.launch(Dispatchers.IO) {
+    fun saveOrUnsave(context: Context, scope: CoroutineScope) {
+        scope.launch(Dispatchers.IO) {
             Reddit.getInstance(context).saveOrUnsave(saved, name)
             saved = !saved
         }

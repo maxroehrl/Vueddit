@@ -30,11 +30,13 @@ import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Util
 import de.max.roehrl.vueddit2.ui.fragment.PostListFragmentDirections
 import de.max.roehrl.vueddit2.ui.fragment.UserPostListFragmentDirections
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
+    RecyclerView.ViewHolder(itemView) {
     companion object {
         private const val TAG = "PostViewHolder"
     }
@@ -222,7 +224,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     private fun vote(up: Boolean) {
-        GlobalScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             var dir = if (up) 1 else -1
             if (post.likes == up) {
                 post.likes = null
@@ -233,7 +235,7 @@ open class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                 post.score += dir
             }
             Reddit.getInstance(title.context).vote(post.name, dir.toString())
-            GlobalScope.launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 updateVotes()
             }
         }

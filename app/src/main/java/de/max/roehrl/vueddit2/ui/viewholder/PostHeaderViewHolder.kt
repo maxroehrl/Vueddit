@@ -9,6 +9,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -26,7 +27,7 @@ import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
 
 @SuppressLint("SetJavaScriptEnabled")
 open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetailViewModel) :
-    PostViewHolder(itemView) {
+    PostViewHolder(itemView, viewModel.viewModelScope) {
     companion object {
         private const val TAG = "PostHeaderViewHolder"
         private const val INTERFACE_NAME = "JsInterface"
