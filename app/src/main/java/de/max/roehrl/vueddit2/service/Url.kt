@@ -3,6 +3,7 @@ package de.max.roehrl.vueddit2.service
 import android.content.Context
 import android.util.Log
 import android.util.Patterns
+import androidx.annotation.IdRes
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
@@ -40,7 +41,7 @@ object Url {
         }
     }
 
-    fun openDeepLink(permalink: String, navController: NavController, popUpToId: Int = -1) {
+    fun openDeepLink(permalink: String, navController: NavController, @IdRes popUpToId: Int = -1) {
         val request = NavDeepLinkRequest.Builder.fromUri((Reddit.api + permalink).toUri()).build()
         val options = navOptions {
             anim {
@@ -49,7 +50,7 @@ object Url {
                 popEnter = R.anim.slide_in_left
                 popExit = R.anim.slide_out_right
             }
-            popUpTo = popUpToId
+            popUpTo(popUpToId)
         }
         navController.navigate(request, options)
     }
