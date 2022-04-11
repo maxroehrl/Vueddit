@@ -139,7 +139,7 @@
             app:popUpToInclusive="false" />
         <deepLink
             android:id="@+id/post_deep_link"
-            app:uri="www.reddit.com/r/{subreddit_name}/comments/{post_name}/{post_title}/{comment_name}" />
+            app:uri="www.reddit.com/r/{subreddit_name}/comments/{post_name}/{post_title}/{comment_name}/" />
         <deepLink
             android:id="@+id/post_deep_link2"
             app:uri="www.reddit.com/r/{subreddit_name}/comments/{post_name}/{post_title}" />
