@@ -1,5 +1,6 @@
 package de.max.roehrl.vueddit2.ui.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -61,6 +62,7 @@ class PostDetailFragment : Fragment() {
     private val viewModel: PostDetailViewModel by viewModels()
     private val safeArgs: PostDetailFragmentArgs by navArgs()
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,

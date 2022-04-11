@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.util.Log
 import android.view.View
 import android.webkit.JavascriptInterface
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
@@ -72,8 +73,16 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
                 view?.loadUrl("javascript:$code")
             }
 
+            @Deprecated("Deprecated in Java")
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                 return !url.equals(currentUrl)
+            }
+
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): Boolean {
+                return request?.url?.equals(currentUrl) != true
             }
         }
         embeddedWebView.settings.apply {

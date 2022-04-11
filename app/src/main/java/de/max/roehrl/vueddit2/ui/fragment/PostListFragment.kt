@@ -1,5 +1,6 @@
 package de.max.roehrl.vueddit2.ui.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -53,6 +54,7 @@ open class PostListFragment : Fragment() {
     private lateinit var collapsingToolbar: CollapsingToolbarLayout
     private var currentSubreddit: Subreddit? = null
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
