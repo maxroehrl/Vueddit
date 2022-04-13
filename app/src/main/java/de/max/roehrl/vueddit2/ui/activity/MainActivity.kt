@@ -1,5 +1,6 @@
 package de.max.roehrl.vueddit2.ui.activity
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -88,9 +89,16 @@ class MainActivity : AppCompatActivity() {
             } else {
                 viewModel.subreddits.value
             })
+            if (subreddits != null) {
+                val searchText = navView.getHeaderView(0).findViewById<TextInputEditText>(R.id.search_text)
+                (navView[0] as RecyclerView).post {
+                    searchText.requestFocus()
+                }
+            }
         }
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
