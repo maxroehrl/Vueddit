@@ -21,7 +21,7 @@ class PostDetailViewModel(application: Application) : AndroidViewModel(applicati
     val selectedComment: LiveData<Comment?> = liveData { }
 
     val comments: LiveData<MutableList<NamedItem>> = liveData {
-        emit(mutableListOf<NamedItem>(NamedItem))
+        emit(mutableListOf(NamedItem))
     }
 
     val commentSorting: LiveData<String> = liveData {

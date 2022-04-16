@@ -98,7 +98,6 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
         videoView.player = ExoPlayer.Builder(itemView.context).build().apply {
             repeatMode = Player.REPEAT_MODE_ONE
             playWhenReady = true
-
         }
         videoView.apply {
             setShowNextButton(false)

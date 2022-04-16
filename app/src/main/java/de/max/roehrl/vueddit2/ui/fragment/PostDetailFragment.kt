@@ -231,17 +231,17 @@ class PostDetailFragment : Fragment() {
 
     private fun gotoUser(userName: String) {
         findNavController().navigate(
-                PostDetailFragmentDirections.actionPostDetailFragmentToUserPostListFragment(
-                        userName
-                )
+            PostDetailFragmentDirections.actionPostDetailFragmentToUserPostListFragment(
+                userName,
+            ),
         )
     }
 
     private fun gotoSubreddit(subreddit: String) {
         findNavController().navigate(
-                PostDetailFragmentDirections.actionPostDetailFragmentToPostListFragment(
-                        subreddit
-                )
+            PostDetailFragmentDirections.actionPostDetailFragmentToPostListFragment(
+                subreddit,
+            ),
         )
     }
 }
