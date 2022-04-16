@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.Vueddit2" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.Vueddit2" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/action_bar_background</item>
         <item name="colorPrimaryVariant">@color/action_bar_background2</item>
@@ -16,7 +16,7 @@
         <item name="android:navigationBarColor">@color/nav_bar_background</item>
     </style>
 
-    <style name="Theme.Vueddit2.NavigationTheme">
+    <style name="Theme.Vueddit2.NavigationTheme" parent="ThemeOverlay.Material3.NavigationView">
         <!-- Color of text and icon when SELECTED -->
         <item name="colorPrimary">@color/white</item>
         <!-- Background color when SELECTED -->

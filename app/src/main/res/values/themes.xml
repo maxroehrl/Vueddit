@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.Vueddit2" parent="Theme.MaterialComponents.DayNight">
+    <style name="Theme.Vueddit2" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/action_bar_background</item>
         <item name="colorPrimaryVariant">@color/action_bar_background2</item>
@@ -16,18 +16,13 @@
         <item name="android:navigationBarColor">@color/nav_bar_background</item>
     </style>
 
-    <style name="Theme.Vueddit2.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
+    <style name="Theme.Vueddit2.AppBarOverlay" parent="ThemeOverlay.Material3.ActionBar" />
 
-    <style name="Theme.Vueddit2.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
-
-    <style name="Theme.Vueddit2.Login" parent="Theme.Vueddit2.NoActionBar">
+    <style name="Theme.Vueddit2.Login" parent="Theme.Vueddit2">
         <item name="android:windowTranslucentStatus">false</item>
     </style>
 
-    <style name="Theme.Vueddit2.NavigationTheme">
+    <style name="Theme.Vueddit2.NavigationTheme" parent="ThemeOverlay.Material3.NavigationView">
         <!-- Color of text and icon when SELECTED -->
         <item name="colorPrimary">@color/black</item>
         <!-- Background color when SELECTED -->
@@ -35,12 +30,12 @@
         <item name="android:listDivider">@color/action_bar_background</item>
     </style>
 
-    <style name="Theme.Vueddit2.Dialog.Alert" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <style name="Theme.Vueddit2.Dialog.Alert" parent="Theme.Material3.DayNight.Dialog.Alert">
         <item name="buttonBarPositiveButtonStyle">@style/Theme.Vueddit2.ButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/Theme.Vueddit2.ButtonStyle</item>
     </style>
 
-    <style name="Theme.Vueddit2.ButtonStyle" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
+    <style name="Theme.Vueddit2.ButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">@color/highlight</item>
     </style>
 </resources>

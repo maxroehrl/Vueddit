@@ -45,6 +45,5 @@
     <color name="comment_author_mod">#4afff5</color>
     <color name="comment_flair_bg">@color/post_flair_bg</color>
     <color name="comment_flair_text">@color/post_flair_text</color>
-    <color name="comment_selected">#1053ba82</color>
     <color name="comments_load_more">@color/highlight</color>
 </resources>

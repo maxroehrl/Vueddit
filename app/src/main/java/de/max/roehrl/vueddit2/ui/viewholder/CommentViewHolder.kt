@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -70,7 +71,7 @@ open class CommentViewHolder(
 
         if (isSelected) {
             buttonBar.visibility = View.VISIBLE
-            commentLayout.background = ContextCompat.getDrawable(commentLayout.context, R.drawable.comment_bg)
+            commentLayout.setBackgroundColor(ColorUtils.setAlphaComponent(ContextCompat.getColor(commentLayout.context, R.color.highlight), 16))
             updateVotes()
             if (comment.depth == 0) {
                 prev.text = prev.context.getString(R.string.comment_prev)
