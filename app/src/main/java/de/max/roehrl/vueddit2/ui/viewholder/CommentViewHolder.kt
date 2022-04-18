@@ -135,7 +135,10 @@ open class CommentViewHolder(
             var color = ContextCompat.getColor(header.context, R.color.comment_flair_bg)
             try {
                 if (comment.author_flair_background_color != "")
-                    color = Color.parseColor(comment.author_flair_background_color)
+                    color = if (comment.author_flair_background_color == "transparent")
+                        Color.TRANSPARENT
+                    else
+                        Color.parseColor(comment.author_flair_background_color)
             } catch (e: IllegalArgumentException) {
                 Log.e(TAG, "Failed to parse author_flair_background_color: '${comment.author_flair_background_color}'")
             }

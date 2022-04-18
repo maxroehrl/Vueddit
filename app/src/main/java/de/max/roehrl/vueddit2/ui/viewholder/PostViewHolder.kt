@@ -158,7 +158,10 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
             var color = ContextCompat.getColor(meta.context, R.color.post_flair_bg)
             try {
                 if (post.author_flair_background_color != "")
-                    color = Color.parseColor(post.author_flair_background_color)
+                    if (post.author_flair_background_color == "transparent")
+                        Color.TRANSPARENT
+                    else
+                        color = Color.parseColor(post.author_flair_background_color)
             } catch (e: IllegalArgumentException) {
                 Log.e(TAG, "Failed to parse author_flair_background_color: '${post.author_flair_background_color}'")
             }
