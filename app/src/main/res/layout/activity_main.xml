@@ -21,8 +21,9 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
+        android:fitsSystemWindows="false"
         android:theme="@style/Theme.Vueddit2.NavigationTheme"
-        app:headerLayout="@layout/nav_search" />
+        app:headerLayout="@layout/nav_search"
+        app:itemShapeFillColor="@color/menu_item_background" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
