@@ -84,13 +84,14 @@
             app:argType="string" />
         <argument
             android:name="comment_name"
-            android:defaultValue="null"
+            android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
         <argument
-            android:name="post_json"
-            android:defaultValue="null"
-            app:argType="string" />
+            android:name="post"
+            android:defaultValue="@null"
+            app:argType="de.max.roehrl.vueddit2.model.Post"
+            app:nullable="true" />
         <action
             android:id="@+id/action_postDetailFragment_to_userPostListFragment"
             app:destination="@id/userPostListFragment"

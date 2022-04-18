@@ -75,11 +75,9 @@ class PostDetailFragment : Fragment() {
         val linearLayoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = linearLayoutManager
         val commentsAdapter = CommentsAdapter(viewModel)
-        if (safeArgs.postJson != "null") {
-            val post = Post.fromJSONString(safeArgs.postJson)
-            if (post != null) {
-                viewModel.setSelectedPost(post)
-            }
+
+        if (safeArgs.post != null) {
+            viewModel.setSelectedPost(safeArgs.post as Post)
         }
         recyclerView.adapter = commentsAdapter
         viewModel.comments.observe(viewLifecycleOwner) { comments ->

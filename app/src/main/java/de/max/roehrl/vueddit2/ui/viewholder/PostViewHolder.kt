@@ -75,8 +75,8 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
                     post.subreddit,
                     post.name,
                     null,
-                    post.getJSONString()
-                )
+                    post,
+                ),
             )
         } catch (error: IllegalArgumentException) {
             view.findNavController().navigate(
@@ -84,8 +84,8 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
                     post.subreddit,
                     post.name,
                     null,
-                    post.getJSONString()
-                )
+                    post,
+                ),
             )
         }
     }
