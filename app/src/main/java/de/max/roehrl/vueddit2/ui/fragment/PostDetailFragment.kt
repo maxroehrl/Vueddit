@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.transition.MaterialContainerTransform
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
@@ -65,6 +67,16 @@ class PostDetailFragment : Fragment() {
     }
     private val safeArgs: PostDetailFragmentArgs by navArgs()
 
+    override fun onCreate(savedInstanceState: Bundle?)  {
+        super.onCreate(savedInstanceState)
+        sharedElementEnterTransition = MaterialContainerTransform().apply {
+            drawingViewId = R.id.swipe
+            fadeMode = MaterialContainerTransform.FADE_MODE_THROUGH
+            interpolator = FastOutSlowInInterpolator()
+            isDrawDebugEnabled = true
+        }
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -74,15 +86,27 @@ class PostDetailFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_post_detail, container, false)
         toolbar = root.findViewById(R.id.toolbar)
         collapsingToolbar = root.findViewById(R.id.collapsing_toolbar)
-        recyclerView = root.findViewById(R.id.comments)
+
         val linearLayoutManager = LinearLayoutManager(context)
-        recyclerView.layoutManager = linearLayoutManager
         val commentsAdapter = CommentsAdapter(viewModel)
 
+        recyclerView = root.findViewById(R.id.comments)
+        recyclerView.apply {
+            layoutManager = linearLayoutManager
+            adapter = commentsAdapter
+            if (safeArgs.post != null) {
+                viewTreeObserver.addOnPreDrawListener {
+                    startPostponedEnterTransition()
+                    true
+                }
+            }
+        }
+
         if (safeArgs.post != null) {
+            postponeEnterTransition()
             viewModel.setSelectedPost(safeArgs.post as Post)
         }
-        recyclerView.adapter = commentsAdapter
+
         viewModel.comments.observe(viewLifecycleOwner) { comments ->
             val oldSize = commentsAdapter.comments.size
             val newSize = comments.size

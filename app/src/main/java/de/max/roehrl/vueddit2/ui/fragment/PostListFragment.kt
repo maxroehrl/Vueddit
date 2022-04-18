@@ -25,6 +25,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.transition.MaterialElevationScale
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
@@ -59,6 +60,12 @@ open class PostListFragment : Fragment() {
     private lateinit var collapsingToolbar: CollapsingToolbarLayout
     private var currentSubreddit: Subreddit? = null
 
+    override fun onCreate(savedInstanceState: Bundle?)  {
+        super.onCreate(savedInstanceState)
+        exitTransition = MaterialElevationScale(false)
+        reenterTransition = MaterialElevationScale(true)
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -67,41 +74,50 @@ open class PostListFragment : Fragment() {
     ): View? {
         val root = inflater.inflate(layoutId, container, false)
         val postsAdapter = PostsAdapter(viewModel.viewModelScope)
-        val layoutManager = LinearLayoutManager(context)
+        val linearLayoutManager = LinearLayoutManager(context)
 
         toolbar = root.findViewById(R.id.toolbar)
         collapsingToolbar = root.findViewById(R.id.collapsing_toolbar)
         sortingTabLayout = root.findViewById(R.id.tab_layout)
 
-        val recyclerView: RecyclerView = root.findViewById(R.id.recycler_view)
-        recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = postsAdapter
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (!viewModel.isPostListLoading()
-                    && layoutManager.findLastVisibleItemPosition() + 2 == recyclerView.adapter?.itemCount
-                    && dy != 0
-                ) {
-                    viewModel.loadMorePosts()
+        postponeEnterTransition()
+        (root as ViewGroup).isTransitionGroup = true
+
+        root.findViewById<RecyclerView?>(R.id.recycler_view).apply {
+            layoutManager = linearLayoutManager
+            adapter = postsAdapter
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if (!viewModel.isPostListLoading()
+                        && linearLayoutManager.findLastVisibleItemPosition() + 2 == recyclerView.adapter?.itemCount
+                        && dy != 0
+                    ) {
+                        viewModel.loadMorePosts()
+                    }
                 }
+            })
+            viewTreeObserver.addOnPreDrawListener {
+                startPostponedEnterTransition()
+                true
             }
-        })
-        recyclerView.addOnItemTouchListener(
-            RecyclerOnTouchListener(
-                requireContext(),
-                recyclerView,
-                { view, position ->
-                    onItemLongPressed(view, position)
-                },
-                null
+            addOnItemTouchListener(
+                RecyclerOnTouchListener(
+                    requireContext(),
+                    this,
+                    { view, position ->
+                        onItemLongPressed(view, position)
+                    },
+                    null
+                )
             )
-        )
-        val swipeRefreshLayout: SwipeRefreshLayout = root.findViewById(R.id.swipe)
-        swipeRefreshLayout.setOnRefreshListener {
-            swipeRefreshLayout.post {
-                if (swipeRefreshLayout.isRefreshing) {
-                    viewModel.refreshPosts(false) {
-                        swipeRefreshLayout.isRefreshing = false
+        }
+        root.findViewById<SwipeRefreshLayout?>(R.id.swipe).apply {
+            setOnRefreshListener {
+                post {
+                    if (isRefreshing) {
+                        viewModel.refreshPosts(false) {
+                            isRefreshing = false
+                        }
                     }
                 }
             }

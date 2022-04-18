@@ -9,11 +9,14 @@ import android.text.style.RelativeSizeSpan
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
@@ -39,11 +42,16 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
     RecyclerView.ViewHolder(itemView) {
     companion object {
         private const val TAG = "PostViewHolder"
+        const val TRANSITION_VOTES = "TransitionVotes"
+        const val TRANSITION_TITLE = "TransitionTitle"
+        const val TRANSITION_META = "TransitionMeta"
+        const val TRANSITION_PREVIEW = "TransitionPreview"
     }
     private val postHeader: RelativeLayout = itemView.findViewById(R.id.post_header)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val meta: TextView = itemView.findViewById(R.id.meta)
     protected val imageView: SimpleDraweeView = itemView.findViewById(R.id.preview)
+    private val voteButtons: LinearLayout = itemView.findViewById(R.id.vote_buttons)
     private val votes: TextView = itemView.findViewById(R.id.votes)
     private val upvote: TextView = itemView.findViewById(R.id.up)
     private val downvote: TextView = itemView.findViewById(R.id.down)
@@ -69,6 +77,12 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
     }
 
     open fun onClick(view: View) {
+        val extras = FragmentNavigatorExtras(
+            voteButtons to TRANSITION_VOTES + post.id,
+            title to TRANSITION_TITLE + post.id,
+            meta to TRANSITION_META + post.id,
+            imageView to TRANSITION_PREVIEW + post.id,
+        )
         try {
             view.findNavController().navigate(
                 PostListFragmentDirections.actionPostListFragmentToPostDetailFragment(
@@ -77,6 +91,7 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
                     null,
                     post,
                 ),
+                extras,
             )
         } catch (error: IllegalArgumentException) {
             view.findNavController().navigate(
@@ -86,6 +101,7 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
                     null,
                     post,
                 ),
+                extras,
             )
         }
     }
@@ -93,6 +109,11 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
     open fun bind(post: NamedItem, highlightSticky: Boolean = true) {
         this.post = post as Post
         val builder = SpannableStringBuilder()
+
+        ViewCompat.setTransitionName(voteButtons, TRANSITION_VOTES + post.id)
+        ViewCompat.setTransitionName(title, TRANSITION_TITLE + post.id)
+        ViewCompat.setTransitionName(meta, TRANSITION_META + post.id)
+        ViewCompat.setTransitionName(imageView, TRANSITION_PREVIEW + post.id)
 
         if (post.link_flair_text != "" && post.link_flair_text != "null") {
             val flairString = SpannableString(post.link_flair_text)
