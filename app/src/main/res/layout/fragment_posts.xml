@@ -37,7 +37,7 @@
                 android:layout_gravity="bottom"
                 android:background="@color/sortings_bar"
                 app:layout_collapseMode="none"
-                app:tabGravity="fill"
+                app:tabGravity="start"
                 app:tabIndicatorColor="@color/highlight"
                 app:tabMode="scrollable"
                 app:tabSelectedTextColor="@color/highlight" />
