@@ -17,6 +17,7 @@ import androidx.core.view.get
 import androidx.core.widget.doOnTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.setupWithNavController
@@ -44,7 +45,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var drawerLayout: DrawerLayout
     private lateinit var navView: NavigationView
     private lateinit var navController: NavController
-    private val viewModel: AppViewModel by viewModels()
+    private val viewModel: AppViewModel by viewModels {
+        SavedStateViewModelFactory(application, this)
+    }
     private val multiRedditMenuItems = mutableListOf<MenuItem>()
     private val userRedditMenuItems = mutableListOf<MenuItem>()
     private var searchTextLength: Int = 0
@@ -256,5 +259,10 @@ class MainActivity : AppCompatActivity() {
                 groupId += 1
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        viewModel.saveBundle()
+        super.onSaveInstanceState(outState)
     }
 }

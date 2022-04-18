@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -19,7 +20,9 @@ import de.max.roehrl.vueddit2.ui.viewmodel.UserPostListViewModel
 import kotlinx.coroutines.launch
 
 class UserPostListFragment : PostListFragment() {
-    override val viewModel: UserPostListViewModel by viewModels()
+    override val viewModel: UserPostListViewModel by viewModels {
+        SavedStateViewModelFactory(requireActivity().application, this)
+    }
     override val layoutId = R.layout.fragment_user_posts
     override val isGroupTabLayoutVisible = true
     override val menuId = R.menu.user_post_list

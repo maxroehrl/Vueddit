@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -59,14 +60,16 @@ class PostDetailFragment : Fragment() {
     private lateinit var toolbar: MaterialToolbar
     private lateinit var collapsingToolbar: CollapsingToolbarLayout
     private lateinit var recyclerView: RecyclerView
-    private val viewModel: PostDetailViewModel by viewModels()
+    private val viewModel: PostDetailViewModel by viewModels {
+        SavedStateViewModelFactory(requireActivity().application, this)
+    }
     private val safeArgs: PostDetailFragmentArgs by navArgs()
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
-            savedInstanceState: Bundle?
+            savedInstanceState: Bundle?,
     ): View? {
         val root = inflater.inflate(R.layout.fragment_post_detail, container, false)
         toolbar = root.findViewById(R.id.toolbar)
@@ -187,6 +190,11 @@ class PostDetailFragment : Fragment() {
             headerVh.onPause()
         }
         super.onPause()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        viewModel.saveBundle()
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroyView() {

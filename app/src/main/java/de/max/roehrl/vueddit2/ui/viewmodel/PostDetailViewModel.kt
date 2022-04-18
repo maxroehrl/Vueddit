@@ -10,22 +10,41 @@ import de.max.roehrl.vueddit2.service.Reddit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class PostDetailViewModel(application: Application) : AndroidViewModel(application) {
+class PostDetailViewModel(
+    application: Application,
+    private val savedStateHandle: SavedStateHandle
+) : AndroidViewModel(application) {
     companion object {
         private const val TAG = "PostDetailViewModel"
         private const val defaultSorting = "top"
+        private const val SELECTED_POST = "selectedPost"
+        private const val SELECTED_COMMENT = "selectedComment"
+        private const val COMMENTS = "comments"
+        private const val COMMENT_SORTING = "commentSorting"
     }
 
-    val selectedPost: LiveData<Post> = liveData { }
+    val selectedPost: LiveData<Post> = liveData {
+        val saved: Post? = savedStateHandle.get(SELECTED_POST)
+        if (saved != null) {
+            emit(saved)
+        }
+    }
 
-    val selectedComment: LiveData<Comment?> = liveData { }
+    val selectedComment: LiveData<Comment?> = liveData {
+        val saved: Comment? = savedStateHandle.get(SELECTED_COMMENT)
+        if (saved != null) {
+            emit(saved)
+        }
+    }
 
     val comments: LiveData<MutableList<NamedItem>> = liveData {
-        emit(mutableListOf(NamedItem))
+        val saved: MutableList<NamedItem>? = savedStateHandle.get(COMMENTS)
+        emit(saved ?: mutableListOf(NamedItem.Loading))
     }
 
     val commentSorting: LiveData<String> = liveData {
-        emit(defaultSorting)
+        val saved: String? = savedStateHandle.get(COMMENT_SORTING)
+        emit(saved ?: defaultSorting)
     }
 
     private fun loadComments(commentName: String?, cb: (() -> Unit)? = null) {
@@ -139,5 +158,12 @@ class PostDetailViewModel(application: Application) : AndroidViewModel(applicati
             val newlySelectedComment = commentCandidates[if (next) 0 else commentCandidates.size - 1]
             selectComment(newlySelectedComment as Comment)
         }
+    }
+
+    fun saveBundle() {
+        savedStateHandle.set(SELECTED_POST, selectedPost.value)
+        savedStateHandle.set(SELECTED_COMMENT, selectedComment.value)
+        savedStateHandle.set(COMMENTS, comments.value)
+        savedStateHandle.set(COMMENT_SORTING, commentSorting.value)
     }
 }

@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -42,8 +43,12 @@ open class PostListFragment : Fragment() {
     companion object {
         private const val TAG = "PostListFragment"
     }
-    protected open val viewModel: PostListViewModel by viewModels()
-    protected open val appViewModel: AppViewModel by activityViewModels()
+    protected open val viewModel: PostListViewModel by viewModels {
+        SavedStateViewModelFactory(requireActivity().application, this)
+    }
+    protected open val appViewModel: AppViewModel by activityViewModels {
+        SavedStateViewModelFactory(requireActivity().application, this)
+    }
     protected open lateinit var toolbar: MaterialToolbar
     protected open lateinit var sortingTabLayout: TabLayout
     protected open val isGroupTabLayoutVisible = false
@@ -313,5 +318,10 @@ open class PostListFragment : Fragment() {
             }
             show()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        viewModel.saveBundle()
+        super.onSaveInstanceState(outState)
     }
 }

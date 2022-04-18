@@ -12,42 +12,91 @@ import de.max.roehrl.vueddit2.service.Store
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class AppViewModel(application: Application) : AndroidViewModel(application) {
+class AppViewModel(application: Application, private val savedStateHandle: SavedStateHandle) :
+    AndroidViewModel(application) {
     companion object {
         private const val TAG = "AppViewModel"
         const val WAS_LOGGED_IN = "wasLoggedIn"
+        const val IS_LOGGED_IN = "isLoggedIn"
+        const val USERNAME = "username"
+        const val SUBREDDIT = "subreddit"
+        const val SUBREDDITS = "subreddits"
+        const val SUBSCRIBED_SUBREDDITS = "subscribedSubreddits"
+        const val VISITED_SUBREDDITS = "visitedSubreddits"
+        const val VISITED_USERS = "visitedUsers"
+        const val MULTI_REDDITS = "multiReddits"
+        const val IS_BIG_TEMPLATE_PREFERRED = "isBigTemplatePreferred"
+        const val SEARCH_RESULTS = "searchResults"
     }
 
     val isLoggedIn: LiveData<Boolean> = liveData(Dispatchers.IO) {
-        emit(Reddit.getInstance(getApplication()).login())
+        val saved: Boolean? = savedStateHandle.get(IS_LOGGED_IN)
+        emit(saved ?: Reddit.getInstance(getApplication()).login())
     }
 
     val username: LiveData<String?> = liveData(Dispatchers.IO) {
-        emit(Store.getInstance(getApplication()).getUsername())
+        val saved: String? = savedStateHandle.get(USERNAME)
+        emit(saved ?: Store.getInstance(getApplication()).getUsername())
     }
 
     val subreddit: LiveData<Subreddit> = liveData {
-        emit(Subreddit.frontPage)
+        val saved: Subreddit? = savedStateHandle.get(SUBREDDIT)
+        emit(saved ?: Subreddit.frontPage)
     }
 
     val subreddits: LiveData<List<List<Subreddit>>> = liveData {
         emit(loadCachedSubreddits())
     }
 
-    private val subscribedSubreddits: LiveData<List<Subreddit>> = liveData { }
+    private val subscribedSubreddits: LiveData<List<Subreddit>> = liveData {
+        val saved: List<Subreddit>? = savedStateHandle.get(SUBSCRIBED_SUBREDDITS)
+        if (saved != null) {
+            emit(saved)
+        }
+    }
 
-    private val visitedSubreddits: LiveData<List<Subreddit>> = liveData { }
+    private val visitedSubreddits: LiveData<List<Subreddit>> = liveData {
+        val saved: List<Subreddit>? = savedStateHandle.get(VISITED_SUBREDDITS)
+        if (saved != null) {
+            emit(saved)
+        }
+    }
 
-    private val visitedUsers: LiveData<List<Subreddit>> = liveData { }
+    private val visitedUsers: LiveData<List<Subreddit>> = liveData {
+        val saved: List<Subreddit>? = savedStateHandle.get(VISITED_USERS)
+        if (saved != null) {
+            emit(saved)
+        }
+    }
 
-    private val multiReddits: LiveData<List<Subreddit>> = liveData { }
+    private val multiReddits: LiveData<List<Subreddit>> = liveData {
+        val saved: List<Subreddit>? = savedStateHandle.get(MULTI_REDDITS)
+        if (saved != null) {
+            emit(saved)
+        }
+    }
 
     val isBigTemplatePreferred: LiveData<Boolean?> = liveData {
-        emit(null)
+        val saved: Boolean? = savedStateHandle.get(IS_BIG_TEMPLATE_PREFERRED)
+        emit(saved)
     }
 
     val searchResults: LiveData<List<Subreddit>?> = liveData {
-        emit(null)
+        val saved: List<Subreddit>? = savedStateHandle.get(SEARCH_RESULTS)
+        emit(saved)
+    }
+
+    fun saveBundle() {
+        savedStateHandle.set(IS_LOGGED_IN, isLoggedIn.value)
+        savedStateHandle.set(USERNAME, username.value)
+        savedStateHandle.set(SUBREDDIT, subreddit.value)
+        savedStateHandle.set(SUBREDDITS, subreddits.value)
+        savedStateHandle.set(SUBSCRIBED_SUBREDDITS, subscribedSubreddits.value)
+        savedStateHandle.set(VISITED_SUBREDDITS, visitedSubreddits.value)
+        savedStateHandle.set(VISITED_USERS, visitedUsers.value)
+        savedStateHandle.set(MULTI_REDDITS, multiReddits.value)
+        savedStateHandle.set(IS_BIG_TEMPLATE_PREFERRED, isBigTemplatePreferred.value)
+        savedStateHandle.set(SEARCH_RESULTS, searchResults.value)
     }
 
     fun updateSearchText(text: CharSequence?) {

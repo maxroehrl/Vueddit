@@ -9,26 +9,41 @@ import de.max.roehrl.vueddit2.service.Reddit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-open class PostListViewModel(application: Application) : AndroidViewModel(application) {
+open class PostListViewModel(
+    application: Application,
+    private val savedStateHandle: SavedStateHandle
+) : AndroidViewModel(application) {
     companion object {
         protected const val TAG = "PostListViewModel"
         private const val defaultTopPostTime = "all"
+        private const val SUBREDDIT = "subreddit"
+        private const val POST_SORTING = "postSorting"
+        private const val POSTS = "posts"
+        private const val TOP_POSTS_TIME = "topPostsTime"
     }
     protected open val defaultSorting = "hot"
     open val sortingList = listOf("hot", "top", "new", "best", "controversial", "rising")
 
-    val subreddit: LiveData<Subreddit> = liveData { }
+    val subreddit: LiveData<Subreddit> = liveData {
+        val saved: Subreddit? = savedStateHandle.get(SUBREDDIT)
+        if (saved != null) {
+            emit(saved)
+        }
+    }
 
     open val postSorting: LiveData<String> = liveData {
-        emit(defaultSorting)
+        val saved: String? = savedStateHandle.get(POST_SORTING)
+        emit(saved ?: defaultSorting)
     }
 
     val posts: LiveData<List<NamedItem>> = liveData {
-        emit(listOf(NamedItem.Loading))
+        val saved: List<NamedItem>? = savedStateHandle.get(POSTS)
+        emit(saved ?: listOf(NamedItem.Loading))
     }
 
     private val topPostsTime: LiveData<String> = liveData {
-        emit(defaultTopPostTime)
+        val saved: String? = savedStateHandle.get(TOP_POSTS_TIME)
+        emit(saved ?: defaultTopPostTime)
     }
 
     fun selectSubreddit(subredditName: String) {
@@ -106,5 +121,12 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
     private fun getPostCount(): Int {
         val size = posts.value?.size ?: 0
         return 25 * (size / 25 + 1)
+    }
+
+    open fun saveBundle() {
+        savedStateHandle.set(SUBREDDIT, subreddit.value)
+        savedStateHandle.set(POST_SORTING, postSorting.value)
+        savedStateHandle.set(POSTS, posts.value)
+        savedStateHandle.set(TOP_POSTS_TIME, topPostsTime.value)
     }
 }
