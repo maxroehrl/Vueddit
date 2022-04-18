@@ -89,7 +89,7 @@ class PostDetailFragment : Fragment() {
             var comment: NamedItem? = null
             var refreshAll = false
             if (newSize == 1) {
-                if (comments[0] is NamedItem.Loading) {
+                if (comments[0] == NamedItem.Loading) {
                     if (oldSize > 1) {
                         commentsAdapter.notifyItemRangeRemoved(2, oldSize - 1)
                     }

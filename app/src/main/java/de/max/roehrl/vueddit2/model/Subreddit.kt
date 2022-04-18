@@ -2,9 +2,19 @@ package de.max.roehrl.vueddit2.model
 
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.service.Reddit
+import kotlinx.parcelize.Parcelize
 import org.json.JSONObject
 
-class Subreddit(json: JSONObject, var isMultiReddit: Boolean = false) : NamedItem("subreddit") {
+@Parcelize
+data class Subreddit(
+    val name: String,
+    val subreddits: String = "",
+    var isMultiReddit: Boolean = false,
+    var user: String? = null,
+    var isSubscribedTo: Boolean = true,
+    var isStarred: Boolean = false,
+    var isVisited: Boolean = true,
+) : NamedItem("subreddit") {
     companion object {
         val frontPage = fromName(Reddit.frontpage)
         val all = fromName("all")
@@ -13,7 +23,7 @@ class Subreddit(json: JSONObject, var isMultiReddit: Boolean = false) : NamedIte
         val defaultSubreddits = listOf(frontPage, all, popular, random)
 
         fun fromName(name: String) : Subreddit {
-            return Subreddit(JSONObject("{\"display_name\": \"$name\"}"))
+            return Subreddit(name)
         }
 
         fun fromUser(name: String) : Subreddit {
@@ -22,28 +32,27 @@ class Subreddit(json: JSONObject, var isMultiReddit: Boolean = false) : NamedIte
                 isSubscribedTo = false
             }
         }
+
+        private fun parseSubreddits(json: JSONObject) : String {
+            val subreddits = json.optJSONArray("subreddits")
+            val list = mutableListOf<String>()
+            if (subreddits != null) {
+                for (i in 0 until subreddits.length()) {
+                    list.add(subreddits.getJSONObject(i).getString("name"))
+                }
+            }
+            return list.joinToString("+")
+        }
     }
 
-    val name = json.optString("display_name")
-    val subreddits = getSubreddits(json)
-    var user: String? = null
-    var isSubscribedTo = true
-    var isStarred = false
-    var isVisited = true
+    constructor(json: JSONObject, isMultiReddit: Boolean = false) : this(
+        name = json.optString("display_name"),
+        subreddits = parseSubreddits(json),
+        isMultiReddit = isMultiReddit,
+    )
 
     override fun toString(): String {
         return "$name (${if (isMultiReddit) subreddits else "isStarred: $isStarred, isVisited: $isStarred"})"
-    }
-
-    private fun getSubreddits(json: JSONObject) : String {
-        val subreddits = json.optJSONArray("subreddits")
-        val list = mutableListOf<String>()
-        if (subreddits != null) {
-            for (i in 0 until subreddits.length()) {
-                list.add(subreddits.getJSONObject(i).getString("name"))
-            }
-        }
-        return list.joinToString("+")
     }
 
     fun getIconId(): Int {

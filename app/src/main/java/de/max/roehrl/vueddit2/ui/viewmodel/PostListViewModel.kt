@@ -53,7 +53,7 @@ open class PostListViewModel(application: Application) : AndroidViewModel(applic
             val oldPosts = posts.value?.toMutableList() ?: mutableListOf()
             if (showLoadingIndicator) {
                 if (!isPostListLoading()) {
-                    (posts as MutableLiveData).postValue(oldPosts + NamedItem)
+                    (posts as MutableLiveData).postValue(oldPosts + NamedItem.Loading)
                 } else {
                     oldPosts.removeLastOrNull()
                 }

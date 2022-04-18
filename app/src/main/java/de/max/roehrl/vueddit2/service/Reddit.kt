@@ -158,9 +158,9 @@ class Reddit private constructor(val context: Context) {
             for (i in 0 until postsData.length()) {
                 val postOrComment = postsData.getJSONObject(i).getJSONObject("data")
                 if (postOrComment.has("body")) {
-                    posts.add(Comment(postOrComment))
+                    posts.add(Comment.fromJson(postOrComment)!!)
                 } else {
-                    posts.add(Post(postOrComment))
+                    posts.add(Post.fromJson(postOrComment)!!)
                 }
             }
         }
@@ -170,14 +170,14 @@ class Reddit private constructor(val context: Context) {
     suspend fun getPostAndComments(permalink: String, sort: String = "top"): Pair<Post, MutableList<Comment>> {
         val response = get("$permalink.json?raw_json=1&sort=$sort")
         val responseArray = JSONArray(response)
-        val post = Post(
-                responseArray
-                        .optJSONObject(0)
-                        ?.optJSONObject("data")
-                        ?.optJSONArray("children")
-                        ?.optJSONObject(0)
-                        ?.optJSONObject("data") ?: JSONObject()
-        )
+        val post = Post.fromJson(
+            responseArray
+                .optJSONObject(0)
+                ?.optJSONObject("data")
+                ?.optJSONArray("children")
+                ?.optJSONObject(0)
+                ?.optJSONObject("data") ?: JSONObject()
+        )!!
         val commentsData = responseArray
                 .optJSONObject(1)
                 ?.optJSONObject("data")
@@ -185,7 +185,7 @@ class Reddit private constructor(val context: Context) {
         val comments = mutableListOf<Comment>()
 
         fun addAllChildren(item: JSONObject) {
-            comments.add(Comment(item))
+            comments.add(Comment.fromJson(item)!!)
             val children = item
                     .optJSONObject("replies")
                     ?.optJSONObject("data")
@@ -209,7 +209,7 @@ class Reddit private constructor(val context: Context) {
         val commentsData = JSONObject(response).getJSONObject("json").getJSONObject("data").getJSONArray("things")
         val comments = mutableListOf<Comment>()
         for (i in 0 until commentsData.length()) {
-            comments.add(Comment(commentsData.getJSONObject(i).getJSONObject("data")))
+            comments.add(Comment.fromJson(commentsData.getJSONObject(i).getJSONObject("data"))!!)
         }
         return comments
     }
@@ -241,7 +241,7 @@ class Reddit private constructor(val context: Context) {
         if (response != "[]") {
             val data = JSONArray(response)
             for (i in 0 until data.length()) {
-                list.add(Subreddit(data.getJSONObject(i).getJSONObject("data"), true))
+                list.add(Subreddit(data.getJSONObject(i).getJSONObject("data"), isMultiReddit =  true))
             }
         }
         return list
@@ -255,7 +255,7 @@ class Reddit private constructor(val context: Context) {
                 val data = JSONObject(response).getJSONArray("names")
                 for (i in 0 until data.length()) {
                     val name = data.getString(i)
-                    val subreddit = Subreddit(JSONObject("{display_name: \"$name\"}"))
+                    val subreddit = Subreddit.fromName(name)
                     subreddit.isVisited = false
                     list.add(subreddit)
                 }
