@@ -19,8 +19,6 @@ object CustomTabs {
         val customTabsIntent = Builder()
             .setShareState(SHARE_STATE_ON)
             .setShowTitle(true)
-            .setStartAnimations(context, R.anim.slide_in_right, R.anim.slide_out_left)
-            .setExitAnimations(context, R.anim.slide_in_left, R.anim.slide_out_right)
             .setCloseButtonIcon(backArrow)
             .setUrlBarHidingEnabled(true)
             .build()

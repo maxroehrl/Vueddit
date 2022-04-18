@@ -8,7 +8,6 @@ import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.navOptions
-import de.max.roehrl.vueddit2.R
 
 object Url {
     private const val TAG = "UrlService"
@@ -44,12 +43,6 @@ object Url {
     fun openDeepLink(permalink: String, navController: NavController, @IdRes popUpToId: Int = -1) {
         val request = NavDeepLinkRequest.Builder.fromUri((Reddit.api + permalink).toUri()).build()
         val options = navOptions {
-            anim {
-                enter = R.anim.slide_in_right
-                exit = R.anim.slide_out_left
-                popEnter = R.anim.slide_in_left
-                popExit = R.anim.slide_out_right
-            }
             popUpTo(popUpToId)
         }
         navController.navigate(request, options)
