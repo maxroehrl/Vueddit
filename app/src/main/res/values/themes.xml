@@ -13,7 +13,6 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:navigationBarColor">@color/nav_bar_background</item>
     </style>
 
     <style name="Theme.Vueddit2.AppBarOverlay" parent="ThemeOverlay.Material3.ActionBar" />
