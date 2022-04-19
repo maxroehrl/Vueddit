@@ -112,7 +112,7 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
         for (sorting in sortings) {
             sortingTabLayout.addTab(sortingTabLayout.newTab().setText(sorting))
         }
-        val index = sortings.indexOf(viewModel.commentSorting.value)
+        val index = sortings.indexOf(viewModel.commentSorting)
         if (index != -1) {
             sortingTabLayout.getTabAt(index)!!.select()
         }
@@ -187,7 +187,7 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
     }
 
     private fun onSortingSelected(sorting: String) {
-        viewModel.setCommentSorting(sorting)
+        viewModel.commentSorting = sorting
         viewModel.refreshComments()
     }
 
