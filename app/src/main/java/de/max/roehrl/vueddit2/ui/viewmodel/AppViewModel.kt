@@ -65,19 +65,6 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
         emit(saved)
     }
 
-    fun saveBundle() {
-        savedStateHandle.set(IS_LOGGED_IN, isLoggedIn.value)
-        savedStateHandle.set(USERNAME, username.value)
-        savedStateHandle.set(SUBREDDIT, subreddit.value)
-        savedStateHandle.set(SUBREDDITS, subreddits.value)
-        savedStateHandle.set(SUBSCRIBED_SUBREDDITS, subscribedSubreddits.value)
-        savedStateHandle.set(VISITED_SUBREDDITS, visitedSubreddits.value)
-        savedStateHandle.set(VISITED_USERS, visitedUsers.value)
-        savedStateHandle.set(MULTI_REDDITS, multiReddits.value)
-        savedStateHandle.set(IS_BIG_TEMPLATE_PREFERRED, isBigTemplatePreferred.value)
-        savedStateHandle.set(SEARCH_RESULTS, searchResults.value)
-    }
-
     fun updateSearchText(text: CharSequence?) {
         viewModelScope.launch(Dispatchers.IO) {
             val results = if (text.isNullOrEmpty()) null else Reddit.getInstance(getApplication())
@@ -286,11 +273,12 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
     }
 
     fun toggleBigPreview(postList: List<NamedItem>) {
-        (isBigTemplatePreferred as MutableLiveData).value = !if (isBigTemplatePreferred.value != null) {
-            isBigTemplatePreferred.value!!
-        } else {
-            shouldShowBigTemplate(postList)
-        }
+        (isBigTemplatePreferred as MutableLiveData).value =
+            !if (isBigTemplatePreferred.value != null) {
+                isBigTemplatePreferred.value!!
+            } else {
+                shouldShowBigTemplate(postList)
+            }
     }
 
     fun shouldShowBigTemplate(postList: List<NamedItem>): Boolean {
@@ -305,5 +293,18 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
             Log.d(TAG, "$numberOfPreviewPictures of the first 10 posts have a preview")
             numberOfPreviewPictures > 4
         }
+    }
+
+    fun saveBundle() {
+        savedStateHandle.set(SUBSCRIBED_SUBREDDITS, subscribedSubreddits)
+        savedStateHandle.set(VISITED_SUBREDDITS, visitedSubreddits)
+        savedStateHandle.set(VISITED_USERS, visitedUsers)
+        savedStateHandle.set(MULTI_REDDITS, multiReddits)
+        savedStateHandle.set(IS_LOGGED_IN, isLoggedIn.value)
+        savedStateHandle.set(USERNAME, username.value)
+        savedStateHandle.set(SUBREDDIT, subreddit.value)
+        savedStateHandle.set(SUBREDDITS, subreddits.value)
+        savedStateHandle.set(IS_BIG_TEMPLATE_PREFERRED, isBigTemplatePreferred.value)
+        savedStateHandle.set(SEARCH_RESULTS, searchResults.value)
     }
 }
