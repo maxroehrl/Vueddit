@@ -21,6 +21,7 @@ class UserPostListViewModel(
     }
     override val sortingList = listOf("new", "top", "hot", "controversial")
     override val defaultSorting = "new"
+    var selectedType: String = savedStateHandle.get(SELECTED_TYPE) ?: defaultType
 
     val selectedUser: LiveData<String> = liveData {
         val saved: String? = savedStateHandle.get(SELECTED_USER)
@@ -34,17 +35,8 @@ class UserPostListViewModel(
         emit(saved ?: defaultGroup)
     }
 
-    private val selectedType: LiveData<String> = liveData {
-        val saved: String? = savedStateHandle.get(SELECTED_TYPE)
-        emit(saved ?: defaultType)
-    }
-
     fun setSelectedUser(username: String) {
         (selectedUser as MutableLiveData).value = username
-    }
-
-    fun setSavedPostsType(type: String) {
-        (selectedType as MutableLiveData).value = type
     }
 
     fun setUserPostGroup(group: String) {
@@ -57,16 +49,21 @@ class UserPostListViewModel(
             time: String,
             count: Int,
     ): List<NamedItem> {
-        val userName = selectedUser.value!!
-        val group = userPostGroup.value ?: defaultGroup
-        val type = selectedType.value ?: defaultType
-        return Reddit.getInstance(getApplication()).getUserPosts(userName, after, sorting, group, time, type, count)
+        return Reddit.getInstance(getApplication()).getUserPosts(
+            selectedUser.value!!,
+            after,
+            sorting,
+            userPostGroup.value ?: defaultGroup,
+            time,
+            selectedType,
+            count
+        )
     }
 
     override fun saveBundle() {
         super.saveBundle()
         savedStateHandle.set(SELECTED_USER, selectedUser.value)
         savedStateHandle.set(USER_POST_GROUP, userPostGroup.value)
-        savedStateHandle.set(SELECTED_TYPE, selectedType.value)
+        savedStateHandle.set(SELECTED_TYPE, selectedType)
     }
 }

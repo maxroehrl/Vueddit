@@ -86,8 +86,7 @@ class UserPostListFragment : PostListFragment() {
                     val items = listOf("All", "Comments", "Links")
                     MaterialAlertDialogBuilder(requireContext()).apply {
                         setItems(items.toTypedArray()) { _, which ->
-                            val type = items[which].lowercase()
-                            viewModel.setSavedPostsType(type)
+                            viewModel.selectedType = items[which].lowercase()
                             viewModel.refreshPosts()
                         }
                         show()
