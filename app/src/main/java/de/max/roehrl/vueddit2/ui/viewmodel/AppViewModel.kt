@@ -29,12 +29,19 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
         private const val SEARCH_RESULTS = "searchResults"
     }
 
+    private var subscribedSubreddits: List<Subreddit> =
+        savedStateHandle.get(SUBSCRIBED_SUBREDDITS) ?: emptyList()
+    private var visitedSubreddits: List<Subreddit> =
+        savedStateHandle.get(VISITED_SUBREDDITS) ?: emptyList()
+    private var visitedUsers: List<Subreddit> = savedStateHandle.get(VISITED_USERS) ?: emptyList()
+    private var multiReddits: List<Subreddit> = savedStateHandle.get(MULTI_REDDITS) ?: emptyList()
+
     val isLoggedIn: LiveData<Boolean> = liveData(Dispatchers.IO) {
         val saved: Boolean? = savedStateHandle.get(IS_LOGGED_IN)
         emit(saved ?: Reddit.getInstance(getApplication()).login())
     }
 
-    val username: LiveData<String?> = liveData(Dispatchers.IO) {
+    private val username: LiveData<String?> = liveData(Dispatchers.IO) {
         val saved: String? = savedStateHandle.get(USERNAME)
         emit(saved ?: Store.getInstance(getApplication()).getUsername())
     }
@@ -46,34 +53,6 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
 
     val subreddits: LiveData<List<List<Subreddit>>> = liveData {
         emit(loadCachedSubreddits())
-    }
-
-    private val subscribedSubreddits: LiveData<List<Subreddit>> = liveData {
-        val saved: List<Subreddit>? = savedStateHandle.get(SUBSCRIBED_SUBREDDITS)
-        if (saved != null) {
-            emit(saved)
-        }
-    }
-
-    private val visitedSubreddits: LiveData<List<Subreddit>> = liveData {
-        val saved: List<Subreddit>? = savedStateHandle.get(VISITED_SUBREDDITS)
-        if (saved != null) {
-            emit(saved)
-        }
-    }
-
-    private val visitedUsers: LiveData<List<Subreddit>> = liveData {
-        val saved: List<Subreddit>? = savedStateHandle.get(VISITED_USERS)
-        if (saved != null) {
-            emit(saved)
-        }
-    }
-
-    private val multiReddits: LiveData<List<Subreddit>> = liveData {
-        val saved: List<Subreddit>? = savedStateHandle.get(MULTI_REDDITS)
-        if (saved != null) {
-            emit(saved)
-        }
     }
 
     val isBigTemplatePreferred: LiveData<Boolean?> = liveData {
@@ -101,9 +80,10 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
 
     fun updateSearchText(text: CharSequence?) {
         viewModelScope.launch(Dispatchers.IO) {
-            val results = if (text.isNullOrEmpty()) null else Reddit.getInstance(getApplication()).searchForSubreddit(text.toString())
+            val results = if (text.isNullOrEmpty()) null else Reddit.getInstance(getApplication())
+                .searchForSubreddit(text.toString())
             results?.forEach { subreddit ->
-                subreddit.isSubscribedTo = subscribedSubreddits.value?.contains(subreddit) ?: false
+                subreddit.isSubscribedTo = subscribedSubreddits.contains(subreddit)
             }
             (searchResults as MutableLiveData).postValue(results)
         }
@@ -126,7 +106,7 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
     }
 
     fun selectUser(user: String) {
-        if (visitedUsers.value?.find { sub ->sub.user == user} == null) {
+        if (visitedUsers.find { sub -> sub.user == user } == null) {
             viewModelScope.launch(Dispatchers.IO) {
                 addToVisitedUsers(Subreddit.fromUser(user))
             }
@@ -135,85 +115,77 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
 
     private suspend fun addToVisitedSubreddits(sub: Subreddit) {
         Store.getInstance(getApplication()).addToVisitedSubreddits(sub.name)
-        (visitedSubreddits as MutableLiveData).postValue(sortByName((visitedSubreddits.value!! + listOf(sub))))
+        visitedSubreddits = sortByName((visitedSubreddits + listOf(sub)))
         updateAllSubredditsList()
     }
 
     private suspend fun addToVisitedUsers(sub: Subreddit) {
         Store.getInstance(getApplication()).addToVisitedUsers(sub.user!!)
-        (visitedUsers as MutableLiveData).postValue(sortByName((visitedUsers.value!! + listOf(sub))))
+        visitedUsers = sortByName((visitedUsers + listOf(sub)))
         updateAllSubredditsList()
     }
 
     private fun sortByName(list: List<Subreddit>): List<Subreddit> {
         return list.sortedWith(
-                compareBy { sub: Subreddit -> !sub.isStarred }
-                        .thenBy { it.name.lowercase() }
+            compareBy { sub: Subreddit -> !sub.isStarred }
+                .thenBy { it.name.lowercase() }
         )
     }
 
     private suspend fun loadCachedSubreddits(): List<List<Subreddit>> {
         val store = Store.getInstance(getApplication())
         val starred = store.getStarredSubreddits()
-        val subscriptions = sortByName(store.getCachedSubscribedSubreddits().map {
+
+        subscribedSubreddits = sortByName(store.getCachedSubscribedSubreddits().map {
             Subreddit.fromName(it).apply {
                 if (starred.contains(name))
                     isStarred = true
             }
         })
-        Log.d(TAG, "Loaded ${subscriptions.size} cached subscribed subreddits")
-        (subscribedSubreddits as MutableLiveData).value = subscriptions
-
-        val visited = sortByName(store.getVisitedSubreddits().map {
+        visitedSubreddits = sortByName(store.getVisitedSubreddits().map {
             Subreddit.fromName(it).apply {
                 isSubscribedTo = false
             }
         })
-        Log.d(TAG, "Loaded ${visited.size} visited subreddits")
-        (visitedSubreddits as MutableLiveData).value = visited
-
-        val users = sortByName(store.getVisitedUsers().map {
+        visitedUsers = sortByName(store.getVisitedUsers().map {
             Subreddit.fromUser(it)
         })
-        Log.d(TAG, "Loaded ${users.size} visited users")
-        (visitedUsers as MutableLiveData).value = users
-
-        val multis = sortByName(store.getCachedMultiSubreddits().map {
+        multiReddits = sortByName(store.getCachedMultiSubreddits().map {
             Subreddit.fromName(it).apply {
                 isMultiReddit = true
             }
         })
-        Log.d(TAG, "Loaded ${multis.size} cached multi subreddits")
-        (multiReddits as MutableLiveData).value = multis
-
-        return listOfNotNull(Subreddit.defaultSubreddits, subscriptions, visited, multis)
+        return listOfNotNull(
+            Subreddit.defaultSubreddits,
+            subscribedSubreddits,
+            visitedSubreddits,
+            multiReddits,
+        )
     }
 
     fun loadSubscriptions() {
         viewModelScope.launch(Dispatchers.IO) {
             val store = Store.getInstance(getApplication())
             val starred = store.getStarredSubreddits()
-            val subscriptions = sortByName(Reddit.getInstance(getApplication()).getSubscriptions().map { subreddit ->
-                subreddit.apply {
-                    if (starred.contains(name))
-                        isStarred = true
+
+            subscribedSubreddits = sortByName(
+                Reddit.getInstance(getApplication()).getSubscriptions().map { subreddit ->
+                    subreddit.apply {
+                        if (starred.contains(name))
+                            isStarred = true
+                    }
+                })
+            store.updateCachedSubscribedSubreddits(subscribedSubreddits)
+            visitedSubreddits = sortByName(store.getVisitedSubreddits().map { name ->
+                Subreddit.fromName(name).apply {
+                    isSubscribedTo = false
                 }
             })
-            (subscribedSubreddits as MutableLiveData).postValue(subscriptions)
-            store.updateCachedSubscribedSubreddits(subscriptions)
-            (visitedSubreddits as MutableLiveData).postValue(
-                    sortByName(store.getVisitedSubreddits().map { name ->
-                        Subreddit.fromName(name).apply {
-                            isSubscribedTo = false
-                        }
-                    }))
-            (visitedUsers as MutableLiveData).postValue(
-                    sortByName(store.getVisitedUsers().map { name ->
-                        Subreddit.fromUser(name)
-                    }))
-            val multis = sortByName(Reddit.getInstance(getApplication()).getMultis())
-            (multiReddits as MutableLiveData).postValue(multis)
-            store.updateCachedMultiSubreddits(multis)
+            visitedUsers = sortByName(store.getVisitedUsers().map { name ->
+                Subreddit.fromUser(name)
+            })
+            multiReddits = sortByName(Reddit.getInstance(getApplication()).getMultis())
+            store.updateCachedMultiSubreddits(multiReddits)
             updateAllSubredditsList()
         }
     }
@@ -222,10 +194,10 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
         viewModelScope.launch(Dispatchers.Main) {
             (subreddits as MutableLiveData).value = listOfNotNull(
                 Subreddit.defaultSubreddits,
-                    subscribedSubreddits.value,
-                    visitedSubreddits.value,
-                    visitedUsers.value,
-                    multiReddits.value,
+                subscribedSubreddits,
+                visitedSubreddits,
+                visitedUsers,
+                multiReddits,
             )
         }
     }
@@ -247,9 +219,9 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
     fun removeSubredditFromVisited(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             Store.getInstance(getApplication()).removeFromVisitedSubreddits(name)
-            (visitedSubreddits as MutableLiveData).postValue(visitedSubreddits.value?.filter {
+            visitedSubreddits = visitedSubreddits.filter {
                 it.name != name
-            })
+            }
             updateAllSubredditsList()
         }
     }
@@ -257,9 +229,9 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
     fun removeUserFromVisited(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             Store.getInstance(getApplication()).removeFromVisitedUsers(name)
-            (visitedUsers as MutableLiveData).postValue(visitedUsers.value?.filter {
+            visitedUsers = visitedUsers.filter {
                 it.name != name
-            })
+            }
             updateAllSubredditsList()
         }
     }
@@ -279,7 +251,7 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
     }
 
     private fun updateSubscribedSubreddit(subreddit: Subreddit, isStarred: Boolean?) {
-        val subscriptions = subscribedSubreddits.value!!.toMutableList()
+        val subscriptions = subscribedSubreddits.toMutableList()
         if (isStarred != null) {
             subscriptions.find { it == subreddit }?.isStarred = isStarred
         } else {
@@ -299,7 +271,7 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
             }
             (searchResults as MutableLiveData).postValue(results)
         }
-        (subscribedSubreddits as MutableLiveData).postValue(sortByName(subscriptions))
+        subscribedSubreddits = sortByName(subscriptions)
         updateAllSubredditsList()
     }
 
