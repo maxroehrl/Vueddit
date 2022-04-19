@@ -152,7 +152,7 @@ open class PostListFragment : Fragment() {
         for (sorting in viewModel.sortingList) {
             sortingTabLayout.addTab(sortingTabLayout.newTab().setText(sorting))
         }
-        val index = viewModel.sortingList.indexOf(viewModel.postSorting.value)
+        val index = viewModel.sortingList.indexOf(viewModel.postSorting)
         if (index != -1) {
             sortingTabLayout.selectTab(sortingTabLayout.getTabAt(index), true)
         }
@@ -198,13 +198,14 @@ open class PostListFragment : Fragment() {
     }
 
     open fun onSortingSelected(sorting: String, adapter: PostsAdapter) {
-        viewModel.setPostSorting(sorting)
+        viewModel.postSorting = sorting
+
         if (listOf("top", "rising").contains(sorting)) {
             val items = listOf("Hour", "Day", "Week", "Month", "Year", "All")
             MaterialAlertDialogBuilder(requireContext()).apply {
                 setItems(items.toTypedArray()) { _, which ->
                     val time = items[which].lowercase()
-                    viewModel.setTopPostsTime(time)
+                    viewModel.topPostsTime = time
                     adapter.showBigPreview = null
                     viewModel.refreshPosts()
                 }

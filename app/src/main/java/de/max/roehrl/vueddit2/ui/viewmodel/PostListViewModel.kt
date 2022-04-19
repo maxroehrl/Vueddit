@@ -23,6 +23,8 @@ open class PostListViewModel(
     }
     protected open val defaultSorting = "hot"
     open val sortingList = listOf("hot", "top", "new", "best", "controversial", "rising")
+    var postSorting: String = savedStateHandle.get(POST_SORTING) ?: defaultSorting
+    var topPostsTime: String = savedStateHandle.get(TOP_POSTS_TIME) ?: defaultTopPostTime
 
     val subreddit: LiveData<Subreddit> = liveData {
         val saved: Subreddit? = savedStateHandle.get(SUBREDDIT)
@@ -31,19 +33,9 @@ open class PostListViewModel(
         }
     }
 
-    open val postSorting: LiveData<String> = liveData {
-        val saved: String? = savedStateHandle.get(POST_SORTING)
-        emit(saved ?: defaultSorting)
-    }
-
     val posts: LiveData<List<NamedItem>> = liveData {
         val saved: List<NamedItem>? = savedStateHandle.get(POSTS)
         emit(saved ?: listOf(NamedItem.Loading))
-    }
-
-    private val topPostsTime: LiveData<String> = liveData {
-        val saved: String? = savedStateHandle.get(TOP_POSTS_TIME)
-        emit(saved ?: defaultTopPostTime)
     }
 
     fun selectSubreddit(subredditName: String) {
@@ -74,10 +66,8 @@ open class PostListViewModel(
                 }
             }
             val after = lastPost?.id ?: ""
-            val sorting = postSorting.value ?: defaultSorting
-            val time = topPostsTime.value ?: defaultTopPostTime
             val newPosts = try {
-                getMorePosts(after, sorting, time, getPostCount())
+                getMorePosts(after, postSorting, topPostsTime, getPostCount())
             } catch (e: Exception) {
                 Log.e(TAG, "Error getting posts", e)
                 emptyList()
@@ -106,14 +96,6 @@ open class PostListViewModel(
         loadMorePosts(showLoadingIndicator, cb)
     }
 
-    fun setPostSorting(sorting: String) {
-        (postSorting as MutableLiveData).value = sorting
-    }
-
-    fun setTopPostsTime(time : String) {
-        (topPostsTime as MutableLiveData).value = time
-    }
-
     fun resetPosts() {
         (posts as MutableLiveData).value = emptyList()
     }
@@ -124,9 +106,9 @@ open class PostListViewModel(
     }
 
     open fun saveBundle() {
-        savedStateHandle.set(SUBREDDIT, subreddit.value)
-        savedStateHandle.set(POST_SORTING, postSorting.value)
+        savedStateHandle.set(POST_SORTING, postSorting)
+        savedStateHandle.set(TOP_POSTS_TIME, topPostsTime)
         savedStateHandle.set(POSTS, posts.value)
-        savedStateHandle.set(TOP_POSTS_TIME, topPostsTime.value)
+        savedStateHandle.set(SUBREDDIT, subreddit.value)
     }
 }

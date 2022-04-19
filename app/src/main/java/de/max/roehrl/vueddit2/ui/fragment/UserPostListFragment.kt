@@ -79,7 +79,7 @@ class UserPostListFragment : PostListFragment() {
                     sortingTabLayout.visibility = View.VISIBLE
                 } else {
                     sortingTabLayout.visibility = View.GONE
-                    viewModel.setPostSorting("new")
+                    viewModel.postSorting = "new"
                 }
                 postsAdapter.showBigPreview = null
                 if (group == "saved") {
