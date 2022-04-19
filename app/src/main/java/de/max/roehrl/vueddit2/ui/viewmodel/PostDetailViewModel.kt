@@ -23,6 +23,8 @@ class PostDetailViewModel(
         private const val COMMENT_SORTING = "commentSorting"
     }
 
+    var commentSorting: String = savedStateHandle.get(COMMENT_SORTING) ?: defaultSorting
+
     val selectedPost: LiveData<Post> = liveData {
         val saved: Post? = savedStateHandle.get(SELECTED_POST)
         if (saved != null) {
@@ -42,22 +44,18 @@ class PostDetailViewModel(
         emit(saved ?: mutableListOf(NamedItem.Loading))
     }
 
-    val commentSorting: LiveData<String> = liveData {
-        val saved: String? = savedStateHandle.get(COMMENT_SORTING)
-        emit(saved ?: defaultSorting)
-    }
-
     private fun loadComments(commentName: String?, cb: (() -> Unit)? = null) {
         val post = selectedPost.value!!
         loadComments(post.subreddit, post.name, commentName, cb)
     }
 
-    fun loadComments(subredditName: String,
-                     postName: String,
-                     commentName: String?,
-                     cb: (() -> Unit)? = null) {
+    fun loadComments(
+        subredditName: String,
+        postName: String,
+        commentName: String?,
+        cb: (() -> Unit)? = null
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val sorting = commentSorting.value ?: defaultSorting
             var post = postName
             var comment = commentName
             if (post.contains("/comments/")) {
@@ -70,10 +68,13 @@ class PostDetailViewModel(
             if (comment != null) {
                 permalink += "/$comment"
             }
-             try {
-                 val pair = Reddit.getInstance(getApplication()).getPostAndComments(permalink, sorting)
-                 (selectedPost as MutableLiveData).postValue(pair.first)
-                 (comments as MutableLiveData).postValue(pair.second.toMutableList())
+            try {
+                val pair = Reddit.getInstance(getApplication()).getPostAndComments(
+                    permalink,
+                    commentSorting
+                )
+                (selectedPost as MutableLiveData).postValue(pair.first)
+                (comments as MutableLiveData).postValue(pair.second.toMutableList())
             } catch (e: Exception) {
                 Log.e(TAG, "Error getting comments and post", e)
             }
@@ -90,10 +91,6 @@ class PostDetailViewModel(
         loadComments(null, cb)
     }
 
-    fun setCommentSorting(sorting: String) {
-        (commentSorting as MutableLiveData).value = sorting
-    }
-
     fun setSelectedPost(post: Post) {
         (selectedPost as MutableLiveData).value = post
     }
@@ -104,7 +101,8 @@ class PostDetailViewModel(
             loadComments(subtreeCommentName)
         } else {
             viewModelScope.launch(Dispatchers.IO) {
-                val newComments = Reddit.getInstance(getApplication()).getMoreComments(selectedPost.value!!.name, comment.moreChildren)
+                val newComments = Reddit.getInstance(getApplication())
+                    .getMoreComments(selectedPost.value!!.name, comment.moreChildren)
                 val index = comments.value?.indexOf(comment)
                 if (index != null && index >= 0) {
                     val oldComments = comments.value!!
@@ -153,17 +151,19 @@ class PostDetailViewModel(
         } else {
             comments.subList(0, index)
         }
-        commentCandidates = commentCandidates.filter { it is Comment && it.depth == depth }.toMutableList()
+        commentCandidates =
+            commentCandidates.filter { it is Comment && it.depth == depth }.toMutableList()
         if (commentCandidates.isNotEmpty()) {
-            val newlySelectedComment = commentCandidates[if (next) 0 else commentCandidates.size - 1]
+            val newlySelectedComment =
+                commentCandidates[if (next) 0 else commentCandidates.size - 1]
             selectComment(newlySelectedComment as Comment)
         }
     }
 
     fun saveBundle() {
+        savedStateHandle.set(COMMENT_SORTING, commentSorting)
         savedStateHandle.set(SELECTED_POST, selectedPost.value)
         savedStateHandle.set(SELECTED_COMMENT, selectedComment.value)
         savedStateHandle.set(COMMENTS, comments.value)
-        savedStateHandle.set(COMMENT_SORTING, commentSorting.value)
     }
 }
