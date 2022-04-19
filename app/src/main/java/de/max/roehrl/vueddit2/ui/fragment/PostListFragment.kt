@@ -58,7 +58,6 @@ open class PostListFragment : Fragment() {
     protected open var showGotoUser = true
     private val safeArgs: PostListFragmentArgs by navArgs()
     private lateinit var collapsingToolbar: CollapsingToolbarLayout
-    private var currentSubreddit: Subreddit? = null
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
@@ -134,7 +133,7 @@ open class PostListFragment : Fragment() {
             val newSize = posts.size
             postsAdapter.posts = posts
             if (postsAdapter.showBigPreview == null && posts.any { item -> item != NamedItem.Loading }) {
-                postsAdapter.showBigPreview = if (currentSubreddit == Subreddit.frontPage)
+                postsAdapter.showBigPreview = if (viewModel.subreddit.value == Subreddit.frontPage)
                     false
                 else
                     appViewModel.shouldShowBigTemplate(posts)
@@ -171,28 +170,30 @@ open class PostListFragment : Fragment() {
     }
 
     open fun initialize(postsAdapter: PostsAdapter) {
-        if (currentSubreddit == null) {
-            viewModel.selectSubreddit(safeArgs.subredditName)
-        }
         appViewModel.isLoggedIn.observe(viewLifecycleOwner) { isLoggedIn ->
             if (isLoggedIn)
                 viewModel.loadMorePosts()
         }
+        viewModel.startingSubreddit = safeArgs.subredditName
         viewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
             toolbar.title = subreddit?.name ?: Reddit.frontpage
-            if (subreddit != null && subreddit != currentSubreddit && appViewModel.isLoggedIn.value == true) {
+            if (subreddit != null && appViewModel.isLoggedIn.value == true) {
                 postsAdapter.highlightStickied = subreddit != Subreddit.frontPage
                 postsAdapter.showBigPreview = null
                 viewModel.refreshPosts(true)
-                if (safeArgs.rootFragment) {
+                if (safeArgs.rootFragment && appViewModel.subreddit.value != subreddit) {
                     appViewModel.selectSubreddit(subreddit.name, subreddit.isMultiReddit)
                 }
             }
-            currentSubreddit = subreddit ?: currentSubreddit
         }
         if (safeArgs.rootFragment) {
             appViewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
-                viewModel.selectSubreddit(subreddit)
+                // Prevent restoring the sub to initial value
+                if (viewModel.subreddit.value != subreddit && viewModel.startingSubreddit?.let {
+                        Subreddit.fromName(it)
+                    } != subreddit) {
+                    viewModel.selectSubreddit(subreddit)
+                }
             }
         }
     }
@@ -308,11 +309,12 @@ open class PostListFragment : Fragment() {
     }
 
     private fun showSidebar() {
+        val currentSubreddit = viewModel.subreddit.value
         if (currentSubreddit != null
             && currentSubreddit != Subreddit.frontPage
-            && !currentSubreddit!!.isMultiReddit
+            && !currentSubreddit.isMultiReddit
         ) {
-            Sidebar.show(requireContext(), currentSubreddit!!.name, viewModel.viewModelScope)
+            Sidebar.show(requireContext(), currentSubreddit.name, viewModel.viewModelScope)
         } else {
             val view = activity?.findViewById<View>(R.id.nav_host_fragment)
             val text = requireContext().getString(R.string.no_sidebar)
