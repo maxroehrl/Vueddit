@@ -138,7 +138,6 @@ open class PostListFragment : Fragment() {
                     false
                 else
                     appViewModel.shouldShowBigTemplate(posts)
-                Log.i(TAG, "Showing ${if (postsAdapter.showBigPreview == true) "big" else "small"} preview")
             }
             if (newSize > oldSize) {
                 if (oldSize > 0)
