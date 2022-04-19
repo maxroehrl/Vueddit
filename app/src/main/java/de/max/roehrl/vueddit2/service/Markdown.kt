@@ -91,7 +91,7 @@ class Markdown private constructor(context: Context) {
             }
 
             override fun configureTheme(builder: MarkwonTheme.Builder) {
-                builder.linkColor(linkColor)
+                builder.linkColor(linkColor).isLinkUnderlined(false)
             }
         }
         return UrlResolverPlugin()
