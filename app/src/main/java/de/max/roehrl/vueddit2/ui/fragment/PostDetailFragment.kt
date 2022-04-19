@@ -30,6 +30,9 @@ import de.max.roehrl.vueddit2.ui.adapter.CommentsAdapter
 import de.max.roehrl.vueddit2.ui.dialog.Sidebar
 import de.max.roehrl.vueddit2.ui.viewholder.PostHeaderViewHolder
 import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
+import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.concurrent.schedule
 
 class PostDetailFragment : Fragment() {
     companion object {
@@ -202,7 +205,16 @@ class PostDetailFragment : Fragment() {
         try {
             collapsingToolbar.setupWithNavController(toolbar, findNavController())
         } catch (e: IllegalStateException) {
-            Log.e(TAG, "Failed to setup collapsing toolbar with nav controller", e)
+            // Workaround for graph not being ready
+            Timer().schedule(300) {
+                viewModel.viewModelScope.launch {
+                    try {
+                        collapsingToolbar.setupWithNavController(toolbar, findNavController())
+                    } catch (e: IllegalStateException) {
+                        Log.e(TAG, "Failed to setup collapsing toolbar with nav controller", e)
+                    }
+                }
+            }
         }
         toolbar.inflateMenu(R.menu.post_detail)
         toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
