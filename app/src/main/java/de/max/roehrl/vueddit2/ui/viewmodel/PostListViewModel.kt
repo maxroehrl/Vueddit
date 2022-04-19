@@ -21,8 +21,10 @@ open class PostListViewModel(
         private const val POSTS = "posts"
         private const val TOP_POSTS_TIME = "topPostsTime"
     }
+
     protected open val defaultSorting = "hot"
     open val sortingList = listOf("hot", "top", "new", "best", "controversial", "rising")
+    @Suppress("LeakingThis")
     var postSorting: String = savedStateHandle.get(POST_SORTING) ?: defaultSorting
     var topPostsTime: String = savedStateHandle.get(TOP_POSTS_TIME) ?: defaultTopPostTime
 
