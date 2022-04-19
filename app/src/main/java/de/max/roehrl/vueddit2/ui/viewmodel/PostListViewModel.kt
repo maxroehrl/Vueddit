@@ -17,7 +17,6 @@ open class PostListViewModel(
         protected const val TAG = "PostListViewModel"
         private const val defaultTopPostTime = "all"
         private const val SUBREDDIT = "subreddit"
-        private const val STARTING_SUBREDDIT = "startingSubreddit"
         private const val POST_SORTING = "postSorting"
         private const val POSTS = "posts"
         private const val TOP_POSTS_TIME = "topPostsTime"
@@ -29,12 +28,9 @@ open class PostListViewModel(
     @Suppress("LeakingThis")
     var postSorting: String = savedStateHandle.get(POST_SORTING) ?: defaultSorting
     var topPostsTime: String = savedStateHandle.get(TOP_POSTS_TIME) ?: defaultTopPostTime
-    var startingSubreddit: String? = savedStateHandle.get(STARTING_SUBREDDIT)
 
     val subreddit: LiveData<Subreddit> = liveData {
-        val saved: Subreddit? = savedStateHandle.get(SUBREDDIT) ?: startingSubreddit?.let {
-            Subreddit.fromName(it)
-        }
+        val saved: Subreddit? = savedStateHandle.get(SUBREDDIT)
         if (saved != null) {
             emit(saved)
         }
@@ -114,7 +110,6 @@ open class PostListViewModel(
     open fun saveBundle() {
         savedStateHandle.set(POST_SORTING, postSorting)
         savedStateHandle.set(TOP_POSTS_TIME, topPostsTime)
-        savedStateHandle.set(STARTING_SUBREDDIT, startingSubreddit)
         savedStateHandle.set(POSTS, posts.value)
         savedStateHandle.set(SUBREDDIT, subreddit.value)
     }

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.SavedStateViewModelFactory
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -121,6 +122,10 @@ open class PostListFragment : Fragment() {
                 }
             }
         }
+
+        // Specific init for post or user lists
+        initialize(postsAdapter)
+
         appViewModel.isBigTemplatePreferred.observe(viewLifecycleOwner) { isBigTemplatePreferred ->
             if (viewModel.posts.value != null && postsAdapter.showBigPreview != isBigTemplatePreferred) {
                 postsAdapter.showBigPreview = isBigTemplatePreferred
@@ -146,7 +151,6 @@ open class PostListFragment : Fragment() {
                 postsAdapter.notifyDataSetChanged()
             }
         }
-        initialize(postsAdapter)
 
         for (sorting in viewModel.sortingList) {
             sortingTabLayout.addTab(sortingTabLayout.newTab().setText(sorting))
@@ -174,27 +178,27 @@ open class PostListFragment : Fragment() {
             if (isLoggedIn)
                 viewModel.loadMorePosts()
         }
-        viewModel.startingSubreddit = safeArgs.subredditName
-        viewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
+        viewModel.subreddit.distinctUntilChanged().observe(viewLifecycleOwner) { subreddit ->
             toolbar.title = subreddit?.name ?: Reddit.frontpage
+
             if (subreddit != null && appViewModel.isLoggedIn.value == true) {
                 postsAdapter.highlightStickied = subreddit != Subreddit.frontPage
                 postsAdapter.showBigPreview = null
-                viewModel.refreshPosts(true)
+                viewModel.refreshPosts()
+
                 if (safeArgs.rootFragment && appViewModel.subreddit.value != subreddit) {
                     appViewModel.selectSubreddit(subreddit.name, subreddit.isMultiReddit)
                 }
             }
         }
         if (safeArgs.rootFragment) {
-            appViewModel.subreddit.observe(viewLifecycleOwner) { subreddit ->
-                // Prevent restoring the sub to initial value
-                if (viewModel.subreddit.value != subreddit && viewModel.startingSubreddit?.let {
-                        Subreddit.fromName(it)
-                    } != subreddit) {
+            appViewModel.subreddit.distinctUntilChanged().observe(viewLifecycleOwner) { subreddit ->
+                if (viewModel.subreddit.value != subreddit) {
                     viewModel.selectSubreddit(subreddit)
                 }
             }
+        } else {
+            viewModel.selectSubreddit(Subreddit.fromName(safeArgs.subredditName))
         }
     }
 
