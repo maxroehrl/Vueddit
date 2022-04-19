@@ -60,7 +60,16 @@ class MainActivity : AppCompatActivity() {
             Fresco.initialize(this)
         }
 
-        drawerLayout = findViewById(R.id.drawer_layout)
+        drawerLayout = findViewById<DrawerLayout?>(R.id.drawer_layout).apply {
+            addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+                override fun onDrawerClosed(drawerView: View) {
+                    (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                        windowToken,
+                        0
+                    )
+                }
+            })
+        }
         navView = findViewById(R.id.nav_view)
 
         viewModel.isLoggedIn.observe(this) { isLoggedIn ->
@@ -153,7 +162,6 @@ class MainActivity : AppCompatActivity() {
             viewModel.selectSubreddit(item.title.toString(), multiRedditMenuItems.contains(item))
         }
         drawerLayout.close()
-        (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(currentFocus?.windowToken, 0)
     }
 
     private fun onNavItemIconClicked(item: MenuItem) {
