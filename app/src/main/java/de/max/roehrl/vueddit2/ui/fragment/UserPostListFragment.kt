@@ -44,6 +44,7 @@ class UserPostListFragment : PostListFragment() {
             if (index != -1) {
                 groupTabLayout!!.getTabAt(index)!!.select()
             }
+            refreshSortingBar(viewModel.userPostGroup)
             groupTabLayout!!.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     onGroupSelected(tab?.text.toString())
@@ -61,12 +62,7 @@ class UserPostListFragment : PostListFragment() {
 
     private fun onGroupSelected(group: String) {
         if (group != viewModel.userPostGroup || group == "saved") {
-            if (listOf("overview", "submitted", "comments").contains(group)) {
-                sortingTabLayout.visibility = View.VISIBLE
-            } else {
-                sortingTabLayout.visibility = View.GONE
-                viewModel.postSorting = "new"
-            }
+            refreshSortingBar(group)
 
             if (group == "saved") {
                 val items = listOf("All", "Comments", "Links")
@@ -82,6 +78,15 @@ class UserPostListFragment : PostListFragment() {
             }
         }
         viewModel.userPostGroup = group
+    }
+
+    private fun refreshSortingBar(group: String) {
+        if (listOf("overview", "submitted", "comments").contains(group)) {
+            sortingTabLayout.visibility = View.VISIBLE
+        } else {
+            sortingTabLayout.visibility = View.GONE
+            viewModel.postSorting = "new"
+        }
     }
 
     override fun initialize(postsAdapter: PostsAdapter) {
