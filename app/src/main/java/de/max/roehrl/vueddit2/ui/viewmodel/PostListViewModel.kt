@@ -25,6 +25,7 @@ open class PostListViewModel(
 
     protected open val defaultSorting = "hot"
     open val sortingList = listOf("hot", "top", "new", "best", "controversial", "rising")
+
     @Suppress("LeakingThis")
     var postSorting: String = savedStateHandle.get(POST_SORTING) ?: defaultSorting
     var topPostsTime: String = savedStateHandle.get(TOP_POSTS_TIME) ?: defaultTopPostTime
@@ -42,10 +43,6 @@ open class PostListViewModel(
     val posts: LiveData<List<NamedItem>> = liveData {
         val saved: List<NamedItem>? = savedStateHandle.get(POSTS)
         emit(saved ?: listOf(NamedItem.Loading))
-    }
-
-    fun selectSubreddit(subredditName: String) {
-        selectSubreddit(Subreddit.fromName(subredditName))
     }
 
     fun selectSubreddit(sub: Subreddit) {
@@ -73,28 +70,36 @@ open class PostListViewModel(
             }
             val after = lastPost?.id ?: ""
             val newPosts = try {
-                getMorePosts(after, postSorting, topPostsTime, getPostCount())
+                getMorePosts(
+                    after,
+                    postSorting,
+                    topPostsTime,
+                    25 * ((posts.value?.size ?: 0) / 25 + 1)
+                )
             } catch (e: Exception) {
                 Log.e(TAG, "Error getting posts", e)
                 emptyList()
             }
-            (posts as MutableLiveData).postValue(oldPosts + newPosts)
+            val names = oldPosts.map { it.id }
+            // Filter duplicate posts
+            (posts as MutableLiveData).postValue(oldPosts + newPosts.filter { !names.contains(it.id) })
             cb?.invoke()
         }
     }
 
     protected open suspend fun getMorePosts(
-            after: String,
-            sorting: String,
-            time: String,
-            count: Int,
+        after: String,
+        sorting: String,
+        time: String,
+        count: Int,
     ): List<NamedItem> {
         val subredditName = if (subreddit.value?.isMultiReddit == true) {
             subreddit.value!!.subreddits
         } else {
             subreddit.value?.name ?: Subreddit.frontPage.name
         }
-        return Reddit.getInstance(getApplication()).getSubredditPosts(subredditName, after, sorting, time, count)
+        return Reddit.getInstance(getApplication())
+            .getSubredditPosts(subredditName, after, sorting, time, count)
     }
 
     fun refreshPosts(showLoadingIndicator: Boolean = true, cb: (() -> Unit)? = null) {
@@ -104,11 +109,6 @@ open class PostListViewModel(
 
     fun resetPosts() {
         (posts as MutableLiveData).value = emptyList()
-    }
-
-    private fun getPostCount(): Int {
-        val size = posts.value?.size ?: 0
-        return 25 * (size / 25 + 1)
     }
 
     open fun saveBundle() {

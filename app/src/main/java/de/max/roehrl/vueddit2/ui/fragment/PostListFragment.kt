@@ -251,7 +251,7 @@ open class PostListFragment : Fragment() {
 
     open fun gotoSubreddit(subredditName: String) {
         val oldSubredditName = viewModel.subreddit.value ?: Subreddit.frontPage
-        viewModel.selectSubreddit(subredditName)
+        viewModel.selectSubreddit(Subreddit.fromName(subredditName))
         createGoBackSnackBar(oldSubredditName)
     }
 
