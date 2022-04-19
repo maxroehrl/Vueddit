@@ -31,7 +31,11 @@ class UserPostListViewModel(
     }
 
     fun setSelectedUser(username: String) {
+        val old = selectedUser.value
         (selectedUser as MutableLiveData).value = username
+        if (old != username) {
+            refreshPosts()
+        }
     }
 
     override suspend fun getMorePosts(

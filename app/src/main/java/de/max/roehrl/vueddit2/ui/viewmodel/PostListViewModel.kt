@@ -37,12 +37,15 @@ open class PostListViewModel(
     }
 
     val posts: LiveData<List<NamedItem>> = liveData {
-        val saved: List<NamedItem>? = savedStateHandle.get(POSTS)
-        emit(saved ?: listOf(NamedItem.Loading))
+        emit(savedStateHandle.get(POSTS) ?: listOf(NamedItem.Loading))
     }
 
     fun selectSubreddit(sub: Subreddit) {
+        val old = subreddit.value
         (subreddit as MutableLiveData).value = sub
+        if (old != sub) {
+            refreshPosts()
+        }
     }
 
     fun isPostListLoading(): Boolean {
@@ -57,6 +60,7 @@ open class PostListViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val lastPost = posts.value?.lastOrNull { post -> post != NamedItem.Loading }
             val oldPosts = posts.value?.toMutableList() ?: mutableListOf()
+
             if (showLoadingIndicator) {
                 if (!isPostListLoading()) {
                     (posts as MutableLiveData).postValue(oldPosts + NamedItem.Loading)
@@ -70,7 +74,7 @@ open class PostListViewModel(
                     after,
                     postSorting,
                     topPostsTime,
-                    25 * ((posts.value?.size ?: 0) / 25 + 1)
+                    25 * ((posts.value?.size ?: 0) / 25 + 1),
                 )
             } catch (e: Exception) {
                 Log.e(TAG, "Error getting posts", e)

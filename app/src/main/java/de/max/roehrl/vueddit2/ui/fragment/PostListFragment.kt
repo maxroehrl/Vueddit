@@ -137,12 +137,14 @@ open class PostListFragment : Fragment() {
             val oldSize = postsAdapter.posts.size
             val newSize = posts.size
             postsAdapter.posts = posts
+
             if (postsAdapter.showBigPreview == null && posts.any { item -> item != NamedItem.Loading }) {
                 postsAdapter.showBigPreview = if (viewModel.subreddit.value == Subreddit.frontPage)
                     false
                 else
                     appViewModel.shouldShowBigTemplate(posts)
             }
+
             if (newSize > oldSize) {
                 if (oldSize > 0)
                     postsAdapter.notifyItemChanged(oldSize - 1)
@@ -184,7 +186,6 @@ open class PostListFragment : Fragment() {
             if (subreddit != null && appViewModel.isLoggedIn.value == true) {
                 postsAdapter.highlightStickied = subreddit != Subreddit.frontPage
                 postsAdapter.showBigPreview = null
-                viewModel.refreshPosts()
 
                 if (safeArgs.rootFragment && appViewModel.subreddit.value != subreddit) {
                     appViewModel.selectSubreddit(subreddit.name, subreddit.isMultiReddit)
