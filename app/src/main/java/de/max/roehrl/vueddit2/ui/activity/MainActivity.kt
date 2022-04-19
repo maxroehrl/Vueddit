@@ -56,7 +56,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Fresco.initialize(this)
+        if (savedInstanceState == null) {
+            Fresco.initialize(this)
+        }
 
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
