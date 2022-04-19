@@ -13,15 +13,15 @@ class UserPostListViewModel(
     private val savedStateHandle: SavedStateHandle
 ) : PostListViewModel(application, savedStateHandle) {
     companion object {
-        private const val defaultGroup = "overview"
-        private const val defaultType = "all"
         private const val SELECTED_USER = "selectedUser"
         private const val USER_POST_GROUP = "userPostGroup"
         private const val SELECTED_TYPE = "selectedType"
     }
+
     override val sortingList = listOf("new", "top", "hot", "controversial")
     override val defaultSorting = "new"
-    var selectedType: String = savedStateHandle.get(SELECTED_TYPE) ?: defaultType
+    var selectedType: String = savedStateHandle.get(SELECTED_TYPE) ?: "all"
+    var userPostGroup: String = savedStateHandle.get(USER_POST_GROUP) ?: "submitted"
 
     val selectedUser: LiveData<String> = liveData {
         val saved: String? = savedStateHandle.get(SELECTED_USER)
@@ -30,17 +30,8 @@ class UserPostListViewModel(
         }
     }
 
-    val userPostGroup: LiveData<String> = liveData {
-        val saved: String? = savedStateHandle.get(USER_POST_GROUP)
-        emit(saved ?: defaultGroup)
-    }
-
     fun setSelectedUser(username: String) {
         (selectedUser as MutableLiveData).value = username
-    }
-
-    fun setUserPostGroup(group: String) {
-        (userPostGroup as MutableLiveData).value = group
     }
 
     override suspend fun getMorePosts(
@@ -53,7 +44,7 @@ class UserPostListViewModel(
             selectedUser.value!!,
             after,
             sorting,
-            userPostGroup.value ?: defaultGroup,
+            userPostGroup,
             time,
             selectedType,
             count
@@ -63,7 +54,7 @@ class UserPostListViewModel(
     override fun saveBundle() {
         super.saveBundle()
         savedStateHandle.set(SELECTED_USER, selectedUser.value)
-        savedStateHandle.set(USER_POST_GROUP, userPostGroup.value)
+        savedStateHandle.set(USER_POST_GROUP, userPostGroup)
         savedStateHandle.set(SELECTED_TYPE, selectedType)
     }
 }

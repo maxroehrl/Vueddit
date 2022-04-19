@@ -28,8 +28,6 @@ class UserPostListFragment : PostListFragment() {
     override val menuId = R.menu.user_post_list
     override var showGotoUser = false
     private val safeArgs: UserPostListFragmentArgs by navArgs()
-    private var currentUser: String? = null
-    private var currentGroup: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = super.onCreateView(inflater, container, savedInstanceState)
@@ -42,7 +40,7 @@ class UserPostListFragment : PostListFragment() {
             for (group in groups) {
                 groupTabLayout!!.addTab(groupTabLayout.newTab().setText(group))
             }
-            val index = groups.indexOf(viewModel.userPostGroup.value)
+            val index = groups.indexOf(viewModel.userPostGroup)
             if (index != -1) {
                 groupTabLayout!!.getTabAt(index)!!.select()
             }
@@ -61,46 +59,40 @@ class UserPostListFragment : PostListFragment() {
         return root
     }
 
+    private fun onGroupSelected(group: String) {
+        if (group != viewModel.userPostGroup || group == "saved") {
+            if (listOf("overview", "submitted", "comments").contains(group)) {
+                sortingTabLayout.visibility = View.VISIBLE
+            } else {
+                sortingTabLayout.visibility = View.GONE
+                viewModel.postSorting = "new"
+            }
+
+            if (group == "saved") {
+                val items = listOf("All", "Comments", "Links")
+                MaterialAlertDialogBuilder(requireContext()).apply {
+                    setItems(items.toTypedArray()) { _, which ->
+                        viewModel.selectedType = items[which].lowercase()
+                        viewModel.refreshPosts()
+                    }
+                    show()
+                }
+            } else {
+                viewModel.refreshPosts()
+            }
+        }
+        viewModel.userPostGroup = group
+    }
+
     override fun initialize(postsAdapter: PostsAdapter) {
         viewModel.setSelectedUser(safeArgs.userName)
         appViewModel.selectUser(safeArgs.userName)
         viewModel.selectedUser.observe(viewLifecycleOwner) { userName ->
             if (userName != null && userName != "") {
                 toolbar.title = "/u/${userName}"
-                if (userName != currentUser) {
-                    viewModel.refreshPosts()
-                }
-                currentUser = userName
+                viewModel.refreshPosts()
             }
         }
-        viewModel.userPostGroup.observe(viewLifecycleOwner) { group ->
-            if (group != currentGroup || group == "saved") {
-                if (listOf("overview", "submitted", "comments").contains(group)) {
-                    sortingTabLayout.visibility = View.VISIBLE
-                } else {
-                    sortingTabLayout.visibility = View.GONE
-                    viewModel.postSorting = "new"
-                }
-                postsAdapter.showBigPreview = null
-                if (group == "saved") {
-                    val items = listOf("All", "Comments", "Links")
-                    MaterialAlertDialogBuilder(requireContext()).apply {
-                        setItems(items.toTypedArray()) { _, which ->
-                            viewModel.selectedType = items[which].lowercase()
-                            viewModel.refreshPosts()
-                        }
-                        show()
-                    }
-                } else {
-                    viewModel.refreshPosts()
-                }
-            }
-            currentGroup = group
-        }
-    }
-
-    private fun onGroupSelected(group: String) {
-        viewModel.setUserPostGroup(group)
     }
 
     override fun gotoUser(userName: String) {
@@ -122,14 +114,14 @@ class UserPostListFragment : PostListFragment() {
     override fun onItemLongPressed(view: View, position: Int) {
         val item = viewModel.posts.value?.get(position)
         if (item is Post) {
-            showGotoUser = currentUser != item.author
+            showGotoUser = viewModel.selectedUser.value != item.author
             super.onItemLongPressed(view, position)
         } else if (item is Comment) {
             val items = mutableListOf(
                 view.context.getString(if (item.saved) R.string.unsave else R.string.save),
                 view.context.getString(R.string.goto_sub, item.subreddit),
             )
-            if (currentUser != item.author) {
+            if (viewModel.selectedUser.value != item.author) {
                 items.add(view.context.getString(R.string.goto_user, item.author))
             }
             MaterialAlertDialogBuilder(requireContext()).apply {
