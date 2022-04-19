@@ -17,16 +17,16 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
     companion object {
         private const val TAG = "AppViewModel"
         const val WAS_LOGGED_IN = "wasLoggedIn"
-        const val IS_LOGGED_IN = "isLoggedIn"
-        const val USERNAME = "username"
-        const val SUBREDDIT = "subreddit"
-        const val SUBREDDITS = "subreddits"
-        const val SUBSCRIBED_SUBREDDITS = "subscribedSubreddits"
-        const val VISITED_SUBREDDITS = "visitedSubreddits"
-        const val VISITED_USERS = "visitedUsers"
-        const val MULTI_REDDITS = "multiReddits"
-        const val IS_BIG_TEMPLATE_PREFERRED = "isBigTemplatePreferred"
-        const val SEARCH_RESULTS = "searchResults"
+        private const val IS_LOGGED_IN = "isLoggedIn"
+        private const val USERNAME = "username"
+        private const val SUBREDDIT = "subreddit"
+        private const val SUBREDDITS = "subreddits"
+        private const val SUBSCRIBED_SUBREDDITS = "subscribedSubreddits"
+        private const val VISITED_SUBREDDITS = "visitedSubreddits"
+        private const val VISITED_USERS = "visitedUsers"
+        private const val MULTI_REDDITS = "multiReddits"
+        private const val IS_BIG_TEMPLATE_PREFERRED = "isBigTemplatePreferred"
+        private const val SEARCH_RESULTS = "searchResults"
     }
 
     val isLoggedIn: LiveData<Boolean> = liveData(Dispatchers.IO) {
