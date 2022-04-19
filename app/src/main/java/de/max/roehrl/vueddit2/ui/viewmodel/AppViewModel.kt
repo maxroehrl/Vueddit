@@ -57,7 +57,9 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
 
     val isBigTemplatePreferred: LiveData<Boolean?> = liveData {
         val saved: Boolean? = savedStateHandle.get(IS_BIG_TEMPLATE_PREFERRED)
-        emit(saved)
+        if (saved != null) {
+            emit(saved)
+        }
     }
 
     val searchResults: LiveData<List<Subreddit>?> = liveData {
