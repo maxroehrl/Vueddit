@@ -3,6 +3,7 @@
     package="de.max.roehrl.vueddit2">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,11 +13,10 @@
         android:theme="@style/Theme.Vueddit2">
         <activity
             android:name=".ui.activity.MainActivity"
-            android:theme="@style/Theme.Vueddit2"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.Vueddit2">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <nav-graph android:value="@navigation/navigation_graph" />
@@ -28,4 +28,12 @@
             android:theme="@style/Theme.Vueddit2.Login" />
 
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
 </manifest>
