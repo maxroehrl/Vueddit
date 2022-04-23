@@ -8,10 +8,16 @@ plugins {
 android {
     signingConfigs {
         Play {
-            storeFile file('x')
-            storePassword 'x'
-            keyAlias 'x'
-            keyPassword 'x'
+            storeFile file('key.jks')
+            storePassword '1234567890'
+            keyAlias 'debugKey'
+            keyPassword '1234567890'
+        }
+        Debug {
+            storeFile file('key.jks')
+            storePassword '1234567890'
+            keyAlias 'debugKey'
+            keyPassword '1234567890'
         }
     }
     compileSdkVersion 32
@@ -39,6 +45,7 @@ android {
         debug {
             applicationIdSuffix '.debug'
             manifestPlaceholders = [appName: "Vueddit 2 Debug"]
+            signingConfig signingConfigs.Debug
         }
     }
     lint {
