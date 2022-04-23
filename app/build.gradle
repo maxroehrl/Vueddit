@@ -6,6 +6,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        Play {
+            storeFile file('x')
+            storePassword 'x'
+            keyAlias 'x'
+            keyPassword 'x'
+        }
+    }
     compileSdkVersion 32
     buildToolsVersion "32.0.0"
 
@@ -21,8 +29,16 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            applicationIdSuffix '.play'
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.Play
+            manifestPlaceholders = [appName: "Vueddit 2"]
+        }
+        debug {
+            applicationIdSuffix '.debug'
+            manifestPlaceholders = [appName: "Vueddit 2 Debug"]
         }
     }
     lint {
@@ -31,7 +47,7 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin_version}"
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
