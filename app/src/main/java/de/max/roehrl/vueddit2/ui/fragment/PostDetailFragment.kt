@@ -3,10 +3,8 @@ package de.max.roehrl.vueddit2.ui.fragment
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
@@ -216,8 +214,45 @@ class PostDetailFragment : Fragment() {
                 }
             }
         }
-        toolbar.inflateMenu(R.menu.post_detail)
-        toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
+        toolbar.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.post_detail, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.action_refresh -> {
+                        viewModel.refreshComments()
+                        true
+                    }
+                    R.id.action_sidebar -> {
+                        Sidebar.show(
+                            requireContext(),
+                            viewModel.selectedPost.value!!.subreddit,
+                            viewModel.viewModelScope
+                        )
+                        true
+                    }
+                    R.id.action_save -> {
+                        viewModel.selectedPost.value?.saveOrUnsave(
+                            requireContext(),
+                            viewModel.viewModelScope
+                        )
+                        toolbar.menu
+                        true
+                    }
+                    R.id.action_goto_subreddit -> {
+                        gotoSubreddit(viewModel.selectedPost.value!!.subreddit)
+                        true
+                    }
+                    R.id.action_goto_user -> {
+                        gotoUser(viewModel.selectedPost.value!!.author)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        })
     }
 
     override fun onPause() {
@@ -239,36 +274,6 @@ class PostDetailFragment : Fragment() {
             headerVh.onStop()
         }
         super.onDestroyView()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_refresh -> {
-                viewModel.refreshComments()
-                true
-            }
-            R.id.action_sidebar -> {
-                Sidebar.show(requireContext(),
-                    viewModel.selectedPost.value!!.subreddit,
-                    viewModel.viewModelScope)
-                true
-            }
-            R.id.action_save -> {
-                viewModel.selectedPost.value?.saveOrUnsave(requireContext(),
-                    viewModel.viewModelScope)
-                toolbar.menu
-                true
-            }
-            R.id.action_goto_subreddit -> {
-                gotoSubreddit(viewModel.selectedPost.value!!.subreddit)
-                true
-            }
-            R.id.action_goto_user -> {
-                gotoUser(viewModel.selectedPost.value!!.author)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     private fun gotoUser(userName: String) {

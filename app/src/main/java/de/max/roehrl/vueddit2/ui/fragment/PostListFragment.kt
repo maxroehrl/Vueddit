@@ -3,11 +3,9 @@ package de.max.roehrl.vueddit2.ui.fragment
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -274,35 +272,39 @@ open class PostListFragment : Fragment() {
         } catch (e: IllegalStateException) {
             Log.e(TAG, "Failed to setup collapsing toolbar with nav controller", e)
         }
-        toolbar.inflateMenu(menuId)
-        toolbar.setOnMenuItemClickListener { onOptionsItemSelected(it) }
-    }
+        toolbar.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(menuId, menu)
+            }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_refresh -> {
-                viewModel.refreshPosts()
-                true
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.action_refresh -> {
+                        viewModel.refreshPosts()
+                        true
+                    }
+                    R.id.action_sidebar -> {
+                        showSidebar()
+                        true
+                    }
+                    R.id.action_logout -> {
+                        appViewModel.logoutUser()
+                        viewModel.resetPosts()
+                        true
+                    }
+                    R.id.action_user_posts -> {
+                        gotoLoggedInUserPosts()
+                        true
+                    }
+                    R.id.action_toggle_big_preview -> {
+                        appViewModel.toggleBigPreview(viewModel.posts.value!!)
+                        true
+                    }
+                    else -> false
+                }
             }
-            R.id.action_sidebar -> {
-                showSidebar()
-                true
-            }
-            R.id.action_logout -> {
-                appViewModel.logoutUser()
-                viewModel.resetPosts()
-                true
-            }
-            R.id.action_user_posts -> {
-                gotoLoggedInUserPosts()
-                true
-            }
-            R.id.action_toggle_big_preview -> {
-                appViewModel.toggleBigPreview(viewModel.posts.value!!)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
+
+        })
     }
 
     private fun gotoLoggedInUserPosts() {
