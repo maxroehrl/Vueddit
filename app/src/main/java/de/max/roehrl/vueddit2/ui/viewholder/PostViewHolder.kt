@@ -8,6 +8,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -41,11 +42,8 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
     RecyclerView.ViewHolder(itemView) {
     companion object {
         private const val TAG = "PostViewHolder"
-        const val TRANSITION_VOTES = "TransitionVotes"
-        const val TRANSITION_TITLE = "TransitionTitle"
-        const val TRANSITION_META = "TransitionMeta"
-        const val TRANSITION_PREVIEW = "TransitionPreview"
     }
+    private val postGroup: ViewGroup = itemView.findViewById(R.id.post)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val meta: TextView = itemView.findViewById(R.id.meta)
     protected val imageView: SimpleDraweeView = itemView.findViewById(R.id.preview)
@@ -75,12 +73,7 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
     }
 
     open fun onClick(view: View) {
-        val extras = FragmentNavigatorExtras(
-            voteButtons to TRANSITION_VOTES + post.id,
-            title to TRANSITION_TITLE + post.id,
-            meta to TRANSITION_META + post.id,
-            imageView to TRANSITION_PREVIEW + post.id,
-        )
+        val extras = FragmentNavigatorExtras(postGroup to post.id)
         try {
             view.findNavController().navigate(
                 PostListFragmentDirections.actionPostListFragmentToPostDetailFragment(
@@ -108,10 +101,7 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
         this.post = post as Post
         val builder = SpannableStringBuilder()
 
-        ViewCompat.setTransitionName(voteButtons, TRANSITION_VOTES + post.id)
-        ViewCompat.setTransitionName(title, TRANSITION_TITLE + post.id)
-        ViewCompat.setTransitionName(meta, TRANSITION_META + post.id)
-        ViewCompat.setTransitionName(imageView, TRANSITION_PREVIEW + post.id)
+        ViewCompat.setTransitionName(postGroup, post.id)
 
         if (post.link_flair_text != "" && post.link_flair_text != "null") {
             val flairString = SpannableString(post.link_flair_text)

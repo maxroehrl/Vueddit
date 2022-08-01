@@ -72,10 +72,9 @@ class PostDetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition = MaterialContainerTransform().apply {
-            fadeMode = MaterialContainerTransform.FADE_MODE_THROUGH
+            fadeMode = MaterialContainerTransform.FADE_MODE_CROSS
             interpolator = FastOutSlowInInterpolator()
             setPathMotion(MaterialArcMotion())
-            endViewId = R.id.post
             isDrawDebugEnabled = false
         }
     }
