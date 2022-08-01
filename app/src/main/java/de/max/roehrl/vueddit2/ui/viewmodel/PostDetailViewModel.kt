@@ -23,24 +23,24 @@ class PostDetailViewModel(
         private const val COMMENT_SORTING = "commentSorting"
     }
 
-    var commentSorting: String = savedStateHandle.get(COMMENT_SORTING) ?: defaultSorting
+    var commentSorting: String = savedStateHandle[COMMENT_SORTING] ?: defaultSorting
 
     val selectedPost: LiveData<Post> = liveData {
-        val saved: Post? = savedStateHandle.get(SELECTED_POST)
+        val saved: Post? = savedStateHandle[SELECTED_POST]
         if (saved != null) {
             emit(saved)
         }
     }
 
     val selectedComment: LiveData<Comment?> = liveData {
-        val saved: Comment? = savedStateHandle.get(SELECTED_COMMENT)
+        val saved: Comment? = savedStateHandle[SELECTED_COMMENT]
         if (saved != null) {
             emit(saved)
         }
     }
 
     val comments: LiveData<MutableList<NamedItem>> = liveData {
-        val saved: MutableList<NamedItem>? = savedStateHandle.get(COMMENTS)
+        val saved: MutableList<NamedItem>? = savedStateHandle[COMMENTS]
         emit(saved ?: mutableListOf(NamedItem.Loading))
     }
 
@@ -161,9 +161,9 @@ class PostDetailViewModel(
     }
 
     fun saveBundle() {
-        savedStateHandle.set(COMMENT_SORTING, commentSorting)
-        savedStateHandle.set(SELECTED_POST, selectedPost.value)
-        savedStateHandle.set(SELECTED_COMMENT, selectedComment.value)
-        savedStateHandle.set(COMMENTS, comments.value)
+        savedStateHandle[COMMENT_SORTING] = commentSorting
+        savedStateHandle[SELECTED_POST] = selectedPost.value
+        savedStateHandle[SELECTED_COMMENT] = selectedComment.value
+        savedStateHandle[COMMENTS] = comments.value
     }
 }

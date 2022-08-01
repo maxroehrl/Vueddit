@@ -18,16 +18,18 @@ class UserPostListViewModel(
         private const val SELECTED_TYPE = "selectedType"
     }
 
-    override val sortingList = listOf("new", "top", "hot", "controversial")
-    override val defaultSorting = "new"
-    var selectedType: String = savedStateHandle.get(SELECTED_TYPE) ?: "all"
-    var userPostGroup: String = savedStateHandle.get(USER_POST_GROUP) ?: "submitted"
+    var selectedType: String = savedStateHandle[SELECTED_TYPE] ?: "all"
+    var userPostGroup: String = savedStateHandle[USER_POST_GROUP] ?: "submitted"
 
     val selectedUser: LiveData<String> = liveData {
-        val saved: String? = savedStateHandle.get(SELECTED_USER)
+        val saved: String? = savedStateHandle[SELECTED_USER]
         if (saved != null) {
             emit(saved)
         }
+    }
+
+    override fun getPostSortingList(isFrontpage: Boolean): List<String> {
+        return listOf("new", "top", "hot", "controversial")
     }
 
     fun setSelectedUser(username: String) {
@@ -57,8 +59,8 @@ class UserPostListViewModel(
 
     override fun saveBundle() {
         super.saveBundle()
-        savedStateHandle.set(SELECTED_USER, selectedUser.value)
-        savedStateHandle.set(USER_POST_GROUP, userPostGroup)
-        savedStateHandle.set(SELECTED_TYPE, selectedType)
+        savedStateHandle[SELECTED_USER] = selectedUser.value
+        savedStateHandle[USER_POST_GROUP] = userPostGroup
+        savedStateHandle[SELECTED_TYPE] = selectedType
     }
 }

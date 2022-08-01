@@ -15,35 +15,43 @@ open class PostListViewModel(
 ) : AndroidViewModel(application) {
     companion object {
         protected const val TAG = "PostListViewModel"
-        private const val defaultTopPostTime = "all"
         private const val SUBREDDIT = "subreddit"
         private const val POST_SORTING = "postSorting"
         private const val POSTS = "posts"
         private const val TOP_POSTS_TIME = "topPostsTime"
     }
 
-    protected open val defaultSorting = "hot"
-    open val sortingList = listOf("hot", "top", "new", "best", "controversial", "rising")
+    val sortingList: LiveData<List<String>> = liveData {
+        emit(getPostSortingList(true))
+    }
 
-    @Suppress("LeakingThis")
-    var postSorting: String = savedStateHandle.get(POST_SORTING) ?: defaultSorting
-    var topPostsTime: String = savedStateHandle.get(TOP_POSTS_TIME) ?: defaultTopPostTime
+    var postSorting: String = savedStateHandle[POST_SORTING] ?: "best"
+    var topPostsTime: String = savedStateHandle[TOP_POSTS_TIME] ?: "all"
 
     val subreddit: LiveData<Subreddit> = liveData {
-        val saved: Subreddit? = savedStateHandle.get(SUBREDDIT)
+        val saved: Subreddit? = savedStateHandle[SUBREDDIT]
         if (saved != null) {
             emit(saved)
         }
     }
 
     val posts: LiveData<List<NamedItem>> = liveData {
-        emit(savedStateHandle.get(POSTS) ?: listOf(NamedItem.Loading))
+        emit(savedStateHandle[POSTS] ?: listOf(NamedItem.Loading))
+    }
+
+    open fun getPostSortingList(isFrontpage: Boolean): List<String> {
+        return if (isFrontpage) {
+            listOf("best", "hot", "top", "new", "rising", "controversial")
+        } else {
+            listOf("hot", "top", "new", "rising", "controversial")
+        }
     }
 
     fun selectSubreddit(sub: Subreddit) {
         val old = subreddit.value
         (subreddit as MutableLiveData).value = sub
         if (old != sub) {
+            (sortingList as MutableLiveData).value = getPostSortingList(sub == Subreddit.frontPage)
             refreshPosts()
         }
     }
@@ -112,9 +120,9 @@ open class PostListViewModel(
     }
 
     open fun saveBundle() {
-        savedStateHandle.set(POST_SORTING, postSorting)
-        savedStateHandle.set(TOP_POSTS_TIME, topPostsTime)
-        savedStateHandle.set(POSTS, posts.value)
-        savedStateHandle.set(SUBREDDIT, subreddit.value)
+        savedStateHandle[POST_SORTING] = postSorting
+        savedStateHandle[TOP_POSTS_TIME] = topPostsTime
+        savedStateHandle[POSTS] = posts.value
+        savedStateHandle[SUBREDDIT] = subreddit.value
     }
 }

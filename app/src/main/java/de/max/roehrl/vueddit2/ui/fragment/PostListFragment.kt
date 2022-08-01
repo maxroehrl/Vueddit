@@ -152,12 +152,15 @@ open class PostListFragment : Fragment() {
             }
         }
 
-        for (sorting in viewModel.sortingList) {
-            sortingTabLayout.addTab(sortingTabLayout.newTab().setText(sorting))
-        }
-        val index = viewModel.sortingList.indexOf(viewModel.postSorting)
-        if (index != -1) {
-            sortingTabLayout.selectTab(sortingTabLayout.getTabAt(index), true)
+        viewModel.sortingList.observe(viewLifecycleOwner) { sortingList ->
+            sortingTabLayout.removeAllTabs()
+            for (sorting in sortingList) {
+                sortingTabLayout.addTab(sortingTabLayout.newTab().setText(sorting))
+            }
+            val index = sortingList.indexOf(viewModel.postSorting)
+            if (index != -1) {
+                sortingTabLayout.selectTab(sortingTabLayout.getTabAt(index), true)
+            }
         }
         sortingTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
