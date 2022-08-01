@@ -17,27 +17,16 @@ open class PostListViewModel(
         protected const val TAG = "PostListViewModel"
         private const val SUBREDDIT = "subreddit"
         private const val POST_SORTING = "postSorting"
+        private const val POST_SORTINGS = "postSortings"
         private const val POSTS = "posts"
         private const val TOP_POSTS_TIME = "topPostsTime"
     }
 
-    val sortingList: LiveData<List<String>> = liveData {
-        emit(getPostSortingList(true))
-    }
-
+    val sortingList: LiveData<List<String>> = savedStateHandle.getLiveData(POST_SORTINGS, getPostSortingList(true))
     var postSorting: String = savedStateHandle[POST_SORTING] ?: "best"
     var topPostsTime: String = savedStateHandle[TOP_POSTS_TIME] ?: "all"
-
-    val subreddit: LiveData<Subreddit> = liveData {
-        val saved: Subreddit? = savedStateHandle[SUBREDDIT]
-        if (saved != null) {
-            emit(saved)
-        }
-    }
-
-    val posts: LiveData<List<NamedItem>> = liveData {
-        emit(savedStateHandle[POSTS] ?: listOf(NamedItem.Loading))
-    }
+    val subreddit: LiveData<Subreddit> = savedStateHandle.getLiveData(SUBREDDIT, Subreddit.frontPage)
+    val posts: LiveData<List<NamedItem>> = savedStateHandle.getLiveData(POSTS, listOf(NamedItem.Loading))
 
     open fun getPostSortingList(isFrontpage: Boolean): List<String> {
         return if (isFrontpage) {
@@ -49,9 +38,9 @@ open class PostListViewModel(
 
     fun selectSubreddit(sub: Subreddit) {
         val old = subreddit.value
-        (subreddit as MutableLiveData).value = sub
+        savedStateHandle[SUBREDDIT] = sub
         if (old != sub) {
-            (sortingList as MutableLiveData).value = getPostSortingList(sub == Subreddit.frontPage)
+            savedStateHandle[POST_SORTINGS] = getPostSortingList(sub == Subreddit.frontPage)
             refreshPosts()
         }
     }
@@ -116,13 +105,6 @@ open class PostListViewModel(
     }
 
     fun resetPosts() {
-        (posts as MutableLiveData).value = emptyList()
-    }
-
-    open fun saveBundle() {
-        savedStateHandle[POST_SORTING] = postSorting
-        savedStateHandle[TOP_POSTS_TIME] = topPostsTime
-        savedStateHandle[POSTS] = posts.value
-        savedStateHandle[SUBREDDIT] = subreddit.value
+        savedStateHandle[POSTS] = emptyList<NamedItem>()
     }
 }

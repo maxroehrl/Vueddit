@@ -2,9 +2,7 @@ package de.max.roehrl.vueddit2.ui.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.liveData
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.service.Reddit
 
@@ -20,13 +18,7 @@ class UserPostListViewModel(
 
     var selectedType: String = savedStateHandle[SELECTED_TYPE] ?: "all"
     var userPostGroup: String = savedStateHandle[USER_POST_GROUP] ?: "submitted"
-
-    val selectedUser: LiveData<String> = liveData {
-        val saved: String? = savedStateHandle[SELECTED_USER]
-        if (saved != null) {
-            emit(saved)
-        }
-    }
+    val selectedUser: LiveData<String> = savedStateHandle.getLiveData(SELECTED_USER)
 
     override fun getPostSortingList(isFrontpage: Boolean): List<String> {
         return listOf("new", "top", "hot", "controversial")
@@ -34,7 +26,7 @@ class UserPostListViewModel(
 
     fun setSelectedUser(username: String) {
         val old = selectedUser.value
-        (selectedUser as MutableLiveData).value = username
+        savedStateHandle[SELECTED_USER] = username
         if (old != username) {
             refreshPosts()
         }
@@ -55,12 +47,5 @@ class UserPostListViewModel(
             selectedType,
             count
         )
-    }
-
-    override fun saveBundle() {
-        super.saveBundle()
-        savedStateHandle[SELECTED_USER] = selectedUser.value
-        savedStateHandle[USER_POST_GROUP] = userPostGroup
-        savedStateHandle[SELECTED_TYPE] = selectedType
     }
 }

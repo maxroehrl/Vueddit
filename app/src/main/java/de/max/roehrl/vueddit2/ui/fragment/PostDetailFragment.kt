@@ -263,11 +263,6 @@ class PostDetailFragment : Fragment() {
         super.onPause()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        viewModel.saveBundle()
-        super.onSaveInstanceState(outState)
-    }
-
     override fun onDestroyView() {
         val headerVh = recyclerView.findViewHolderForAdapterPosition(0)
         if (headerVh is PostHeaderViewHolder) {

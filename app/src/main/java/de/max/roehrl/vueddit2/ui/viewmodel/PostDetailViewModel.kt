@@ -16,33 +16,16 @@ class PostDetailViewModel(
 ) : AndroidViewModel(application) {
     companion object {
         private const val TAG = "PostDetailViewModel"
-        private const val defaultSorting = "top"
         private const val SELECTED_POST = "selectedPost"
         private const val SELECTED_COMMENT = "selectedComment"
         private const val COMMENTS = "comments"
         private const val COMMENT_SORTING = "commentSorting"
     }
 
-    var commentSorting: String = savedStateHandle[COMMENT_SORTING] ?: defaultSorting
-
-    val selectedPost: LiveData<Post> = liveData {
-        val saved: Post? = savedStateHandle[SELECTED_POST]
-        if (saved != null) {
-            emit(saved)
-        }
-    }
-
-    val selectedComment: LiveData<Comment?> = liveData {
-        val saved: Comment? = savedStateHandle[SELECTED_COMMENT]
-        if (saved != null) {
-            emit(saved)
-        }
-    }
-
-    val comments: LiveData<MutableList<NamedItem>> = liveData {
-        val saved: MutableList<NamedItem>? = savedStateHandle[COMMENTS]
-        emit(saved ?: mutableListOf(NamedItem.Loading))
-    }
+    var commentSorting: String = savedStateHandle[COMMENT_SORTING] ?: "top"
+    val selectedPost: LiveData<Post> = savedStateHandle.getLiveData(SELECTED_POST)
+    val selectedComment: LiveData<Comment?> = savedStateHandle.getLiveData(SELECTED_COMMENT)
+    val comments: LiveData<MutableList<NamedItem>> = savedStateHandle.getLiveData(COMMENTS, mutableListOf(NamedItem.Loading))
 
     private fun loadComments(commentName: String?, cb: (() -> Unit)? = null) {
         val post = selectedPost.value!!
@@ -83,16 +66,16 @@ class PostDetailViewModel(
     }
 
     fun selectComment(comment: Comment?) {
-        (selectedComment as MutableLiveData).value = comment
+        savedStateHandle[SELECTED_COMMENT] = comment
     }
 
     fun refreshComments(cb: (() -> Unit)? = null) {
-        (comments as MutableLiveData).value = mutableListOf(NamedItem.Loading)
+        savedStateHandle[COMMENTS] = mutableListOf(NamedItem.Loading)
         loadComments(null, cb)
     }
 
     fun setSelectedPost(post: Post) {
-        (selectedPost as MutableLiveData).value = post
+        savedStateHandle[SELECTED_POST] = post
     }
 
     fun loadMoreComments(comment: Comment) {
@@ -158,12 +141,5 @@ class PostDetailViewModel(
                 commentCandidates[if (next) 0 else commentCandidates.size - 1]
             selectComment(newlySelectedComment as Comment)
         }
-    }
-
-    fun saveBundle() {
-        savedStateHandle[COMMENT_SORTING] = commentSorting
-        savedStateHandle[SELECTED_POST] = selectedPost.value
-        savedStateHandle[SELECTED_COMMENT] = selectedComment.value
-        savedStateHandle[COMMENTS] = comments.value
     }
 }

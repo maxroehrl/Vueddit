@@ -20,7 +20,6 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
         private const val IS_LOGGED_IN = "isLoggedIn"
         private const val USERNAME = "username"
         private const val SUBREDDIT = "subreddit"
-        private const val SUBREDDITS = "subreddits"
         private const val SUBSCRIBED_SUBREDDITS = "subscribedSubreddits"
         private const val VISITED_SUBREDDITS = "visitedSubreddits"
         private const val VISITED_USERS = "visitedUsers"
@@ -29,43 +28,30 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
         private const val SEARCH_RESULTS = "searchResults"
     }
 
-    private var subscribedSubreddits: List<Subreddit> =
-        savedStateHandle.get(SUBSCRIBED_SUBREDDITS) ?: emptyList()
-    private var visitedSubreddits: List<Subreddit> =
-        savedStateHandle.get(VISITED_SUBREDDITS) ?: emptyList()
-    private var visitedUsers: List<Subreddit> = savedStateHandle.get(VISITED_USERS) ?: emptyList()
-    private var multiReddits: List<Subreddit> = savedStateHandle.get(MULTI_REDDITS) ?: emptyList()
+    private var subscribedSubreddits: List<Subreddit> = savedStateHandle[SUBSCRIBED_SUBREDDITS] ?: emptyList()
+    private var visitedSubreddits: List<Subreddit> = savedStateHandle[VISITED_SUBREDDITS] ?: emptyList()
+    private var visitedUsers: List<Subreddit> = savedStateHandle[VISITED_USERS] ?: emptyList()
+    private var multiReddits: List<Subreddit> = savedStateHandle[MULTI_REDDITS] ?: emptyList()
 
     val isLoggedIn: LiveData<Boolean> = liveData(Dispatchers.IO) {
-        val saved: Boolean? = savedStateHandle.get(IS_LOGGED_IN)
+        val saved: Boolean? = savedStateHandle[IS_LOGGED_IN]
         emit(saved ?: Reddit.getInstance(getApplication()).login())
     }
 
     private val username: LiveData<String?> = liveData(Dispatchers.IO) {
-        val saved: String? = savedStateHandle.get(USERNAME)
+        val saved: String? = savedStateHandle[USERNAME]
         emit(saved ?: Store.getInstance(getApplication()).getUsername())
     }
 
-    val subreddit: LiveData<Subreddit> = liveData {
-        val saved: Subreddit? = savedStateHandle.get(SUBREDDIT)
-        emit(saved ?: Subreddit.frontPage)
-    }
+    val subreddit: LiveData<Subreddit> = savedStateHandle.getLiveData(SUBREDDIT, Subreddit.frontPage)
 
     val subreddits: LiveData<List<List<Subreddit>>> = liveData {
         emit(loadCachedSubreddits())
     }
 
-    val isBigTemplatePreferred: LiveData<Boolean?> = liveData {
-        val saved: Boolean? = savedStateHandle.get(IS_BIG_TEMPLATE_PREFERRED)
-        if (saved != null) {
-            emit(saved)
-        }
-    }
+    val isBigTemplatePreferred: LiveData<Boolean?> = savedStateHandle.getLiveData(IS_BIG_TEMPLATE_PREFERRED)
 
-    val searchResults: LiveData<List<Subreddit>?> = liveData {
-        val saved: List<Subreddit>? = savedStateHandle.get(SEARCH_RESULTS)
-        emit(saved)
-    }
+    val searchResults: LiveData<List<Subreddit>?> = savedStateHandle.getLiveData(SEARCH_RESULTS)
 
     fun updateSearchText(text: CharSequence?) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -269,9 +255,15 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
         viewModelScope.launch(Dispatchers.IO) {
             Store.getInstance(getApplication()).logoutUser()
             (username as MutableLiveData).postValue(null)
+            savedStateHandle[USERNAME] = null
             (subreddits as MutableLiveData).postValue(emptyList())
-            (isLoggedIn as MutableLiveData).postValue(Reddit.getInstance(getApplication()).login())
+            setIsLoggedIn(Reddit.getInstance(getApplication()).login())
         }
+    }
+
+    fun setIsLoggedIn(value: Boolean) {
+        (isLoggedIn as MutableLiveData).postValue(value)
+        savedStateHandle[IS_LOGGED_IN] = value
     }
 
     fun toggleBigPreview(postList: List<NamedItem>) {
@@ -295,18 +287,5 @@ class AppViewModel(application: Application, private val savedStateHandle: Saved
             Log.d(TAG, "$numberOfPreviewPictures of the first 10 posts have a preview")
             numberOfPreviewPictures > 4
         }
-    }
-
-    fun saveBundle() {
-        savedStateHandle.set(SUBSCRIBED_SUBREDDITS, subscribedSubreddits)
-        savedStateHandle.set(VISITED_SUBREDDITS, visitedSubreddits)
-        savedStateHandle.set(VISITED_USERS, visitedUsers)
-        savedStateHandle.set(MULTI_REDDITS, multiReddits)
-        savedStateHandle.set(IS_LOGGED_IN, isLoggedIn.value)
-        savedStateHandle.set(USERNAME, username.value)
-        savedStateHandle.set(SUBREDDIT, subreddit.value)
-        savedStateHandle.set(SUBREDDITS, subreddits.value)
-        savedStateHandle.set(IS_BIG_TEMPLATE_PREFERRED, isBigTemplatePreferred.value)
-        savedStateHandle.set(SEARCH_RESULTS, searchResults.value)
     }
 }

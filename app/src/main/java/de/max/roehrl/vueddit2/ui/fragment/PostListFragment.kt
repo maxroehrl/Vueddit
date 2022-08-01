@@ -347,9 +347,4 @@ open class PostListFragment : Fragment() {
             show()
         }
     }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        viewModel.saveBundle()
-        super.onSaveInstanceState(outState)
-    }
 }

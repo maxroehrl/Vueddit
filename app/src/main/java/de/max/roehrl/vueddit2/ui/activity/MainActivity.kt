@@ -16,7 +16,6 @@ import androidx.core.view.forEach
 import androidx.core.view.get
 import androidx.core.widget.doOnTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -148,7 +147,7 @@ class MainActivity : AppCompatActivity() {
             )
         )
         if (savedInstanceState?.getBoolean(AppViewModel.WAS_LOGGED_IN, false) == true) {
-            (viewModel.isLoggedIn as MutableLiveData).value = true
+            viewModel.setIsLoggedIn(true)
         }
     }
 
@@ -268,10 +267,5 @@ class MainActivity : AppCompatActivity() {
                 groupId += 1
             }
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        viewModel.saveBundle()
-        super.onSaveInstanceState(outState)
     }
 }
