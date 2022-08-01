@@ -18,7 +18,6 @@ open class PostListViewModel(
         private const val SUBREDDIT = "subreddit"
         private const val POST_SORTING = "postSorting"
         private const val POST_SORTINGS = "postSortings"
-        private const val POSTS = "posts"
         private const val TOP_POSTS_TIME = "topPostsTime"
     }
 
@@ -26,7 +25,7 @@ open class PostListViewModel(
     var postSorting: String = savedStateHandle[POST_SORTING] ?: "best"
     var topPostsTime: String = savedStateHandle[TOP_POSTS_TIME] ?: "all"
     val subreddit: LiveData<Subreddit> = savedStateHandle.getLiveData(SUBREDDIT, Subreddit.frontPage)
-    val posts: LiveData<List<NamedItem>> = savedStateHandle.getLiveData(POSTS, listOf(NamedItem.Loading))
+    val posts: LiveData<List<NamedItem>> = liveData { emit(listOf(NamedItem.Loading)) }
 
     open fun getPostSortingList(isFrontpage: Boolean): List<String> {
         return if (isFrontpage) {
@@ -105,6 +104,6 @@ open class PostListViewModel(
     }
 
     fun resetPosts() {
-        savedStateHandle[POSTS] = emptyList<NamedItem>()
+        (posts as MutableLiveData).value = emptyList()
     }
 }
