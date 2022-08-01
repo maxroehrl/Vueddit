@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.transition.MaterialArcMotion
 import com.google.android.material.transition.MaterialContainerTransform
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
@@ -71,10 +72,11 @@ class PostDetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition = MaterialContainerTransform().apply {
-            drawingViewId = R.id.swipe
             fadeMode = MaterialContainerTransform.FADE_MODE_THROUGH
             interpolator = FastOutSlowInInterpolator()
-            isDrawDebugEnabled = true
+            setPathMotion(MaterialArcMotion())
+            endViewId = R.id.post
+            isDrawDebugEnabled = false
         }
     }
 

@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -47,7 +46,6 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
         const val TRANSITION_META = "TransitionMeta"
         const val TRANSITION_PREVIEW = "TransitionPreview"
     }
-    private val postHeader: RelativeLayout = itemView.findViewById(R.id.post_header)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val meta: TextView = itemView.findViewById(R.id.meta)
     protected val imageView: SimpleDraweeView = itemView.findViewById(R.id.preview)

@@ -78,8 +78,8 @@ open class PostListFragment : Fragment() {
         collapsingToolbar = root.findViewById(R.id.collapsing_toolbar)
         sortingTabLayout = root.findViewById(R.id.tab_layout)
 
-        postponeEnterTransition()
         (root as ViewGroup).isTransitionGroup = true
+        postponeEnterTransition()
 
         root.findViewById<RecyclerView?>(R.id.recycler_view).apply {
             layoutManager = linearLayoutManager
