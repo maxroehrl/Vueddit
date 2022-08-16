@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.transition.MaterialElevationScale
@@ -209,42 +208,47 @@ open class PostListFragment : Fragment() {
         viewModel.postSorting = sorting
 
         if (listOf("top", "rising").contains(sorting)) {
-            val items = listOf("Hour", "Day", "Week", "Month", "Year", "All")
-            MaterialAlertDialogBuilder(requireContext()).apply {
-                setItems(items.toTypedArray()) { _, which ->
-                    val time = items[which].lowercase()
-                    viewModel.topPostsTime = time
-                    adapter.showBigPreview = null
-                    viewModel.refreshPosts()
-                }
-                show()
+            val items = listOf("Hour", "Day", "Week", "Month", "Year", "All").associateWith {
+                { onTopPostTimeSelected(it, adapter) }
             }
+            BottomSheetFragment.showSheet(requireContext(), items)
         } else {
             viewModel.refreshPosts()
         }
     }
 
+    private fun onTopPostTimeSelected(time: String, adapter: PostsAdapter) {
+        viewModel.topPostsTime = time.lowercase()
+        adapter.showBigPreview = null
+        viewModel.refreshPosts()
+    }
+
     open fun onItemLongPressed(view: View, position: Int) {
         val post = viewModel.posts.value?.get(position)
         if (post is Post) {
-            val items = mutableListOf(view.context.getString(if (post.saved) R.string.unsave else R.string.save))
+            val saveText =
+                view.context.getString(if (post.saved) R.string.unsave else R.string.save)
+            val items = mutableMapOf(saveText to {
+                post.saveOrUnsave(requireContext(), viewModel.viewModelScope)
+            })
             val showGotoSubreddit = post.subreddit != viewModel.subreddit.value?.name
             if (showGotoSubreddit) {
-                items.add(view.context.getString(R.string.goto_sub, post.subreddit))
+                val gotoSubredditText = view.context.getString(R.string.goto_sub, post.subreddit)
+                items[gotoSubredditText] = {
+                    if (showGotoSubreddit) gotoSubreddit(
+                        post.subreddit
+                    ) else gotoUser(post.author)
+                }
             }
             if (showGotoUser) {
-                items.add(view.context.getString(R.string.goto_user, post.author))
-            }
-            MaterialAlertDialogBuilder(requireContext()).apply {
-                setItems(items.toTypedArray()) { _, which ->
-                    when (which) {
-                        0 -> post.saveOrUnsave(context, viewModel.viewModelScope)
-                        1 -> if (showGotoSubreddit) gotoSubreddit(post.subreddit) else gotoUser(post.author)
-                        2 -> gotoUser(post.author)
-                    }
+                val gotoUserText = view.context.getString(R.string.goto_user, post.author)
+                items[gotoUserText] = {
+                    gotoUser(
+                        post.author
+                    )
                 }
-                show()
             }
+            BottomSheetFragment.showSheet(requireContext(), items)
         }
     }
 

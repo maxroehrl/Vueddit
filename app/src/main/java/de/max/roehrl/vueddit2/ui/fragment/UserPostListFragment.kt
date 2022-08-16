@@ -9,7 +9,6 @@ import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
@@ -65,14 +64,13 @@ class UserPostListFragment : PostListFragment() {
             refreshSortingBar(group)
 
             if (group == "saved") {
-                val items = listOf("All", "Comments", "Links")
-                MaterialAlertDialogBuilder(requireContext()).apply {
-                    setItems(items.toTypedArray()) { _, which ->
-                        viewModel.selectedType = items[which].lowercase()
+                val items = listOf("All", "Comments", "Links").associateWith {
+                    {
+                        viewModel.selectedType = it.lowercase()
                         viewModel.refreshPosts()
                     }
-                    show()
                 }
+                BottomSheetFragment.showSheet(requireContext(), items)
             } else {
                 viewModel.refreshPosts()
             }
@@ -121,23 +119,17 @@ class UserPostListFragment : PostListFragment() {
             showGotoUser = viewModel.selectedUser.value != item.author
             super.onItemLongPressed(view, position)
         } else if (item is Comment) {
-            val items = mutableListOf(
-                view.context.getString(if (item.saved) R.string.unsave else R.string.save),
-                view.context.getString(R.string.goto_sub, item.subreddit),
+            val saveString = view.context.getString(if (item.saved) R.string.unsave else R.string.save)
+            val gotoSubString = view.context.getString(R.string.goto_sub, item.subreddit)
+            val items = mutableMapOf(
+                saveString to { item.saveOrUnsave(requireContext(), viewModel.viewModelScope) },
+                gotoSubString to { gotoSubreddit(item.subreddit) },
             )
             if (viewModel.selectedUser.value != item.author) {
-                items.add(view.context.getString(R.string.goto_user, item.author))
+                val gotoUserString = view.context.getString(R.string.goto_user, item.author)
+                items[gotoUserString] = { gotoUser(item.author) }
             }
-            MaterialAlertDialogBuilder(requireContext()).apply {
-                setItems(items.toTypedArray()) { _, which ->
-                    when (which) {
-                        0 -> item.saveOrUnsave(context, viewModel.viewModelScope)
-                        1 -> gotoSubreddit(item.subreddit)
-                        2 -> gotoUser(item.author)
-                    }
-                }
-                show()
-            }
+            BottomSheetFragment.showSheet(requireContext(), items)
         }
     }
 }

@@ -14,13 +14,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.service.Markdown
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Util
+import de.max.roehrl.vueddit2.ui.fragment.BottomSheetFragment
 import de.max.roehrl.vueddit2.ui.fragment.PostDetailFragmentDirections
 import de.max.roehrl.vueddit2.ui.view.IndentedLabel
 import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
@@ -210,26 +210,21 @@ open class CommentViewHolder(
     }
 
     private fun showMore() {
-        MaterialAlertDialogBuilder(more.context).apply {
-            val items = mutableListOf<String>()
-            items.add(more.context.getString(if (comment.saved) R.string.unsave else R.string.save))
-            items.add(more.context.getString(R.string.goto_user, comment.author))
-            setItems(items.toTypedArray()) { _, which ->
-                when (which) {
-                    0 -> {
-                        comment.saveOrUnsave(context, scope)
-                    }
-                    1 -> {
-                        more.findNavController().navigate(
-                            PostDetailFragmentDirections.actionPostDetailFragmentToUserPostListFragment(
-                                comment.author
-                            )
-                        )
-                    }
-                }
-            }
-            show()
-        }
+        val items = mapOf(
+            more.context.getString(if (comment.saved) R.string.unsave else R.string.save) to {
+                comment.saveOrUnsave(
+                    more.context,
+                    scope
+                )
+            },
+            more.context.getString(R.string.goto_user, comment.author) to {
+                more.findNavController().navigate(
+                    PostDetailFragmentDirections.actionPostDetailFragmentToUserPostListFragment(
+                        comment.author
+                    )
+                )
+            })
+        BottomSheetFragment.showSheet(more.context, items)
     }
 
     private fun selectNeighboringComment(isNextButton: Boolean) {

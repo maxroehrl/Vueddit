@@ -44,4 +44,8 @@
     <style name="Theme.Vueddit.BottomSheetDialog" parent="ThemeOverlay.Material3.DayNight.BottomSheetDialog">
         <item name="android:navigationBarColor" tools:ignore="NewApi">@android:color/transparent</item>
     </style>
+
+    <style name="Theme.Vueddit.MenuButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/highlight</item>
+    </style>
 </resources>
