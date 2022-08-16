@@ -3,6 +3,7 @@ package de.max.roehrl.vueddit2.service
 import android.content.Context
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.text.util.Linkify
@@ -34,9 +35,9 @@ class Markdown private constructor(context: Context) {
         // https://developer.android.com/reference/android/text/util/Linkify
         // Match users (/u(ser)?/username) and subreddits (/r/subreddit) and valid urls
         val mask = Pattern.compile(
-            "(\\/(r|u|user)\\/[^\\s;.,:]+)|((?:^|[\\W])((ht|f)tp(s?):\\/\\/|www\\.)" +
-                    "(([\\w\\-]+\\.){1,}?([\\w\\-.~]+\\/?)*" +
-                    "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]\\*$~@!:/{};\']*))",
+            "(/(r|u|user)/[^\\s;.,:]+)|((?:^|[\\W])((ht|f)tp(s?)://|www\\.)" +
+                    "(([\\w\\-]+\\.)+?([\\w\\-.~]+/?)*" +
+                    "[\\p{Alnum}.,%_=?&#\\-+()\\[\\]*$~@!:/{};\']*))",
             Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
         )
         val transformFilter = Linkify.TransformFilter { _, url ->
@@ -54,6 +55,11 @@ class Markdown private constructor(context: Context) {
 
             override fun onClick(view: View) {
                 urlOpenCallback.invoke(url)
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                ds.color = linkColor
             }
         }
 
