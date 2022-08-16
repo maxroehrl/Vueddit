@@ -1,4 +1,5 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
+
     <style name="Theme.Vueddit2" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/action_bar_background</item>
@@ -11,9 +12,11 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="colorControlHighlight">@color/highlight</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:navigationBarColor">@color/nav_bar_background</item>
+
+        <item name="bottomSheetDialogTheme">@style/Theme.Vueddit.BottomSheetDialog</item>
     </style>
 
     <style name="Theme.Vueddit2.NavigationTheme" parent="ThemeOverlay.Material3.NavigationView">

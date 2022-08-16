@@ -33,7 +33,6 @@ import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Store
 import de.max.roehrl.vueddit2.ui.activity.MainActivity
 import de.max.roehrl.vueddit2.ui.adapter.PostsAdapter
-import de.max.roehrl.vueddit2.ui.dialog.Sidebar
 import de.max.roehrl.vueddit2.ui.listener.RecyclerOnTouchListener
 import de.max.roehrl.vueddit2.ui.viewmodel.AppViewModel
 import de.max.roehrl.vueddit2.ui.viewmodel.PostListViewModel
@@ -326,7 +325,7 @@ open class PostListFragment : Fragment() {
             && currentSubreddit != Subreddit.frontPage
             && !currentSubreddit.isMultiReddit
         ) {
-            Sidebar.show(requireContext(), currentSubreddit.name, viewModel.viewModelScope)
+            SidebarFragment.show(requireContext(), currentSubreddit.name, viewModel.viewModelScope)
         } else {
             val view = activity?.findViewById<View>(R.id.nav_host_fragment)
             val text = requireContext().getString(R.string.no_sidebar)

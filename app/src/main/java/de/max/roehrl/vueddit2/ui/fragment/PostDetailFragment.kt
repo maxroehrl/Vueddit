@@ -26,7 +26,6 @@ import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.ui.adapter.CommentsAdapter
-import de.max.roehrl.vueddit2.ui.dialog.Sidebar
 import de.max.roehrl.vueddit2.ui.viewholder.PostHeaderViewHolder
 import de.max.roehrl.vueddit2.ui.viewmodel.PostDetailViewModel
 import kotlinx.coroutines.launch
@@ -227,7 +226,7 @@ class PostDetailFragment : Fragment() {
                         true
                     }
                     R.id.action_sidebar -> {
-                        Sidebar.show(
+                        SidebarFragment.show(
                             requireContext(),
                             viewModel.selectedPost.value!!.subreddit,
                             viewModel.viewModelScope
