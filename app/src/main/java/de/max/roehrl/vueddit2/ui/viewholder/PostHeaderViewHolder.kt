@@ -172,7 +172,6 @@ open class PostHeaderViewHolder(itemView: View, private val viewModel: PostDetai
                 VideoType.EMBEDDED -> {
                     videoView.visibility = View.GONE
                     embeddedWebView.visibility = View.GONE
-                    @Suppress("unused")
                     try {
                         embeddedWebView.loadUrl(currentUrl!!)
                     } catch (e: Exception) {
