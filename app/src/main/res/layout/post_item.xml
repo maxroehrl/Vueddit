@@ -41,7 +41,7 @@
             android:textSize="@dimen/post_text_size_meta" />
     </LinearLayout>
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <ImageView
         android:id="@+id/preview"
         android:layout_width="100dp"
         android:layout_height="90dp"

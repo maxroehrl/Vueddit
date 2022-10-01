@@ -68,7 +68,7 @@ dependencies {
     implementation 'io.noties.markwon:core:4.6.2'
     implementation 'de.peilicke.sascha:android-customtabs:3.0.3'
     implementation 'com.android.volley:volley:1.2.1'
-    implementation 'com.facebook.fresco:fresco:2.6.0'
+    implementation 'io.coil-kt:coil:2.2.1'
     implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
     implementation 'androidx.browser:browser:1.4.0'
     testImplementation 'junit:junit:4.13.2'

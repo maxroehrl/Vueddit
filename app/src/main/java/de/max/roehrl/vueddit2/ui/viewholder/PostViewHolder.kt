@@ -18,14 +18,7 @@ import androidx.core.view.ViewCompat
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.controller.BaseControllerListener
-import com.facebook.drawee.drawable.ProgressBarDrawable
-import com.facebook.drawee.drawable.ScalingUtils
-import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder
-import com.facebook.drawee.view.SimpleDraweeView
-import com.facebook.imagepipeline.image.ImageInfo
-import com.facebook.imagepipeline.request.ImageRequestBuilder
+import coil.load
 import de.max.roehrl.vueddit2.R
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
@@ -46,7 +39,7 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
     private val postGroup: ViewGroup = itemView.findViewById(R.id.post)
     private val title: TextView = itemView.findViewById(R.id.title)
     private val meta: TextView = itemView.findViewById(R.id.meta)
-    protected val imageView: SimpleDraweeView = itemView.findViewById(R.id.preview)
+    protected val imageView: ImageView = itemView.findViewById(R.id.preview)
     private val voteButtons: LinearLayout = itemView.findViewById(R.id.vote_buttons)
     private val votes: TextView = itemView.findViewById(R.id.votes)
     private val upvote: TextView = itemView.findViewById(R.id.up)
@@ -58,16 +51,7 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
         title.setOnClickListener { view -> onClick(view) }
         meta.setOnClickListener { view -> onClick(view) }
         imageView.setOnClickListener { view -> onClick(view) }
-        imageView.hierarchy = GenericDraweeHierarchyBuilder.newInstance(itemView.resources).apply {
-            progressBarImage = ProgressBarDrawable().apply {
-                backgroundColor = ContextCompat.getColor(itemView.context, R.color.progress_bg)
-                color = ContextCompat.getColor(itemView.context, R.color.progress_color)
-            }
-            setPlaceholderImage(R.drawable.ic_image)
-            placeholderImageScaleType = ScalingUtils.ScaleType.CENTER_INSIDE
-            setFailureImage(R.drawable.ic_broken_image)
-            failureImageScaleType = ScalingUtils.ScaleType.CENTER_INSIDE
-        }.build()
+        imageView.load(R.drawable.ic_image)
         upvote.setOnClickListener { vote(true) }
         downvote.setOnClickListener { vote(false) }
     }
@@ -200,22 +184,13 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
     open fun updatePreviewImage(post: Post) {
         val preview = post.image.url
         if (preview != null) {
-            val request = ImageRequestBuilder.newBuilderWithSource(preview.toUri())
-                .setProgressiveRenderingEnabled(true)
-                .build()
-            imageView.controller = Fresco.newDraweeControllerBuilder()
-                .setImageRequest(request)
-                .setOldController(imageView.controller)
-                .setControllerListener(object : BaseControllerListener<ImageInfo>() {
-                    override fun onFailure(id: String?, throwable: Throwable?) {
-                        Log.w(TAG, "Failed to load image with id '$id'", throwable)
-                    }
-                })
-                .build()
+            imageView.load(preview.toUri()) {
+                crossfade(true)
+                placeholder(R.drawable.ic_image)
+                error(R.drawable.ic_broken_image)
+            }
         } else {
-            imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
-            @Suppress("DEPRECATION")
-            imageView.setImageResource(R.drawable.ic_comment_text_multiple_outline)
+            imageView.load(R.drawable.ic_comment_text_multiple_outline)
         }
     }
 
