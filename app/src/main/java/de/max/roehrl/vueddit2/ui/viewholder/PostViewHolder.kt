@@ -1,6 +1,7 @@
 package de.max.roehrl.vueddit2.ui.viewholder
 
 import android.graphics.Color
+import android.graphics.drawable.InsetDrawable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.BackgroundColorSpan
@@ -190,7 +191,14 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
                 error(R.drawable.ic_broken_image)
             }
         } else {
-            imageView.load(R.drawable.ic_comment_text_multiple_outline)
+            imageView.load(
+                InsetDrawable(
+                    ContextCompat.getDrawable(
+                        meta.context,
+                        R.drawable.ic_comment_text_multiple_outline
+                    ), 40
+                )
+            )
         }
     }
 
