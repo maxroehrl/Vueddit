@@ -1,7 +1,6 @@
 package de.max.roehrl.vueddit2.ui.viewholder
 
 import android.graphics.Color
-import android.graphics.drawable.InsetDrawable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.BackgroundColorSpan
@@ -25,6 +24,8 @@ import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
 import de.max.roehrl.vueddit2.service.Reddit
 import de.max.roehrl.vueddit2.service.Util
+import de.max.roehrl.vueddit2.ui.extensions.getInsetDrawable
+import de.max.roehrl.vueddit2.ui.extensions.loadWithPlaceholders
 import de.max.roehrl.vueddit2.ui.fragment.PostListFragmentDirections
 import de.max.roehrl.vueddit2.ui.fragment.UserPostListFragmentDirections
 import kotlinx.coroutines.CoroutineScope
@@ -185,18 +186,12 @@ open class PostViewHolder(itemView: View, private val scope: CoroutineScope) :
     open fun updatePreviewImage(post: Post) {
         val preview = post.image.url
         if (preview != null) {
-            imageView.load(preview.toUri()) {
-                crossfade(true)
-                placeholder(R.drawable.ic_image)
-                error(R.drawable.ic_broken_image)
-            }
+            imageView.loadWithPlaceholders(preview.toUri())
         } else {
             imageView.load(
-                InsetDrawable(
-                    ContextCompat.getDrawable(
-                        meta.context,
-                        R.drawable.ic_comment_text_multiple_outline
-                    ), 40
+                getInsetDrawable(
+                    R.drawable.ic_comment_text_multiple_outline,
+                    meta.context
                 )
             )
         }
