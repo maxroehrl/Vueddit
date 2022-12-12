@@ -150,7 +150,7 @@ open class PostListFragment : Fragment() {
             }
         }
 
-        val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
+        sortingTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 onSortingSelected(tab?.text.toString(), postsAdapter)
             }
@@ -160,19 +160,16 @@ open class PostListFragment : Fragment() {
             override fun onTabReselected(tab: TabLayout.Tab?) {
                 onTabSelected(tab)
             }
+        })
+        val sortingList = viewModel.getPostSortingList()
+        for (sorting in sortingList) {
+            sortingTabLayout.addTab(sortingTabLayout.newTab().setText(sorting))
         }
-        viewModel.sortingList.observe(viewLifecycleOwner) { sortingList ->
-            sortingTabLayout.removeOnTabSelectedListener(onTabSelectedListener)
-            sortingTabLayout.removeAllTabs()
-            for (sorting in sortingList) {
-                sortingTabLayout.addTab(sortingTabLayout.newTab().setText(sorting))
-            }
-            val index = sortingList.indexOf(viewModel.postSorting)
-            if (index != -1) {
-                sortingTabLayout.selectTab(sortingTabLayout.getTabAt(index), true)
-            }
-            sortingTabLayout.addOnTabSelectedListener(onTabSelectedListener)
+        val index = sortingList.indexOf(viewModel.postSorting)
+        if (index != -1) {
+            sortingTabLayout.selectTab(sortingTabLayout.getTabAt(index), true)
         }
+
         return root
     }
 

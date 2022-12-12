@@ -116,7 +116,7 @@ class Reddit private constructor(val context: Context) {
     suspend fun getSubredditPosts(
             subreddit: String = frontpage,
             after: String = "",
-            sorting: String = "best",
+            sorting: String = "hot",
             time: String? = null,
             count: Int,
     ): MutableList<NamedItem> {

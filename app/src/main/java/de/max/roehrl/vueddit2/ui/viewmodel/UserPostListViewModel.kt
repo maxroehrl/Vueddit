@@ -20,7 +20,7 @@ class UserPostListViewModel(
     var userPostGroup: String = savedStateHandle[USER_POST_GROUP] ?: "submitted"
     val selectedUser: LiveData<String> = savedStateHandle.getLiveData(SELECTED_USER)
 
-    override fun getPostSortingList(isFrontpage: Boolean): List<String> {
+    override fun getPostSortingList(): List<String> {
         return listOf("new", "top", "hot", "controversial")
     }
 

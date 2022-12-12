@@ -17,29 +17,22 @@ open class PostListViewModel(
         protected const val TAG = "PostListViewModel"
         private const val SUBREDDIT = "subreddit"
         private const val POST_SORTING = "postSorting"
-        private const val POST_SORTINGS = "postSortings"
         private const val TOP_POSTS_TIME = "topPostsTime"
     }
 
-    val sortingList: LiveData<List<String>> = savedStateHandle.getLiveData(POST_SORTINGS, getPostSortingList(true))
-    var postSorting: String = savedStateHandle[POST_SORTING] ?: "best"
+    var postSorting: String = savedStateHandle[POST_SORTING] ?: "hot"
     var topPostsTime: String = savedStateHandle[TOP_POSTS_TIME] ?: "all"
     val subreddit: LiveData<Subreddit> = savedStateHandle.getLiveData(SUBREDDIT, Subreddit.frontPage)
     val posts: LiveData<List<NamedItem>> = liveData { emit(listOf(NamedItem.Loading)) }
 
-    open fun getPostSortingList(isFrontpage: Boolean): List<String> {
-        return if (isFrontpage) {
-            listOf("best", "hot", "top", "new", "rising", "controversial")
-        } else {
-            listOf("hot", "top", "new", "rising", "controversial")
-        }
+    open fun getPostSortingList(): List<String> {
+        return listOf("hot", "top", "new", "rising", "controversial")
     }
 
     fun selectSubreddit(sub: Subreddit) {
         val old = subreddit.value
         savedStateHandle[SUBREDDIT] = sub
         if (old != sub) {
-            savedStateHandle[POST_SORTINGS] = getPostSortingList(sub == Subreddit.frontPage)
             refreshPosts()
         }
     }
