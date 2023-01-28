@@ -22,7 +22,7 @@ data class Video(
                 json.optJSONObject("preview")?.optJSONObject("reddit_video_preview") != null ->
                     setVideoObject(
                         json.optJSONObject("preview")?.optJSONObject("reddit_video_preview"),
-                        "dash_url"
+                        "fallback_url"
                     )
                 json.optJSONObject("preview")?.optJSONArray("images")?.optJSONObject(0)
                     ?.optJSONObject("variants")?.optJSONObject("mp4")
@@ -51,6 +51,7 @@ data class Video(
                     val type = when (srcProp) {
                         "dash_url" -> VideoType.DASH
                         "url" -> VideoType.MP4
+                        "fallback_url" -> VideoType.MP4
                         "media_domain_url" -> VideoType.EMBEDDED
                         else -> VideoType.NONE
                     }
