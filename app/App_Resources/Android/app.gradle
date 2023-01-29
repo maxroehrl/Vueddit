@@ -3,13 +3,10 @@ android {
     minSdkVersion 21
   }
 }
-repositories {
-  jcenter()
-}
 
 dependencies {
   // https://github.com/saschpe/android-customtabs/releases
-  implementation 'saschpe.android:customtabs:3.0.2'
+  implementation 'de.peilicke.sascha:android-customtabs:3.0.3'
   // https://github.com/noties/Markwon/releases
   implementation 'io.noties.markwon:core:4.6.2'
   // https://github.com/balysv/material-ripple/releases
