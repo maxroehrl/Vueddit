@@ -1,5 +1,5 @@
 import {Property, View} from '@nativescript/core/ui/core/view';
-import {ad, RESOURCE_PREFIX} from '@nativescript/core/utils/utils';
+import {ad, RESOURCE_PREFIX} from '@nativescript/core/utils';
 
 let isInitialized = false;
 

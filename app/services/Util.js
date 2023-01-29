@@ -1,5 +1,5 @@
 import {Screen} from '@nativescript/core/platform';
-import {RESOURCE_PREFIX} from "@nativescript/core/utils/utils";
+import {RESOURCE_PREFIX} from "@nativescript/core/utils";
 import moment from 'moment';
 
 export default class Util {

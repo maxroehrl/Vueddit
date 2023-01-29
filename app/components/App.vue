@@ -46,7 +46,7 @@ import {LoadingIndicator, Mode} from '@nstudio/nativescript-loading-indicator';
 import * as ApplicationSettings from '@nativescript/core/application-settings';
 import * as application from '@nativescript/core/application';
 import {AndroidApplication} from '@nativescript/core/application';
-import {ad} from '@nativescript/core/utils/utils';
+import {ad} from '@nativescript/core/utils';
 import {action} from '@nativescript/core/ui/dialogs';
 import showSnackbar from './Snackbar';
 import Posts from './Posts';

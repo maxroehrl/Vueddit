@@ -1,5 +1,5 @@
 import * as app from '@nativescript/core/application';
-import {ad} from '@nativescript/core/utils/utils';
+import {ad} from '@nativescript/core/utils';
 
 export default class CustomTabs {
   static slideInRight = ad.resources.getId(':anim/slide_in_right');
