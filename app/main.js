@@ -19,7 +19,7 @@ if (!global.atob) {
 }
 
 RadSideDrawerPlugin.install(Vue);
-RadListViewPlugin.install(Vue, {});
+RadListViewPlugin.install(Vue);
 Vue.registerElement('Ripple', () => Ripple);
 Vue.registerElement('IndentedLabel', () => IndentedLabel);
 Vue.registerElement('CachedImage', () => CachedImage);
