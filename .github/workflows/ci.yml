@@ -2,9 +2,9 @@ name: Nativescript CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ nativescript ]
   pull_request:
-    branches: [ master ]
+    branches: [ nativescript ]
 
 jobs:
   build:
