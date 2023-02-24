@@ -1,5 +1,6 @@
 package de.max.roehrl.vueddit2.ui.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -50,6 +51,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -62,6 +64,7 @@ class LoginActivity : AppCompatActivity() {
         webView.webViewClient = Client()
         webView.settings.displayZoomControls = false
         webView.settings.loadWithOverviewMode = true
+        webView.settings.javaScriptEnabled = true
         webView.loadUrl(Reddit.oAuthLoginUrl)
     }
 }
