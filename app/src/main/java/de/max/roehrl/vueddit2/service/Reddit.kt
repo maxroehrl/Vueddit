@@ -12,7 +12,6 @@ import com.android.volley.toolbox.BasicNetwork
 import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.NoCache
 import com.android.volley.toolbox.StringRequest
-import de.max.roehrl.vueddit2.BuildConfig
 import de.max.roehrl.vueddit2.model.Comment
 import de.max.roehrl.vueddit2.model.NamedItem
 import de.max.roehrl.vueddit2.model.Post
@@ -31,7 +30,7 @@ class Reddit private constructor(val context: Context) {
         private const val TAG = "Reddit"
         const val api = "https://www.reddit.com"
         private const val oauthApi = "https://oauth.reddit.com"
-        private const val userAgent = "${BuildConfig.APPLICATION_ID}:${BuildConfig.VERSION_NAME} (by /u/MaxRoehrl)"
+        private const val userAgent = "de.max.roehrl.vueddit2:1.0.1 (by /u/MaxRoehrl)"
         private val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
         private val randomState = (1..10)
                 .map { Random.nextInt(0, charPool.size) }
