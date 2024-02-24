@@ -79,7 +79,7 @@ dependencies {
     implementation("io.noties.markwon:core:4.6.2")
     implementation("de.peilicke.sascha:android-customtabs:3.0.3")
     implementation("com.android.volley:volley:1.2.1")
-    implementation("io.coil-kt:coil:2.3.0")
+    implementation("io.coil-kt:coil:2.6.0")
     implementation("androidx.browser:browser:1.7.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
