@@ -133,11 +133,16 @@ open class  PostHeaderViewHolder(itemView: View, private val viewModel: PostDeta
     }
 
     fun onStop() {
+        videoView.player?.stop()
         videoView.player?.release()
+        videoView.player = null
     }
 
     fun onPause() {
-        videoView.player?.pause()
+        if (videoView.player?.isPlaying == true) {
+            videoView.player?.playWhenReady = false
+            videoView.player?.pause()
+        }
     }
 
     override fun bind(post: NamedItem, highlightSticky: Boolean) {
