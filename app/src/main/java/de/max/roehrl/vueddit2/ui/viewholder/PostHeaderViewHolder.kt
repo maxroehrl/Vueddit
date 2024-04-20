@@ -172,6 +172,7 @@ open class  PostHeaderViewHolder(itemView: View, private val viewModel: PostDeta
                     videoPreviewLayout.visibility = View.VISIBLE
                     try {
                         videoView.player!!.setMediaItem(MediaItem.fromUri(currentUrl!!))
+                        videoView.player!!.volume = 0f
                         videoView.player!!.prepare()
                     } catch (e: Exception) {
                         Log.e(TAG, "Failed to load ${post.video.type} video from '$currentUrl'", e)
