@@ -20,13 +20,13 @@ android {
             keyPassword = "1234567890"
         }
     }
-    compileSdk = 34
-    buildToolsVersion = "34.0.0"
+    compileSdk = 35
+    buildToolsVersion = "35.0.0"
 
     defaultConfig {
         applicationId = "de.max.roehrl.vueddit2"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 2
         versionName = "1.0.1"
 
