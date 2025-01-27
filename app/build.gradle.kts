@@ -21,7 +21,7 @@ android {
         }
     }
     compileSdk = 35
-    buildToolsVersion = "35.0.0"
+    buildToolsVersion = "35.0.1"
 
     defaultConfig {
         applicationId = "de.max.roehrl.vueddit2"
@@ -73,9 +73,9 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.5.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.8.5")
     implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("androidx.gridlayout:gridlayout:1.0.0")
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
     implementation("io.noties.markwon:core:4.6.2")
     implementation("de.peilicke.sascha:android-customtabs:3.1.0")
     implementation("com.android.volley:volley:1.2.1")
