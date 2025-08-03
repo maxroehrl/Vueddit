@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        drawerLayout = findViewById<DrawerLayout?>(R.id.drawer_layout).apply {
+        drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout).apply {
             addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
                 override fun onDrawerClosed(drawerView: View) {
                     (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(

@@ -79,7 +79,7 @@ open class PostListFragment : Fragment() {
         (root as ViewGroup).isTransitionGroup = true
         postponeEnterTransition()
 
-        root.findViewById<RecyclerView?>(R.id.recycler_view).apply {
+        root.findViewById<RecyclerView>(R.id.recycler_view).apply {
             layoutManager = linearLayoutManager
             adapter = postsAdapter
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -107,7 +107,7 @@ open class PostListFragment : Fragment() {
                 )
             )
         }
-        root.findViewById<SwipeRefreshLayout?>(R.id.swipe).apply {
+        root.findViewById<SwipeRefreshLayout>(R.id.swipe).apply {
             setOnRefreshListener {
                 post {
                     if (isRefreshing) {
